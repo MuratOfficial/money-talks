@@ -14,16 +14,13 @@ export default function LoginScreen() {
       return;
     }
     
-    // Здесь должна быть логика входа
-    // Например, проверка пароля через API
-    
     if (password.length < 6) { // Пример проверки
       setError('Пароль неверный');
       return;
     }
     
     // Если вход успешен
-    router.replace('/(tabs)');
+    router.replace('/(auth)');
   };
 
   return (
@@ -38,16 +35,18 @@ export default function LoginScreen() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          placeholder='Введите почту '
         />
       </View>
       
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Пароль</Text>
         <TextInput
-          style={styles.input}
+          style={styles.input} 
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          placeholder='Введите пароль'
         />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </View>
@@ -59,7 +58,7 @@ export default function LoginScreen() {
         <Text style={styles.loginButtonText}>Войти</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity onPress={() => router.push('/explore')}>
+      <TouchableOpacity onPress={() => router.push('/(auth)')}>
         <Text style={styles.forgotPassword}>Забыли пароль?</Text>
       </TouchableOpacity>
     </View>
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 32,
     textAlign: 'left',
@@ -84,18 +83,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 8,
     color: '#BDBDBD',
   },
   input: {
     height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 20,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#333333',
+    color:"#BDBDBD"
   },
   errorText: {
     color: '#FF6F71',
@@ -105,7 +103,7 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: '#4CAF50',
     height: 50,
-    borderRadius: 8,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
@@ -113,7 +111,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 'medium',
   },
   forgotPassword: {
     color: '#4CAF50',
