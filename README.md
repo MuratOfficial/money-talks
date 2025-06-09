@@ -1,50 +1,86 @@
-# Welcome to your Expo app 👋
+# 💸 Money Talks – Финансовый помощник
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Этот репозиторий предназначен для разработки мобильного приложения **Money Talks**, направленного на отслеживание расходов, рекомендации по сбережениям и финансовое планирование.
 
-## Get started
+---
 
-1. Install dependencies
+## 👥 Участие в проекте
 
+### Доступ
+Если вы участвуете в проекте:
+1. Убедитесь, что у вас есть GitHub-аккаунт.
+2. Получите приглашение к репозиторию от владельца ([@MuratOfficial](https://github.com/MuratOfficial)).
+3. Примите приглашение через email или в интерфейсе GitHub.
+
+---
+
+## Работа с ветками
+
+### Стратегия веток
+- Основная ветка: `master` (в неё сливаются только проверенные изменения)
+- Рабочие ветки создаются для каждой фичи/задачи
+- Принятый формат имени ветки:
+  - `feature/имя-задачи` — добавление новой функциональности
+  - `fixes` — исправление ошибок
+  - `kanat` — ветка Каната
+  - `bekzat` — ветка Бекзата
+
+---
+
+### Процедура ведения веток
+
+1. Подключение к репозиторию:
    ```bash
-   npm install
+   git clone https://github.com/MuratOfficial/money-talks.git
+   ```
+   Или, если вы используете SSH (при настроенном ключе):
+   ```bash
+   git clone git@github.com:MuratOfficial/money-talks.git
    ```
 
-2. Start the app
-
+2. Перейдите в папку проекта:
    ```bash
-    npx expo start
+   cd money-talks
    ```
 
-In the output, you'll find options to open the app in a
+3. Получите список веток:
+   ```bash
+   git fetch origin
+   git branch -r
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+4. Переключитесь на нужную ветку (пример):
+   ```bash
+   git checkout fixes
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+5. Работайте и пушьте свои изменения:
+   ```bash
+   git add .
+   git commit -m "Добавил форму логина"
+   git push origin fixes
+   ```
 
-## Get a fresh project
+### Pull Request (слияние изменений)
 
-When you're ready, run:
+1. Перейдите в Pull Requests.
+2. Нажмите **"New pull request"**.
+3. Выберите вашу ветку и укажите `master` как целевую.
+4. Описание должно включать:
+   * Что реализовано
+   * Как протестировать
+   * Ссылку на задачу (если есть)
+   После проверки и одобрения ваша ветка будет влита в `master`.
 
-```bash
-npm run reset-project
-```
+### Рекомендации
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+* Пишите понятные сообщения к коммитам.
+* Обновляйте свою ветку с `master`, чтобы избежать конфликтов:
+   ```bash
+   git checkout master
+   git pull origin master
+   git checkout your-branch
+   git merge master
+   ```
+* Не пушьте напрямую в `master`.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
