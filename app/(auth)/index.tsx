@@ -62,12 +62,17 @@ export default function OnboardingScreen() {
   }, []);
 
   useEffect(() => {
-    if (currentIndex === slides.length - 1) {
-      setButtonName('Начать');
-    } else {
-      setButtonName('Далее');
-    }
+    setButtonName(currentIndex === slides.length - 1 ? 'Начать' : 'Далее');
   }, [currentIndex]);
+
+  const handleNextOrStart = async () => {
+    if (currentIndex < slides.length - 1) {
+      slidesRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+    } else {
+      await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+      router.replace('/(auth)/login');
+    }
+  };
 
   const renderItem = ({ item, index }: any) => {
     const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
@@ -99,11 +104,6 @@ export default function OnboardingScreen() {
     );
   };
 
-  const handleSkip = async () => {
-    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-    router.replace('/(auth)/login');
-  };
-
   return (
     <ImageBackground
       source={require('../../assets/images/image.png')}
@@ -124,6 +124,11 @@ export default function OnboardingScreen() {
             { useNativeDriver: false }
           )}
           scrollEventThrottle={16}
+          getItemLayout={(_, index) => ({
+            length: width,
+            offset: width * index,
+            index
+          })}
         />
 
         <View style={styles.indicatorContainer}>
@@ -162,7 +167,7 @@ export default function OnboardingScreen() {
           })}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSkip}>
+        <TouchableOpacity style={styles.button} onPress={handleNextOrStart}>
           <Text style={styles.buttonText}>{buttonName}</Text>
         </TouchableOpacity>
       </View>
@@ -179,10 +184,6 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)'
-  },
-  container: {
-    flex: 1,
-    fontFamily:"Inter_900Black"
   },
   slide: {
     width,
@@ -246,21 +247,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50'
   },
   button: {
-  position: 'absolute',
-  bottom: 60,
-  left: 20,
-  right: 20,
-  backgroundColor: '#4CAF50',
-  paddingVertical: 15,
-  borderRadius: 10,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 5,
-  alignItems: 'center'
-},
-
+    position: 'absolute',
+    bottom: 60,
+    left: 20,
+    right: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    alignItems: 'center'
+  },
   buttonText: {
     color: '#fff',
     fontSize: 16,
