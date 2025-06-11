@@ -1,16 +1,18 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image';
+import { Link } from 'expo-router';
 
 export default function AssetsButton() {
   return (
  
-     <TouchableOpacity>
+     <Link href='/finance/screens/assets/assets'><TouchableOpacity>
      <View style={styles.assets}>
-       <Image style={styles.assetsImg}></Image>
+       <Image style={styles.assetsImg} source={require('./iconButton/assets.png')}></Image>
        <Text style={styles.assetsText}>Активы</Text>
      </View>
      </TouchableOpacity>
+     </Link>
    )
  }
  
@@ -18,7 +20,7 @@ export default function AssetsButton() {
    assets:{
       width:  166,
      height: 138,
-     backgroundColor: '#000000',
+     backgroundColor: '#5B5B5B',
      borderRadius: 16,
      padding: 12,
    },

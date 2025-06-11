@@ -1,16 +1,18 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image';
+import { Link } from 'expo-router';
 
 export default function AnalysisButton() {
   return (
    
-       <TouchableOpacity>
+       <Link href='/finance/screens/analysis/analysis'><TouchableOpacity>
        <View style={styles.analysis}>
-         <Image style={styles.analysisImg}></Image>
-         <Text style={styles.analysisText}>Активы</Text>
+         <Image style={styles.analysisImg} source={require('./iconButton/analysis.png')}></Image>
+         <Text style={styles.analysisText}>Анализ</Text>
        </View>
        </TouchableOpacity>
+       </Link>
      )
    }
    
@@ -18,7 +20,7 @@ export default function AnalysisButton() {
      analysis:{
         width:  166,
        height: 138,
-       backgroundColor: '#000000',
+       backgroundColor: '#5B5B5B',
        borderRadius: 16,
        padding: 12,
      },
