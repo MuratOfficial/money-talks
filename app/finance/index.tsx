@@ -25,8 +25,10 @@ export default function Finance() {
         <View style={styles.row}>
         <AssetsButton></AssetsButton>
         <LiabilitiesButton></LiabilitiesButton>
-        </View>
+        </View >
+        <View style={styles.row}>
         <AnalysisButton></AnalysisButton>
+        </View>
       </View>
     </View>
   )
@@ -37,9 +39,7 @@ const styles= StyleSheet.create({
         height: 442,
         justifyContent: 'space-between',
         left: 16,
-        gap: 12,
-        position: 'relative',
-       
+        gap: 12, 
     },
     headerTitle:{
         fontWeight: "bold",

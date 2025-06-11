@@ -1,15 +1,15 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
-import AntDesign from '@expo/vector-icons/AntDesign';
-
-
+import Feather from '@expo/vector-icons/Feather';
+ 
+// маленькая кнопка c +
 
 export default function AddButton() {
   return (
-    <View style={styles.container}>
-      <Text>Добавить</Text>
-      <AntDesign  name="pluscircleo" size={18} color="white" />
-    </View>
+    <TouchableOpacity style={styles.container}>
+      <Text style={styles.text}>Добавить</Text>
+      <Feather name="plus-circle" size={18} color="white" />
+    </TouchableOpacity>
   )
 }
 const styles = StyleSheet.create({
@@ -18,6 +18,18 @@ const styles = StyleSheet.create({
         height: 34,
         borderRadius: 14,
         borderWidth: 1,
+        borderColor: '#fff',
+        backgroundColor: '#121212',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    text:{
+        color: '#fff',
+        width: 64,
+        height: 22,
+        letterSpacing: -0.41, 
     }
 
 })
