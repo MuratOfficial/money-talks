@@ -72,11 +72,13 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 15,
     marginTop: StatusBar.currentHeight || 0,
+    width: 342,
+    height: 32,
     
   },
   item: {
-    width: 342,
-    height: 32,
+    width: 169,
+    height:32,
     borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
