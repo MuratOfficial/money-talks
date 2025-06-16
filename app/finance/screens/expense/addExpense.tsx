@@ -1,12 +1,14 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import AddButtonGreen from '../../components/ui/addButtonGreen'
 import InputField from '../../components/ui/inputFields'
+import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 export default function addExpense() {
   return (
     <View style={styles.screen} >
     <View style={styles.container}>
+      <BackButtonHeader></BackButtonHeader>
       <InputField/>
       <AddButtonGreen></AddButtonGreen>
 
@@ -27,6 +29,13 @@ const styles = StyleSheet.create({
     height: 812,
     backgroundColor: '#121212',
   },
+  icon: {
+        width: 24,
+        height: 24,
+        color: '#fff'},
+  header:{
+        color: '#fff',
+        fontWeight: 'bold'},
 
 })
 

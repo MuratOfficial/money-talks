@@ -17,7 +17,7 @@ export default function NavBar() {
              <GoChevronLeft style={styles.icon}/>
         </TouchableOpacity>
      </Link>
-      <Text style={styles.text}>Расходы</Text>
+      <Text style={styles.header}>Расходы</Text>
     <View style={styles.container2}>    
  <TouchableOpacity>
      <PiChartPie style={styles.icon}/>
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         height: 24,
         color: '#fff'
     },
-    text:{
+    header:{
         color: '#fff',
         fontWeight: 'bold'
     },

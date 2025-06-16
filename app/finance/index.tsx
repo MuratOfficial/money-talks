@@ -44,7 +44,9 @@ const styles= StyleSheet.create({
     headerTitle:{
         fontWeight: "bold",
         fontSize: 24,
-        color: '#fff' 
+        color: '#fff', 
+        width: 365,
+        height: 65,
     },
     row:{
         flexDirection:"row",
