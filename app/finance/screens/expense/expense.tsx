@@ -1,9 +1,13 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import AddButton from '../../components/ui/addButton'
-import SegmentedPicker from '../../components/ui/flatList'
+
 import { Link } from 'expo-router'
 import NavBar from '../../components/ui/navBar'
+import SegmentPicker from '../../components/ui/segmentPicker'
+import Filters from '../../components/ui/filters'
+
+
 
   //спросить как сделать расположение, нижний компонет пропадает
 
@@ -14,8 +18,10 @@ export default function Expense() {
     <View style={styles.container}>
         < View>
       <NavBar></NavBar>
-      <SegmentedPicker></SegmentedPicker>
+      <SegmentPicker></SegmentPicker>
+      <Filters></Filters>
         </View>
+  
       <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет расходов</Text>
       <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои денежные потоки</Text>

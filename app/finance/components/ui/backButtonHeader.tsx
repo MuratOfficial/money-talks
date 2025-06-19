@@ -1,15 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet, } from 'react-native'
 import React from 'react'
 import { GoChevronLeft } from 'react-icons/go'
+import { Link } from 'expo-router'
 
 
 export default function BackButtonHeader() {
   return (
     <View style={styles.container}>
-     <TouchableOpacity>
+     <Link href='/finance/screens/expense/expense' ><TouchableOpacity>
              <GoChevronLeft style={styles.icon}></GoChevronLeft>
            </TouchableOpacity>
-           <Text style={styles.header}>Расходы</Text>
+           </Link>
+           <Text style={styles.header}>Добавить расходы</Text>
            
     </View>
   )
@@ -23,7 +25,7 @@ flexDirection: 'row',
 justifyContent: 'space-between',
 marginBottom: 10,
 alignItems: 'center',
-paddingRight: 154,
+paddingRight: 100,
 
 
 

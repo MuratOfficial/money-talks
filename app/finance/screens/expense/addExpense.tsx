@@ -4,14 +4,19 @@ import AddButtonGreen from '../../components/ui/addButtonGreen'
 import InputField from '../../components/ui/inputFields'
 import BackButtonHeader from '../../components/ui/backButtonHeader'
 
+
+
+
+
 export default function addExpense() {
+  
   return (
     <View style={styles.screen} >
     <View style={styles.container}>
-      <BackButtonHeader></BackButtonHeader>
+      <BackButtonHeader/>
+   
       <InputField/>
       <AddButtonGreen></AddButtonGreen>
-
     </View>
     </View>
   )

@@ -6,7 +6,7 @@ import AssetsButton from './components/assetsButton';
 import AnalysisButton from './components/analysisButton';
 import LiabilitiesButton from './components/liabilitiesButton';
 import IncomeButton from './components/incomeButton';
-import { Link } from 'expo-router';
+
 
 
 

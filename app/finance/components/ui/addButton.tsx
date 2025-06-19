@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native'
 import React from 'react'
 import Feather from '@expo/vector-icons/Feather';
  
@@ -6,7 +6,8 @@ import Feather from '@expo/vector-icons/Feather';
 
 export default function AddButton() {
   return (
-    <TouchableOpacity style={styles.container}>
+   
+    <TouchableOpacity   style={styles.container}>
       <Text style={styles.text}>Добавить</Text>
       <Feather name="plus-circle" size={18} color="white" />
     </TouchableOpacity>
