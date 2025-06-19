@@ -6,6 +6,7 @@ import { Link } from 'expo-router'
 import NavBar from '../../components/ui/navBar'
 import SegmentPicker from '../../components/ui/segmentPicker'
 import Filters from '../../components/ui/filters'
+import CircleAddButton from '../../components/ui/circleAddButton'
 
 
 
@@ -20,6 +21,7 @@ export default function Expense() {
       <NavBar></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
+      <CircleAddButton></CircleAddButton>
         </View>
   
       <View style={styles.container2}>

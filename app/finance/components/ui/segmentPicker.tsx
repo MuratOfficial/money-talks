@@ -40,7 +40,7 @@ tab:{
 },
 tabText:{
      color: 'white',
-     fontWeight: '500',
+     fontWeight: '600',
 },
 activeTab:{
      backgroundColor: '#3C3C3C',

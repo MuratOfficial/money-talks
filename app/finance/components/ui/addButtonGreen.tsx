@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 buttonText:{
     width: 76,
     height: 22,
-    color: '#fff'
+    color: '#FFFFFF'
 }
     
 })

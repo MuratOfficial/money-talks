@@ -14,7 +14,6 @@ export default function addExpense() {
     <View style={styles.screen} >
     <View style={styles.container}>
       <BackButtonHeader/>
-   
       <InputField/>
       <AddButtonGreen></AddButtonGreen>
     </View>
