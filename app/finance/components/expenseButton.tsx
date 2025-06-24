@@ -22,16 +22,19 @@ const styles = StyleSheet.create({
   expenses:{
      width:  166,
     height: 138,
-    backgroundColor: '#5B5B5B',
+    backgroundColor: '#333333',
     borderRadius: 16,
     padding: 12,
+    justifyContent: 'space-between',
   },
   expensesImg:{
     width: 60,
     height: 60,
   },
   expensesText:{
-    color: '#fff'
+    color: '#fff',
+    fontWeight: 'medium',
+    fontSize: 16,
   },
 
 })

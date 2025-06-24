@@ -1,4 +1,4 @@
-import { View, StyleSheet,} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import AddButtonGreen from '../../components/ui/addButtonGreen'
 import InputField from '../../components/ui/inputFields'
@@ -8,27 +8,25 @@ import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 
 
-export default function AddExpense() {
+export default function addExpense() {
   
   return (
     <View style={styles.screen} >
-     <View style={styles.container}>
-       <BackButtonHeader title='Добавить расход'/>
-       <InputField/>
-       <AddButtonGreen></AddButtonGreen>
-     </View>
+    <View style={styles.container}>
+      <BackButtonHeader title='Добавить доход'/>
+      <InputField/>
+      <AddButtonGreen></AddButtonGreen>
+    </View>
     </View>
   )
 }
 const styles = StyleSheet.create({
-    container:{
+  container:{
     backgroundColor: '#121212',
     alignItems: 'center',
     width: 366,
     height: 700,
-    justifyContent: 'space-between',
- 
-    
+    justifyContent: 'space-between'
   },
     screen:{
     width: 375,
@@ -37,11 +35,14 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center'
     
-  
-    
   },
-  
+  icon: {
+        width: 24,
+        height: 24,
+        color: '#fff'},
+  header:{
+        color: '#fff',
+        fontWeight: 'bold'},
 
 })
 
-// если делать контейнер 812, нижний компонент не виден для редактирования

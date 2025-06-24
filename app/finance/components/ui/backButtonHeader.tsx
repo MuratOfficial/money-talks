@@ -1,17 +1,23 @@
 import { View, Text, TouchableOpacity, StyleSheet, } from 'react-native'
 import React from 'react'
-import { GoChevronLeft } from 'react-icons/go'
+
 import { Link } from 'expo-router'
+import { IoChevronBack } from "react-icons/io5";
+
+interface backButtonHeaderProps {
+  title: string;
+}
+const BackButtonHeader: React.FC<backButtonHeaderProps> = ({ title }) =>  {
 
 
-export default function BackButtonHeader() {
   return (
     <View style={styles.container}>
-     <Link href='/finance/screens/expense/expense' ><TouchableOpacity>
-             <GoChevronLeft style={styles.icon}></GoChevronLeft>
+     <Link href='/finance/screens/expense/expense' ><TouchableOpacity >
+             <IoChevronBack style={styles.icon}/>
            </TouchableOpacity>
            </Link>
-           <Text style={styles.header}>Добавить расходы</Text>
+           <Text style={styles.header}>{title}</Text>
+           <View style={styles.emptyBox}></View>
            
     </View>
   )
@@ -21,22 +27,26 @@ const styles= StyleSheet.create({
     container:{
         width: 342,
         height: 52,
-flexDirection: 'row',
-justifyContent: 'space-between',
-marginBottom: 10,
-alignItems: 'center',
-paddingRight: 100,
-
-
-
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    emptyBox:{
+        width: 28,
+        height: 28,
     },
      icon: {
-        width: 24,
-        height: 24,
+        width: 28,
+        height: 28,
         color: '#fff'
+        
     },
     header:{
         color: '#fff',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: 18,
+        
     },
 })
+export default BackButtonHeader

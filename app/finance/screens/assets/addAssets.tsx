@@ -8,12 +8,12 @@ import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 
 
-export default function AddExpense() {
+export default function AddAssets() {
   
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
-       <BackButtonHeader title='Добавить расход'/>
+       <BackButtonHeader title='Добавить активы'/>
        <InputField/>
        <AddButtonGreen></AddButtonGreen>
      </View>
@@ -44,4 +44,3 @@ const styles = StyleSheet.create({
 
 })
 
-// если делать контейнер 812, нижний компонент не виден для редактирования

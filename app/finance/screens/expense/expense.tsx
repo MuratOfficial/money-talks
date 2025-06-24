@@ -3,11 +3,11 @@ import React from 'react'
 import AddButton from '../../components/ui/addButton'
 
 import { Link } from 'expo-router'
-import NavBar from '../../components/ui/navBar'
+
 import SegmentPicker from '../../components/ui/segmentPicker'
 import Filters from '../../components/ui/filters'
 import CircleAddButton from '../../components/ui/circleAddButton'
-
+import NavBar from '../../components/ui/navBar'
 
 
   //спросить как сделать расположение, нижний компонет пропадает
@@ -18,7 +18,7 @@ export default function Expense() {
      <View style={styles.screen}>
     <View style={styles.container}>
         < View>
-      <NavBar></NavBar>
+      <NavBar title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
       <CircleAddButton></CircleAddButton>
@@ -40,6 +40,8 @@ const styles=StyleSheet.create({
     width: 375,
     height: 812,
     backgroundColor: '#121212',
+    display: 'flex',
+    alignItems: 'center'
   },
   container:{
     backgroundColor: '#121212',

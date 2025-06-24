@@ -20,16 +20,19 @@ export default function AssetsButton() {
    assets:{
       width:  166,
      height: 138,
-     backgroundColor: '#5B5B5B',
+     backgroundColor: '#333333',
      borderRadius: 16,
      padding: 12,
+     justifyContent: 'space-between',
    },
    assetsImg:{
      width: 60,
      height: 60,
    },
    assetsText:{
-     color: '#fff'
+    color: '#fff',
+    fontWeight: 'medium',
+    fontSize: 16,
    },
  
  })

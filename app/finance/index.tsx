@@ -10,14 +10,16 @@ import IncomeButton from './components/incomeButton';
 
 
 
+
 //добавь кнопки !!!
 
 
 export default function Finance() {
   return (
     <View style={styles.screen}>
+      <Text style={styles.headerTitle}>Финансы</Text>
       <View style={styles.container} >
-         <Text style={styles.headerTitle}>Финансы</Text>
+         
          <View style={styles.row}>
         <ExpenseButton></ExpenseButton>
         <IncomeButton></IncomeButton>
@@ -38,24 +40,35 @@ const styles= StyleSheet.create({
         width: 343,
         height: 442,
         justifyContent: 'space-between',
-        left: 16,
-        gap: 12, 
+        paddingLeft: 16,
+        paddingRight: 16,
+        columnGap: 14, 
+        display: 'flex',
     },
     headerTitle:{
         fontWeight: "bold",
         fontSize: 24,
         color: '#fff', 
-        width: 365,
+        width: 375,
         height: 65,
+        // marginTop: 18,
+        // marginBottom: 18,
+        paddingBottom: 18,
+        paddingTop: 18,
+        paddingLeft: 16,
+        paddingRight: 16,
+        
     },
     row:{
         flexDirection:"row",
-        gap: 12,
+        gap: 11,
     },
     screen:{
          width: 375,
          height: 812,
           backgroundColor: '#121212',
+          
+        
 
     }
 

@@ -4,39 +4,46 @@ import { PiChartPie } from "react-icons/pi";
 import { GrPowerForceShutdown } from "react-icons/gr";
 import { GoChevronLeft } from "react-icons/go";
 import { Link } from 'expo-router';
+import { IoChevronBack } from "react-icons/io5"
 
+interface NavBarProps {
+  title: string;
+}
 
-
-export default function NavBar() {
+const NavBar: React.FC<NavBarProps> = ({ title }) =>  {
     
 
   return (
     <View style={styles.container}>
      <Link href={'/finance'} >
         <TouchableOpacity>
-             <GoChevronLeft style={styles.icon}/>
+             <IoChevronBack style={styles.icon}/>
         </TouchableOpacity>
      </Link>
-      <Text style={styles.header}>Расходы</Text>
-    <View style={styles.container2}>    
- <TouchableOpacity>
+      <Text style={styles.header}>{title}</Text>
+<View style={styles.container2}>    
+<TouchableOpacity>
      <PiChartPie style={styles.icon}/>
  </TouchableOpacity>   
- <TouchableOpacity>
+  <Link href={'/finance/screens/expense/adviceExpense'}>
+       <TouchableOpacity>
      <GrPowerForceShutdown style={styles.icon}/>  
- </TouchableOpacity></View>
+       </TouchableOpacity>
+  </Link>
+ </View>
     </View>
   )
 }
 const styles = StyleSheet.create({
     icon: {
-        width: 24,
-        height: 24,
+        width: 28,
+        height: 28,
         color: '#fff'
     },
     header:{
         color: '#fff',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: 18,
     },
     container2:{
         flexDirection: "row"
@@ -50,3 +57,4 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 })
+export default NavBar;

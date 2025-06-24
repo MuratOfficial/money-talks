@@ -6,7 +6,7 @@ export default function AdviceExpense() {
   
 return (
     <View style={styles.container}>
-        <BackButtonHeader title='Подсказки про расходы'></BackButtonHeader>
+        <BackButtonHeader title='Подсказки про доходы'></BackButtonHeader>
         <ul style={styles.paragraph} >
             <li>dfdfdfdfdf</li>
             <li>dfdfdfdfdf</li>
