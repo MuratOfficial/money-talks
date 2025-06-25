@@ -2,6 +2,7 @@ import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 //большая кнопка(зеленая)
+// сделать title в props!!, тоже дожно быть универсально
 
 export default function AddButtonGreen() {
   return (

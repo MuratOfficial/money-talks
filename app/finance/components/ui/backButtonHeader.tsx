@@ -1,21 +1,24 @@
 import { View, Text, TouchableOpacity, StyleSheet, } from 'react-native'
 import React from 'react'
-
-import { Link } from 'expo-router'
 import { IoChevronBack } from "react-icons/io5";
+import { Link } from 'expo-router';
 
-interface backButtonHeaderProps {
-  title: string;
+interface BackButtonHeaderProps {
+  title: string; // change title 'Расходы' 'Доходы'
+  link: string; //link to any /expense,/assets
+  
 }
-const BackButtonHeader: React.FC<backButtonHeaderProps> = ({ title }) =>  {
+const BackButtonHeader: React.FC<BackButtonHeaderProps> = ({ title, link }) =>  {
 
 
   return (
     <View style={styles.container}>
-     <Link href='/finance/screens/expense/expense' ><TouchableOpacity >
+      
+     <Link href={link as any} asChild><TouchableOpacity >
              <IoChevronBack style={styles.icon}/>
            </TouchableOpacity>
-           </Link>
+           </Link> 
+            
            <Text style={styles.header}>{title}</Text>
            <View style={styles.emptyBox}></View>
            

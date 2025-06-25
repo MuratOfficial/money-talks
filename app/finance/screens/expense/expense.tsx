@@ -10,7 +10,7 @@ import CircleAddButton from '../../components/ui/circleAddButton'
 import NavBar from '../../components/ui/navBar'
 
 
-  //спросить как сделать расположение, нижний компонет пропадает
+  //выравнить чтобы было читабельно
 
 
 export default function Expense() {
@@ -18,7 +18,7 @@ export default function Expense() {
      <View style={styles.screen}>
     <View style={styles.container}>
         < View>
-      <NavBar title = 'Расходы' ></NavBar>
+      <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
       <CircleAddButton></CircleAddButton>

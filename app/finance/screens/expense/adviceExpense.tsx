@@ -6,7 +6,7 @@ export default function AdviceExpense() {
   
 return (
     <View style={styles.container}>
-        <BackButtonHeader title='Подсказки про расходы'></BackButtonHeader>
+        <BackButtonHeader link='/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
         <ul style={styles.paragraph} >
             <li>dfdfdfdfdf</li>
             <li>dfdfdfdfdf</li>

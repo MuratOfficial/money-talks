@@ -1,38 +1,35 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import AddButton from '../../components/ui/addButton'
-
 import { Link } from 'expo-router'
-
 import SegmentPicker from '../../components/ui/segmentPicker'
 import Filters from '../../components/ui/filters'
 import CircleAddButton from '../../components/ui/circleAddButton'
 import NavBar from '../../components/ui/navBar'
 
 
-  //спросить как сделать расположение, нижний компонет пропадает
+
 
 
 export default function Income() {
   return (
      <View style={styles.screen}>
-    <View style={styles.container}>
-        < View>
-      <NavBar title = 'Доходы' ></NavBar>
-      <SegmentPicker></SegmentPicker>
-      <Filters></Filters>
-      <CircleAddButton></CircleAddButton>
-        </View>
-  
-      <View style={styles.container2}>
-      <Text style={styles.textBold} >У вас пока нет доходов</Text>
-      <Text style={styles.text}>Добавьте ваши доходы, начните отслеживать свои денежные потоки</Text>
-        <Link href={'/finance/screens/income/addIncome'} > <AddButton/>
-     </Link>
-      </View>
+        <View style={styles.container}>
+           < View>
+                 <NavBar link2='/finance/screens/income/adviceIncome' link='/finance' title = 'Доходы' ></NavBar>
+                 <SegmentPicker></SegmentPicker>
+                 <Filters></Filters>
+                 <CircleAddButton></CircleAddButton>
+           </View>
+                 <View style={styles.container2}>
+                     <Text style={styles.textBold} >У вас пока нет доходов</Text>
+                     <Text style={styles.text}>Добавьте ваши доходы, начните отслеживать свои денежные потоки</Text>
+                     <Link href={'/finance/screens/income/addIncome'} > <AddButton/>
+                     </Link>
+                 </View>
      
-    </View>
-    </View>
+        </View>
+     </View>
   )
 }
 const styles=StyleSheet.create({

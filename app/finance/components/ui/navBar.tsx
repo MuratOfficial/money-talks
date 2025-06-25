@@ -2,20 +2,21 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { PiChartPie } from "react-icons/pi";
 import { GrPowerForceShutdown } from "react-icons/gr";
-import { GoChevronLeft } from "react-icons/go";
 import { Link } from 'expo-router';
 import { IoChevronBack } from "react-icons/io5"
 
 interface NavBarProps {
-  title: string;
+  title: string; //title change Expense,Assets,Income etc.
+  link: string; //IoChevronBack
+  link2: string;//GrPowerForceShutdown
 }
 
-const NavBar: React.FC<NavBarProps> = ({ title }) =>  {
+const NavBar: React.FC<NavBarProps> = ({ title, link, link2 }) =>  {
     
 
   return (
     <View style={styles.container}>
-     <Link href={'/finance'} >
+     <Link href={link as any} asChild>
         <TouchableOpacity>
              <IoChevronBack style={styles.icon}/>
         </TouchableOpacity>
@@ -25,7 +26,7 @@ const NavBar: React.FC<NavBarProps> = ({ title }) =>  {
 <TouchableOpacity>
      <PiChartPie style={styles.icon}/>
  </TouchableOpacity>   
-  <Link href={'/finance/screens/expense/adviceExpense'}>
+  <Link href={link2 as any} asChild>
        <TouchableOpacity>
      <GrPowerForceShutdown style={styles.icon}/>  
        </TouchableOpacity>

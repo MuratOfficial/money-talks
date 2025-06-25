@@ -6,7 +6,7 @@ export default function AdviceAssets() {
   
 return (
     <View style={styles.container}>
-        <BackButtonHeader title='Подсказки про активы'></BackButtonHeader>
+        <BackButtonHeader link='/finance/screens/assets/assets' title='Подсказки про активы'></BackButtonHeader>
         <ul style={styles.paragraph} >
             <li>dfdfdfdfdf</li>
             <li>dfdfdfdfdf</li>

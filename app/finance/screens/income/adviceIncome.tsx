@@ -2,11 +2,11 @@ import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import BackButtonHeader from '../../components/ui/backButtonHeader';
 
-export default function AdviceExpense() {
+export default function AdviceIncome() {
   
 return (
     <View style={styles.container}>
-        <BackButtonHeader title='Подсказки про доходы'></BackButtonHeader>
+        <BackButtonHeader link='/finance/screens/income/income' title='Подсказки про доходы'></BackButtonHeader>
         <ul style={styles.paragraph} >
             <li>dfdfdfdfdf</li>
             <li>dfdfdfdfdf</li>

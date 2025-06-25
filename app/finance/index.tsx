@@ -7,31 +7,23 @@ import AnalysisButton from './components/analysisButton';
 import LiabilitiesButton from './components/liabilitiesButton';
 import IncomeButton from './components/incomeButton';
 
-
-
-
-
-//добавь кнопки !!!
-
-
 export default function Finance() {
   return (
     <View style={styles.screen}>
       <Text style={styles.headerTitle}>Финансы</Text>
-      <View style={styles.container} >
-         
-         <View style={styles.row}>
-        <ExpenseButton></ExpenseButton>
-        <IncomeButton></IncomeButton>
+        <View style={styles.container} >
+             <View style={styles.row}>
+                 <ExpenseButton></ExpenseButton>
+                 <IncomeButton></IncomeButton>
+             </View>
+                   <View style={styles.row}>
+                        <AssetsButton></AssetsButton>
+                        <LiabilitiesButton></LiabilitiesButton>
+                   </View >
+          <View style={styles.row}>
+               <AnalysisButton></AnalysisButton>
+          </View>
         </View>
-        <View style={styles.row}>
-        <AssetsButton></AssetsButton>
-        <LiabilitiesButton></LiabilitiesButton>
-        </View >
-        <View style={styles.row}>
-        <AnalysisButton></AnalysisButton>
-        </View>
-      </View>
     </View>
   )
 }
@@ -46,13 +38,11 @@ const styles= StyleSheet.create({
         display: 'flex',
     },
     headerTitle:{
-        fontWeight: "bold",
+        fontWeight: '500',
         fontSize: 24,
         color: '#fff', 
         width: 375,
         height: 65,
-        // marginTop: 18,
-        // marginBottom: 18,
         paddingBottom: 18,
         paddingTop: 18,
         paddingLeft: 16,

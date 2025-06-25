@@ -8,12 +8,13 @@ import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 
 
+
 export default function AddExpense() {
   
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
-       <BackButtonHeader title='Добавить расход'/>
+       <BackButtonHeader link='/finance/screens/expense/expense'  title='Добавить расход'/>
        <InputField/>
        <AddButtonGreen></AddButtonGreen>
      </View>

@@ -11,14 +11,14 @@ import NavBar from '../../components/ui/navBar'
 
 
 
-
+ //выравнить чтобы было читабельно
 
 export default function Assets() {
   return (
      <View style={styles.screen}>
     <View style={styles.container}>
         < View>
-      <NavBar title = 'Активы' ></NavBar>
+      <NavBar link2='/finance/screens/assets/adviceAssets' link='/finance' title = 'Активы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
       <CircleAddButton></CircleAddButton>
@@ -27,7 +27,7 @@ export default function Assets() {
       <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет aктивов</Text>
       <Text style={styles.text}>Добавьте ваши активы, начните отслеживать свои денежные потоки</Text>
-        <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
+        <Link href={'/finance/screens/assets/addAssets'} > <AddButton/>
      </Link>
       </View>
      

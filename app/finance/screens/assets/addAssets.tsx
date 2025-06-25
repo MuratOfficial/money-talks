@@ -4,16 +4,12 @@ import AddButtonGreen from '../../components/ui/addButtonGreen'
 import InputField from '../../components/ui/inputFields'
 import BackButtonHeader from '../../components/ui/backButtonHeader'
 
-
-
-
-
 export default function AddAssets() {
   
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
-       <BackButtonHeader title='Добавить активы'/>
+       <BackButtonHeader link='/finance/screens/assets/assets'  title='Добавить активы'/>
        <InputField/>
        <AddButtonGreen></AddButtonGreen>
      </View>
