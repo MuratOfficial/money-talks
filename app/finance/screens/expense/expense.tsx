@@ -10,28 +10,28 @@ import CircleAddButton from '../../components/ui/circleAddButton'
 import NavBar from '../../components/ui/navBar'
 
 
-  //выравнить чтобы было читабельно
+
 
 
 export default function Expense() {
   return (
      <View style={styles.screen}>
-    <View style={styles.container}>
-        < View>
+        <View style={styles.container}>
+           <View>
       <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
       <CircleAddButton></CircleAddButton>
-        </View>
+           </View>
   
-      <View style={styles.container2}>
+               <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет расходов</Text>
       <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои денежные потоки</Text>
         <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
      </Link>
-      </View>
+               </View>
      
-    </View>
+        </View>
     </View>
   )
 }

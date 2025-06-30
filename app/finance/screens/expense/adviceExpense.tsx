@@ -1,55 +1,106 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView,  } from 'react-native'
 import React from 'react'
 import BackButtonHeader from '../../components/ui/backButtonHeader';
 
-export default function AdviceExpense() {
-  
+
+
+// corect css!!!!
+
+
+
+
+const AdviceExpense:React.FC=()=> {
+
+
 return (
+ <View style={styles.screen}>
     <View style={styles.container}>
-        <BackButtonHeader link='/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
-        <ul style={styles.paragraph} >
-            <li>dfdfdfdfdf</li>
-            <li>dfdfdfdfdf</li>
-        </ul>
-      <Text style={styles.paragraph}>
-        11111111111111111111 {`\n`}{`\n`}
-        222222222222222222{`\n`}3333333333333{`\n`}
-        55555555555555555
-      </Text>
-      <View style={styles.paragraphSpacing}>
-        <Text>бббббббббббббббб</Text>
+     <BackButtonHeader link='/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
+        <View style={styles.textSection}>
+        <Text style={styles.sectionTitle}>Расходы 💸</Text>
+        <Text style={styles.text}>📌 
+        <Text style={styles.bold}>Фиксированные расходы</Text> – обязательные платежи (квартира, кредит, коммуналка, подписки). Эти траты повторяются каждый месяц.</Text>
+        <Text style={styles.text}>📌 
+        <Text>Переменные расходы</Text> – еда, развлечения, шопинг. Они могут меняться, но именно здесь прячется возможность экономии.</Text>
+        <Text style={styles.text}>📌 
+        <Text style={styles.bold}>Импульсивные траты</Text> – покупки, о которых ты жалеешь. Перед покупкой спроси себя: "А точно надо?"</Text>
+        <Text style={styles.text}>📌 
+        <Text style={styles.bold}>Хорошие и плохие расходы</Text> – вложение в здоровье и образование = хорошие. Деньги на бессмысленные вещи = плохие.</Text>
+
+        <View>
+                 <Text style={styles.text2}><Text>1. Регулярные расходы:{`\n`}
+           Коммунальные платежи, аренда, транспорт.{`\n`}
+           Подсказка: оптимизируйте регулярные расходы, чтобы сэкономить.
+          </Text>
+        {`\n`}
+          <Text style={styles.text2}>2. Обязательные расходы:{`\n`}
+          Питание, медицина, образование.{`\n`}
+          Подсказка: сокращайте излишние траты в обязательных категориях.
+          </Text>
+        {`\n`}
+          <Text style={styles.text2}>3. Необязательные расходы:{`\n`}
+          Развлечения, рестораны, покупка ненужных вещей.{`\n`}
+          Подсказка: контролируйте необязательные расходы, чтобы не выходить за рамки бюджета.
+          </Text>
+        {`\n`}
+         <Text style={styles.text2}>4. Нерегулярные расходы:{`\n`}
+          Ремонт, путешествия, крупные покупки.{`\n`}
+          Подсказка: планируйте нерегулярные расходы заранее, чтобы избежать финансовых трудностей.
+          </Text>
+          
+                 </Text>
+      
+        
+
+          
       </View>
-      <Text style={[styles.paragraph, {lineHeight: 24}]}>
-       аааааааааааааа
-      </Text>
+        </View>
+      
+      
+     
     </View>
+
+ </View>
   );
 };
 
 const styles = StyleSheet.create({
-  paragraph: {
-    marginBottom: 10, // Отступ для параграфа
-    color: '#fff'
+  text2:{
+      color: '#fff'
   },
-  paragraphSpacing: {
-    marginBottom: 20, // Дополнительный отступ
-    backgroundColor: '#fff',
-    
+  container:{
+      backgroundColor: '#121212',
+      alignItems: 'center',
+      width: 366,
+      height: 760,
+      justifyContent: 'space-between',
   },
-    container:{
-    backgroundColor: '#121212',
-    alignItems: 'center',
-    width: 366,
-    height: 700,
-    justifyContent: 'space-between',
-
+  textSection:{
+    width:343,
+    height: 638,
   },
-    screen:{
-    width: 375,
-    height: 812,
-    backgroundColor: '#121212',
-    display: 'flex',
-    alignItems: 'center'
+  screen:{
+      width: 375,
+      height: 812,
+      backgroundColor: '#121212',
+      display: 'flex',
+      alignItems: 'center'
   },
-  
+  sectionTitle: {
+      fontSize: 14,
+      color: '#fff',
+      fontWeight: '500',
+  },
+  text: {
+      fontSize: 14,
+      color: '#fff',
+      lineHeight: 22,
+      fontWeight: 'medium',
+      letterSpacing: 0},
+  bold: {
+      fontWeight: 'medium',
+      color: '#fff',
+  },
 });
+
+export default  AdviceExpense

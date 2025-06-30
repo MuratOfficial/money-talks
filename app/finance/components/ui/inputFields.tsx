@@ -2,31 +2,27 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import React from 'react'
 
 
+interface InputFieldProps{
+    placeHolderTitle: string;
+    title: string;
+}
 
-
-const InputField = ()=>{
-    const[text, onChangeText] = React.useState('');
-    const [number, onChangeNumber] = React.useState('');
+const InputField: React.FC<InputFieldProps> = ({placeHolderTitle, title})=>{
+const[text, onChangeText] = React.useState('');
+   
 
 return(
-<View style={styles.container}>
+<View>
    <View style={styles.containerText}>
-    <Text style={styles.text}>Название</Text>
+    <Text style={styles.text}>{title}</Text>
     <TextInput
           style={styles.input}
           onChangeText={onChangeText}
           value={text}
-          placeholder='Введите название'
+          placeholder={placeHolderTitle}
     />
     </View>
-    <View style={styles.containerNum}>
-    <Text style={styles.num}>Сумма</Text>
-    <TextInput
-          style={styles.input}
-          onChangeText={onChangeNumber}
-          value={number}
-          placeholder  ='Введите сумму'/>
-    </View>
+    
           
 </View>
 
@@ -59,10 +55,6 @@ const styles= StyleSheet.create({
         width: 44,
         height: 22,
     },
- container:{
-    width: 343,
-    height: 400,
-    gap : 16,
- }, 
+
 })
 export default InputField

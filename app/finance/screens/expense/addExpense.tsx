@@ -15,8 +15,12 @@ export default function AddExpense() {
     <View style={styles.screen} >
      <View style={styles.container}>
        <BackButtonHeader link='/finance/screens/expense/expense'  title='Добавить расход'/>
-       <InputField/>
-       <AddButtonGreen></AddButtonGreen>
+       <View style={styles.inputContainer}>
+           <InputField title='Название' placeHolderTitle='Введите название'/>
+           <InputField title='Сумма' placeHolderTitle='Введите сумму'/>
+       </View>
+       <AddButtonGreen title='Добавить' />
+       
      </View>
     </View>
   )
@@ -26,7 +30,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     alignItems: 'center',
     width: 366,
-    height: 700,
+    height: 760,
     justifyContent: 'space-between',
  
     
@@ -37,12 +41,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     display: 'flex',
     alignItems: 'center'
-    
-  
-    
   },
+   inputContainer:{
+    width: 343,
+    height: 400,
+    gap : 16,
+ }, 
   
 
 })
-
-// если делать контейнер 812, нижний компонент не виден для редактирования

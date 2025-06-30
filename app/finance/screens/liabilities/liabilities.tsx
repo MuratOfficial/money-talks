@@ -6,7 +6,9 @@ import React from 'react'
 export default function Liabilities() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text} >Liabilities</Text>
+      <Text style={styles.text} >Пассивы
+        
+      </Text>
       
     </View>
   )
