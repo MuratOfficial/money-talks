@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView,  } from 'react-native'
 import React from 'react'
 import BackButtonHeader from '../../components/ui/backButtonHeader';
+import LinkToTutorial from '../../components/ui/linkToTutorial';
 
 
 
@@ -16,7 +17,7 @@ return (
  <View style={styles.screen}>
     <View style={styles.container}>
      <BackButtonHeader link='/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
-        <View style={styles.textSection}>
+        <ScrollView style={styles.textSection}>
         <Text style={styles.sectionTitle}>Расходы 💸</Text>
         <Text style={styles.text}>📌 
         <Text style={styles.bold}>Фиксированные расходы</Text> – обязательные платежи (квартира, кредит, коммуналка, подписки). Эти траты повторяются каждый месяц.</Text>
@@ -27,7 +28,7 @@ return (
         <Text style={styles.text}>📌 
         <Text style={styles.bold}>Хорошие и плохие расходы</Text> – вложение в здоровье и образование = хорошие. Деньги на бессмысленные вещи = плохие.</Text>
 
-        <View>
+          <View>
                  <Text style={styles.text2}><Text>1. Регулярные расходы:{`\n`}
            Коммунальные платежи, аренда, транспорт.{`\n`}
            Подсказка: оптимизируйте регулярные расходы, чтобы сэкономить.
@@ -47,14 +48,11 @@ return (
           Ремонт, путешествия, крупные покупки.{`\n`}
           Подсказка: планируйте нерегулярные расходы заранее, чтобы избежать финансовых трудностей.
           </Text>
-          
                  </Text>
-      
-        
-
+          </View>
           
-      </View>
-        </View>
+        </ScrollView>
+        <LinkToTutorial link='https://web.telegram.org/a/#-1002352024763_2'/>
       
       
      
@@ -73,7 +71,8 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       width: 366,
       height: 760,
-      justifyContent: 'space-between',
+      // justifyContent: 'space-between',
+      gap: 12,
   },
   textSection:{
     width:343,

@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native'
 import React from 'react'
 import BackButtonHeader from '../../components/ui/backButtonHeader';
 // corect css, composition
 
 
-export default function AdviceIncome() {
-  
+const AdviceIncome:React.FC=()=> {
+
 return (
     <View style={styles.container}>
         <BackButtonHeader link='/finance/screens/income/income' title='Подсказки про доходы'></BackButtonHeader>
@@ -31,15 +31,15 @@ return (
                  Подсказка: рассмотрите возможность сдачи недвижимости в аренду для увеличения доходности.</Text>
                  </Text>
              </View>
-             </View>
+        </View>
+       
     </View>
   );
 };
 
 const styles = StyleSheet.create({
- 
-   text2:{
-    color: '#fff'
+  text2:{
+      color: '#fff'
   },
   container:{
       backgroundColor: '#121212',
@@ -59,12 +59,10 @@ const styles = StyleSheet.create({
       display: 'flex',
       alignItems: 'center'
   },
-  
   sectionTitle: {
       fontSize: 14,
       color: '#fff',
       fontWeight: '500',
-      
   },
   text: {
       fontSize: 14,
@@ -78,3 +76,4 @@ const styles = StyleSheet.create({
   },
  
 });
+export default AdviceIncome;
