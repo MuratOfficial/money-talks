@@ -1,7 +1,9 @@
 import { View, Text, Linking, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { IoIosLink } from "react-icons/io";
-// не получилось поместить иконку цепи в один ряд!!!
+import { Entypo, Feather } from '@expo/vector-icons';
+
+
 // corect css!!
 interface LinkToTutorialProps{
     link: string;
@@ -20,12 +22,12 @@ const LinkToTutorial:React.FC<LinkToTutorialProps>=({link})=> {
        <View style={styles.linkContainer}>
             <Text style={styles.title}>Ссылка на видеоурок:
             </Text>
-                <View style={styles.linkContainerIn}>
-                   <TouchableOpacity onPress={handleOpenLink}>
-                    <IoIosLink height={12} width={12} color='#fff'></IoIosLink>
-                     <Text style={styles.linkText}>{link}</Text>
-                   </TouchableOpacity>
+                <TouchableOpacity onPress={handleOpenLink}>
+                    <View style={styles.linkContainerIn}>
+                   <Feather name='link' size={13} color={"#fff"}></Feather>
+                   <Text style={styles.linkText}>{link}</Text>
                  </View>
+                  </TouchableOpacity>
               </View>
     </View>
   )
@@ -48,7 +50,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         letterSpacing: -0.41,
         lineHeight: 24,
-        
+
     },
     linkContainerIn:{
         width:315,
@@ -61,7 +63,8 @@ const styles = StyleSheet.create({
         paddingRight: 12,
      justifyContent: 'center',
      alignItems: 'center',
-       flexDirection: 'row'
+       flexDirection: 'row',
+       gap: 8,
     },
     linkText:{
         fontSize: 12,

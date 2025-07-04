@@ -14,8 +14,9 @@ export default function AddIncome() {
     <View style={styles.screen} >
     <View style={styles.container}>
       <BackButtonHeader link='/finance/screens/income/income' title='Добавить доход'/>
-      <InputField/>
-      <AddButtonGreen></AddButtonGreen>
+          <InputField title='Название' placeHolderTitle='Введите название'/>
+          <InputField title='Сумма' placeHolderTitle='Введите сумму'/>
+      <AddButtonGreen title='Добавить'/>
     </View>
     </View>
   )

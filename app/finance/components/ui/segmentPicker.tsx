@@ -2,8 +2,9 @@
  import React from 'react'
  import { useState } from 'react';
  
+
  
-  export default function SegmentPicker() {
+  const SegmentPicker:React.FC=()=> {
   const [activeTab, setActiveTab] = useState<'Регулярные' | 'Нерегулярные'>('Регулярные');
  
    return (
@@ -37,6 +38,7 @@ tab:{
     justifyContent: 'center',
     backgroundColor: '#1E1E1E',
     marginRight: 0,
+    marginBottom: 16,
 },
 tabText:{
      color: 'white',
@@ -46,4 +48,6 @@ activeTab:{
      backgroundColor: '#3C3C3C',
 },
  })
+
+ export default SegmentPicker
  
