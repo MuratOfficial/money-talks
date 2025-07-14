@@ -9,25 +9,33 @@ import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 
 export default function AddIncome() {
-  
+const handlePress=()=>{
+  console.log('GreenButton')
+}
+// onPress  передается наконец !!!!
   return (
     <View style={styles.screen} >
-    <View style={styles.container}>
-      <BackButtonHeader link='/finance/screens/income/income' title='Добавить доход'/>
-          <InputField title='Название' placeHolderTitle='Введите название'/>
-          <InputField title='Сумма' placeHolderTitle='Введите сумму'/>
-      <AddButtonGreen title='Добавить'/>
-    </View>
+     <View style={styles.container}>
+       <BackButtonHeader link='/finance/screens/income/income'  title='Добавить доход'/>
+       <View style={styles.inputContainer}>
+           <InputField title='Название' placeHolder='Введите название'/>
+           <InputField title='Сумма' placeHolder='Введите сумму'/>
+       </View>
+       <AddButtonGreen onPress={handlePress} title='Добавить' />
+       
+     </View>
     </View>
   )
 }
 const styles = StyleSheet.create({
-  container:{
+    container:{
     backgroundColor: '#121212',
     alignItems: 'center',
     width: 366,
-    height: 700,
-    justifyContent: 'space-between'
+    height: 760,
+    justifyContent: 'space-between',
+ 
+    
   },
     screen:{
     width: 375,
@@ -35,15 +43,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     display: 'flex',
     alignItems: 'center'
-    
   },
-  icon: {
-        width: 24,
-        height: 24,
-        color: '#fff'},
-  header:{
-        color: '#fff',
-        fontWeight: 'bold'},
+   inputContainer:{
+    width: 343,
+    height: 400,
+    gap : 16,
+ }, 
+  
 
 })
 

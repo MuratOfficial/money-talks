@@ -18,7 +18,6 @@ const Expense:React.FC=()=> {
   <Pressable onPress={handlePress} style={styles.pressScreen}>
     <View style={styles.container}>
       <View style={styles.screen}>
-
         {showHint && (
           <View style={styles.tooltip}>
             <View style={styles.tail}></View> 
@@ -31,12 +30,11 @@ const Expense:React.FC=()=> {
         
         {layerVisible && (<TouchableOpacity style={styles.visible} onPress={handlePress}>
         </TouchableOpacity>)}
-{/* сделать как отдельный компонент (подсказка и слой) */}
+{/*  */}
            <View>
       <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
-      
            </View>
   
                <View style={styles.container2}>

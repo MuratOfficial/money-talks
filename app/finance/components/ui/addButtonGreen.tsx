@@ -1,19 +1,21 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, Button, StyleSheet, TouchableOpacity, TouchableOpacityProps } from 'react-native'
+import React, { ReactNode } from 'react'
 
 //большая кнопка(зеленая)
 
 
 
-interface AddButtonGreenProps{
+interface AddButtonGreenProps extends TouchableOpacityProps{
   title: string;
 
 }
-const AddButtonGreen: React.FC<AddButtonGreenProps>=({title})=> {
+
+// onPress  другом комоненте!!!
+const AddButtonGreen: React.FC<AddButtonGreenProps>=({title, onPress,})=> {
   return (
-    <TouchableOpacity style={styles.button} onPress={alert}>
+    <TouchableOpacity onPress={onPress} style={styles.button} >
             <Text style={styles.buttonText}>{title}</Text>
-        </TouchableOpacity>
+    </TouchableOpacity>
   )
 }
 

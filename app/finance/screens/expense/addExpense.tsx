@@ -10,16 +10,19 @@ import BackButtonHeader from '../../components/ui/backButtonHeader'
 
 
 export default function AddExpense() {
-  
+const handlePress=()=>{
+  console.log('GreenButton')
+}
+// onPress  передается наконец !!!!
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
        <BackButtonHeader link='/finance/screens/expense/expense'  title='Добавить расход'/>
        <View style={styles.inputContainer}>
-           <InputField title='Название' placeHolderTitle='Введите название'/>
-           <InputField title='Сумма' placeHolderTitle='Введите сумму'/>
+           <InputField title='Название' placeHolder='Введите название'/>
+           <InputField title='Сумма' placeHolder='Введите сумму'/>
        </View>
-       <AddButtonGreen title='Добавить' />
+       <AddButtonGreen onPress={handlePress} title='Добавить' />
        
      </View>
     </View>

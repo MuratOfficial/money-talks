@@ -2,15 +2,18 @@ import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native'
 import React from 'react'
 import BackButtonHeader from '../../components/ui/backButtonHeader';
 import LinkToTutorial from '../../components/ui/linkToTutorial';
-// corect css, composition
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 
 const AdviceIncome:React.FC=()=> {
 
 return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
+      <View style={styles.container}>
         <BackButtonHeader link='/finance/screens/income/income' title='Подсказки про доходы'></BackButtonHeader>
-        <View style={styles.textSection}>
+        <ScrollView style={styles.textSection}>
+          
                <Text style={styles.sectionTitle}>Доходы 💰</Text>
                <Text style={styles.text}>
                 📌 <Text style={styles.bold}>Активный доход</Text> – деньги, которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия дохода нет.
@@ -24,27 +27,34 @@ return (
        
                <View>
                  <Text style={styles.text2}><Text>1. Регулярные доходы:{`\n`}
-                 Зарплата, пенсия, арендная плата.{`\n`}
+                <Text style={styles.text3}> Зарплата, пенсия, арендная плата.{`\n`}
                  Подсказка: старайтесь увеличивать источники регулярных доходов.
-                 </Text>
+                </Text> </Text>
                {`\n`}
                  <Text style={styles.text2}>2. Нерегулярные доходы:{`\n`}
-                 Подарки, подработки.{`\n`}
+                 <Text style={styles.text3}>Подарки, подработки.{`\n`}
                  Подсказка: рассмотрите возможность сдачи недвижимости в аренду для увеличения {`\n`}
-                 доходности.</Text>
+                 доходности.
+                 </Text></Text>
                  </Text>
              </View>
               
-        </View>
+        </ScrollView>
         <LinkToTutorial link='https://web.telegram.org/a/#-1002352024763_2'/>
        
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+ text3:{ 
+      fontWeight: 300,
+
+  },
   text2:{
-      color: '#fff'
+      color: '#fff',
+      fontWeight: 500,
   },
   container:{
       backgroundColor: '#121212',
@@ -53,11 +63,10 @@ const styles = StyleSheet.create({
       height: 760,
       // justifyContent: 'space-between',
       gap: 12,
-   
   },
   textSection:{
     width:343,
-    height: 440,
+    height: 638,
   },
   screen:{
       width: 375,
@@ -75,10 +84,10 @@ const styles = StyleSheet.create({
       fontSize: 14,
       color: '#fff',
       lineHeight: 22,
-      fontWeight: 'medium',
-    letterSpacing: 0},
+      fontWeight: 400,
+      letterSpacing: -0.41},
   bold: {
-      fontWeight: 'medium',
+      fontWeight: 500,
       color: '#fff',
   },
  

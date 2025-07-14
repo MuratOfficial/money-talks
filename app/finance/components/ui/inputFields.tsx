@@ -1,34 +1,24 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, TextInputProps } from 'react-native'
+import React, { useState } from 'react'
 
-
-interface InputFieldProps{
-    placeHolderTitle: string;
+interface InputFieldProps extends TextInputProps{
+    placeHolder: string;
     title: string;
 }
-
-const InputField: React.FC<InputFieldProps> = ({placeHolderTitle, title})=>{
-const[text, onChangeText] = React.useState('');
-   
-
+const InputField: React.FC<InputFieldProps> = ({placeHolder, title,...textInputProps})=>{
 return(
 <View>
    <View style={styles.containerText}>
     <Text style={styles.text}>{title}</Text>
     <TextInput
           style={styles.input}
-          onChangeText={onChangeText}
-          value={text}
-          placeholder={placeHolderTitle}
-    />
-    </View>
-    
-          
+          placeholder={placeHolder}
+         {...textInputProps}/>
+    </View>  
 </View>
 
 );
 }
-
 const styles= StyleSheet.create({
     containerText:{
         gap: 4

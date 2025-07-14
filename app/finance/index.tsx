@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet,  } from 'react-native'
 import React from 'react'
-import { HeaderTitle } from "@react-navigation/elements";
 import ExpenseButton from './components/expenseButton';
 import AssetsButton from './components/assetsButton';
 import AnalysisButton from './components/analysisButton';
@@ -9,6 +8,7 @@ import IncomeButton from './components/incomeButton';
 
 export default function Finance() {
   return (
+    
     <View style={styles.screen}>
       <Text style={styles.headerTitle}>Финансы</Text>
         <View style={styles.container} >
