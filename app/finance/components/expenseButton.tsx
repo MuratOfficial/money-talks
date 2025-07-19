@@ -33,8 +33,10 @@ const styles = StyleSheet.create({
   },
   expensesText:{
     color: '#fff',
-    fontWeight: 'medium',
+    lineHeight: 24,
+    letterSpacing: -0.41,
     fontSize: 16,
+    fontFamily: 'SFProDisplayRegular'
   },
 
 })

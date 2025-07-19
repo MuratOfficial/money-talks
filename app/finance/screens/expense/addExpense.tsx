@@ -13,7 +13,7 @@ export default function AddExpense() {
 const handlePress=()=>{
   console.log('GreenButton')
 }
-// onPress  передается наконец !!!!
+
   return (
     <View style={styles.screen} >
      <View style={styles.container}>

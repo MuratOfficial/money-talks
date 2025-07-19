@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
         color: '#fff',
         width: 64,
         height: 22,
-        letterSpacing: -0.41, 
+        letterSpacing: -0.41,
+        lineHeight: 22, 
     }
 
 })

@@ -30,9 +30,11 @@ export default function AssetsButton() {
      height: 60,
    },
    assetsText:{
-    color: '#fff',
-    fontWeight: 'medium',
+  color: '#fff',
+    lineHeight: 24,
+    letterSpacing: -0.41,
     fontSize: 16,
+    fontFamily: 'SFProDisplayRegular'
    },
  
  })

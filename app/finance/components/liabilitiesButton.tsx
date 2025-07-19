@@ -28,8 +28,10 @@ export default function LiabilitiesButton() {
      height: 60,
    },
    liabilitiesText:{
-     color: '#fff',
-     fontWeight: 'medium',
-     fontSize: 16,
+    color: '#fff',
+    lineHeight: 24,
+    letterSpacing: -0.41,
+    fontSize: 16,
+    fontFamily: 'SFProDisplayRegular'
    },
  })

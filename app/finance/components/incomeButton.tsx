@@ -29,7 +29,9 @@ const styles = StyleSheet.create({
   },
   incomeText:{
     color: '#fff',
-    fontWeight: 'medium',
+    lineHeight: 24,
+    letterSpacing: -0.41,
     fontSize: 16,
+    fontFamily: 'SFProDisplayRegular'
   },
 })

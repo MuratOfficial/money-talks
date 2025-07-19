@@ -27,9 +27,14 @@
 tabs:{
         flexDirection: 'row',
     marginBottom: 10,
+    width: 338,
+    height:32,
+    backgroundColor: '#1E1E1E',
+    borderRadius: 7,
     
 },
 tab:{
+    
     width: 169,
     height:32,
     borderRadius: 7,

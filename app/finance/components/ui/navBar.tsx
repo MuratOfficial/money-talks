@@ -39,13 +39,19 @@ const styles = StyleSheet.create({
     icon: {
         width: 28,
         height: 28,
-        color: '#fff'
+        color: '#fff',
+        
     },
     header:{
         color: '#fff',
-        fontWeight: 'bold',
         fontSize: 18,
+        fontFamily: 'SFProDisplayBold',
+        letterSpacing: 0.38,
+        
+
+        
     },
+    
     container2:{
         flexDirection: "row"
    },

@@ -9,12 +9,15 @@ const InputField: React.FC<InputFieldProps> = ({placeHolder, title,...textInputP
 return(
 <View>
    <View style={styles.containerText}>
-    <Text style={styles.text}>{title}</Text>
+    <Text numberOfLines={1}    style={styles.text}>{title}</Text>
     <TextInput
+          
           style={styles.input}
           placeholder={placeHolder}
+
          {...textInputProps}/>
     </View>  
+    
 </View>
 
 );
@@ -37,8 +40,10 @@ const styles= StyleSheet.create({
     },
     text:{
         color: '#BDBDBD',
-        width: 64,
         height: 22,
+      
+        
+        
  },
     num:{
         color: '#BDBDBD',

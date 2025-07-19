@@ -32,7 +32,6 @@ const styles= StyleSheet.create({
         height: 52,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        
         alignItems: 'center',
     },
     emptyBox:{
@@ -47,8 +46,10 @@ const styles= StyleSheet.create({
     },
     header:{
         color: '#fff',
-        fontWeight: 'bold',
         fontSize: 18,
+        fontFamily: 'SFProDisplayBold',
+        letterSpacing: 0.38,
+        
         
     },
 })

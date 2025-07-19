@@ -76,11 +76,13 @@ container2:{
   top: 108,
 },
   text:{
-    color: '#fff',
+    color: '#BDBDBD',
+    
   },
   textBold:{
     color: '#fff',
-    fontWeight:'bold'
+    fontWeight:'bold',
+    fontSize: 18,
   },
   tooltip: {
     width: 333,

@@ -42,13 +42,17 @@ filters: {
     
   },
 filterButton: {
-    width: 100,
+    borderWidth: 1,
+    borderColor: '#fff',
+    width: 101,
     height: 30,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
     backgroundColor: '#1E1E1E',},
 filterButton2: {
+    borderWidth: 1,
+    borderColor: '#fff',
     width: 113,
     height: 30,
     paddingVertical: 6,
@@ -65,6 +69,8 @@ activeFilter: {
     backgroundColor: '#2AA651',
   },
    dateRange: {
+    borderWidth: 1,
+    borderColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 'auto',
