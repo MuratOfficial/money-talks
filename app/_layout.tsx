@@ -13,8 +13,13 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded, error] = useFonts({
-    "Inter": Inter_900Black,
+  const [loaded] = useFonts({
+    // "Inter": Inter_900Black,
+    // ActorRegular:require('../assets/fonts/Actor-Regular.ttf'),
+    SFProDisplayBold:require('../assets/fonts/SF-Pro-Display-Bold.otf'),
+    SFProDisplayRegular:require('../assets/fonts/SF-Pro-Display-Regular.otf'),
+    SFProDisplaySemiBold: require('../assets/fonts/SF-Pro-Display-Semibold.otf'),
+    // InterSemiBold: require('../assets/fonts/InterSemiBold')
   });
 
   useEffect(() => {
