@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
         height: 22,
         letterSpacing: -0.41,
         lineHeight: 22, 
+        // fontFamily: '' не работает шрифт Actor
     }
 
 })

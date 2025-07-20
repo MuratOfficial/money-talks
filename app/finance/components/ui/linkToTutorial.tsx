@@ -46,10 +46,10 @@ const styles = StyleSheet.create({
     },
     title:{
         fontSize: 16,
-        fontWeight: 'medium',
         color: '#fff',
         letterSpacing: -0.41,
         lineHeight: 24,
+        fontFamily: 'SFProDisplayMedium',
 
     },
     linkContainerIn:{
@@ -69,6 +69,9 @@ const styles = StyleSheet.create({
     linkText:{
         fontSize: 12,
         color: '#fff',
+        fontFamily: 'SFProDisplayMedium',
+        lineHeight:18,
+        letterSpacing: 0,
     }
 })
 

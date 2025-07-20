@@ -38,8 +38,7 @@ const styles= StyleSheet.create({
         display: 'flex',
     },
     headerTitle:{
-        fontFamily: 'SFProDisplaySemiBold',
-        // fontWeight: 600,
+        fontFamily: ' SFProDisplaySemiBold',
         fontSize: 24,
         color: '#fff', 
         width: 375,

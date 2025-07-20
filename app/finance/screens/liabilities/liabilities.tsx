@@ -116,7 +116,8 @@ container2:{
     height: 40,
     color: '#000',
     fontSize: 14,
-    fontWeight: 'regular'},
+    fontFamily: 'SFProDisplayRegular',
+  fontWeight: 400,},
 
   visible:{
     position: 'absolute',

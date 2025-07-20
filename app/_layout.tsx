@@ -15,11 +15,14 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     // "Inter": Inter_900Black,
-    // ActorRegular:require('../assets/fonts/Actor-Regular.ttf'),
+    ActorRegular:require('../assets/fonts/Actor-Regular.ttf'),
     SFProDisplayBold:require('../assets/fonts/SF-Pro-Display-Bold.otf'),
     SFProDisplayRegular:require('../assets/fonts/SF-Pro-Display-Regular.otf'),
-    SFProDisplaySemiBold: require('../assets/fonts/SF-Pro-Display-Semibold.otf'),
-    // InterSemiBold: require('../assets/fonts/InterSemiBold')
+    SFProDisplayMedium:require('../assets/fonts/SF-Pro-Display-Medium.otf'),
+    SFProDisplaySemiBold:require('../assets/fonts/SF-Pro-Display-Semibold.otf'),
+    InterMedium:require('../assets/fonts/Inter_18pt-Medium.ttf'),
+    InterSemiBold:require('../assets/fonts/Inter_18pt-SemiBold.ttf'),
+    AverageSansRegular:require('../assets/fonts/AverageSans-Regular.ttf'),
   });
 
   useEffect(() => {

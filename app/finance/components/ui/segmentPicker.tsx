@@ -2,8 +2,6 @@
  import React from 'react'
  import { useState } from 'react';
  
-
- 
   const SegmentPicker:React.FC=()=> {
   const [activeTab, setActiveTab] = useState<'Регулярные' | 'Нерегулярные'>('Регулярные');
  
@@ -21,11 +19,9 @@
      
    );
  }
-
-
  const styles = StyleSheet.create({
 tabs:{
-        flexDirection: 'row',
+    flexDirection: 'row',
     marginBottom: 10,
     width: 338,
     height:32,
@@ -34,7 +30,6 @@ tabs:{
     
 },
 tab:{
-    
     width: 169,
     height:32,
     borderRadius: 7,
@@ -47,12 +42,14 @@ tab:{
 },
 tabText:{
      color: 'white',
-     fontWeight: '600',
+     fontFamily: 'InterMedium',
+     lineHeight: 20,
+     fontSize: 13,
+     letterSpacing: -0.08,
 },
 activeTab:{
      backgroundColor: '#3C3C3C',
 },
  })
-
  export default SegmentPicker
  

@@ -58,12 +58,14 @@ filterButton2: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: '#1E1E1E',},
+    backgroundColor: '#1E1E1E',
+    },
 filterText: {
     color: '#FFFFFF',
     fontSize: 11,
     letterSpacing: 0,
-    fontWeight: 500,
+    lineHeight: 18,
+    fontFamily: 'SFProDisplayMedium'
   },
 activeFilter: {
     backgroundColor: '#2AA651',
@@ -78,12 +80,15 @@ activeFilter: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
+    
   },
 dateText: {
     color: '#FFFFFF',
     marginRight: 4,
     fontSize: 11,
     letterSpacing: 0,
-    fontWeight: 500,}
+    lineHeight: 18,
+    fontFamily: 'SFProDisplayMedium'
+  }
 
 })

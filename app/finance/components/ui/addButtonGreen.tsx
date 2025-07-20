@@ -34,7 +34,11 @@ const styles = StyleSheet.create({
 buttonText:{
     width: 76,
     height: 22,
-    color: '#FFFFFF'
+    color: '#FFFFFF',
+    // fontFamily: '',не работает шрифт Actor
+    fontSize:16,
+    lineHeight: 22,
+    letterSpacing: 0,
 }
     
 })

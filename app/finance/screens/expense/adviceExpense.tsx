@@ -67,7 +67,6 @@ return (
 const styles = StyleSheet.create({
   text3:{ 
       fontWeight: 300,
-
   },
   text2:{
       color: '#fff',
@@ -78,7 +77,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       width: 366,
       height: 760,
-      // justifyContent: 'space-between',
       gap: 12,
   },
   textSection:{
