@@ -39,7 +39,7 @@ const Expense:React.FC=()=> {
   
                <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет расходов</Text>
-      <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                            денежные потоки</Text>
+      <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                                       денежные потоки</Text>
         <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
      </Link>
                </View>
@@ -75,8 +75,11 @@ container2:{
   gap: 20,
   top: 108,
 },
- text:{
+  text:{
     color: '#BDBDBD',
+    fontSize: 14,
+    letterSpacing: -0.41,
+    fontFamily: 'SFProDisplayRegular'
     
   },
   textBold:{

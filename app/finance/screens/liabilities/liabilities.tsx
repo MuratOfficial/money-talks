@@ -36,7 +36,7 @@ const [layerVisible, setLayerVisible]= useState(true);
   
       <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет пассивов</Text>
-      <Text style={styles.text}>Добавьте ваши пассивы, начните отслеживать свои денежные потоки</Text>
+      <Text style={styles.text}>Добавьте ваши пассивы, начните отслеживать свои{`\n`}                                       денежные потоки</Text>
         <Link href={'/finance/screens/liabilities/addLiabilities'} > <AddButton/>
      </Link>
       </View>
@@ -70,16 +70,20 @@ container2:{
   width: 343,
   height: 127,
   gap: 20,
-  top: 196,
+  top: 108,
 },
- text:{
+  text:{
     color: '#BDBDBD',
+    fontSize: 14,
+    letterSpacing: -0.41,
+    fontFamily: 'SFProDisplayRegular'
     
   },
   textBold:{
     color: '#fff',
-    fontWeight:'bold',
     fontSize: 18,
+    fontFamily: 'SFProDisplaySemiBold',
+    letterSpacing: 0,
   },
   tooltip: {
     width: 333,
@@ -118,6 +122,7 @@ container2:{
     fontSize: 14,
     fontFamily: 'SFProDisplayRegular',
   fontWeight: 400,},
+    
 
   visible:{
     position: 'absolute',

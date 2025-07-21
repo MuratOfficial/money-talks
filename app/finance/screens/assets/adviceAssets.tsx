@@ -8,7 +8,7 @@ export default function AdviceAssets() {
 return (
     <View style={styles.screen}>
       <View style={styles.container}>
-        <BackButtonHeader link='/finance/screens/income/income' title='Подсказки про доходы'></BackButtonHeader>
+        <BackButtonHeader link='/finance/screens/assets/assets' title='Подсказки про активы'></BackButtonHeader>
         <ScrollView style={styles.textSection}>
           
                <Text style={styles.sectionTitle}>Активы 🏡📈</Text>

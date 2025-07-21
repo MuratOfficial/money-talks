@@ -39,7 +39,7 @@ export default function Income() {
   
                <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет доходов</Text>
-      <Text style={styles.text}>Добавьте ваши доходы, начните отслеживать свои денежные потоки</Text>
+      <Text style={styles.text}>Добавьте ваши доходы, начните отслеживать свои {`\n`}                                     денежные потоки</Text>
         <Link href={'/finance/screens/income/addIncome'} > <AddButton/>
      </Link>
                </View>
@@ -77,12 +77,16 @@ container2:{
 },
   text:{
     color: '#BDBDBD',
+    fontSize: 14,
+    letterSpacing: -0.41,
+    fontFamily: 'SFProDisplayRegular'
     
   },
   textBold:{
     color: '#fff',
-    fontWeight:'bold',
     fontSize: 18,
+    fontFamily: 'SFProDisplaySemiBold',
+    letterSpacing: 0,
   },
   tooltip: {
     width: 333,
@@ -121,6 +125,7 @@ container2:{
     fontSize: 14,
     fontFamily: 'SFProDisplayRegular',
   fontWeight: 400,},
+    
 
   visible:{
     position: 'absolute',
