@@ -5,15 +5,24 @@ import { Link } from 'expo-router'
 import SegmentPicker from '../../components/ui/segmentPicker'
 import Filters from '../../components/ui/filters'
 import NavBar from '../../components/ui/navBar'
+import { LuCirclePlus } from "react-icons/lu";
+import { BsPencilSquare } from "react-icons/bs";
+import AmountModal from '../../components/ui/amountModal'
 
 
 const Expense:React.FC=()=> {
+ const [isModalVisible, setModalVisible]= useState(false);
  const [layerVisible, setLayerVisible]= useState(true);
  const [showHint,setShowHint] = useState(true)
  const handlePress = ()=>{
     setShowHint(false);//hide hint
     setLayerVisible(false);//hide Layer
   }
+  const handleOpenModal=()=>{
+    setModalVisible(true)
+  }
+
+
   return (
   <Pressable onPress={handlePress} style={styles.pressScreen}>
     <View style={styles.container}>
@@ -30,11 +39,31 @@ const Expense:React.FC=()=> {
         
         {layerVisible && (<TouchableOpacity style={styles.visible} onPress={handlePress}>
         </TouchableOpacity>)}
-{/*  */}
+
            <View>
       <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
+
+      <View style={styles.pick}>
+        <Text style={styles.picked}>Picked Item(Продукты)</Text>
+       
+        <TouchableOpacity onPress={handleOpenModal}>
+          <AmountModal
+          visible={isModalVisible}
+  onClose={() => setModalVisible(false)}
+  onSubmit={(amount) => {
+    console.log('Вы ввели сумму:', amount);
+    setModalVisible(false);
+  }}></AmountModal>
+          <LuCirclePlus size={20} color='#fff'></LuCirclePlus>
+        </TouchableOpacity>
+        <TouchableOpacity>
+           <BsPencilSquare size={20} color='#fff'></BsPencilSquare>
+        </TouchableOpacity>
+     
+      </View>
+{/*компонент pick временный, необходимо вывести в отдельный компонент  */}
            </View>
   
                <View style={styles.container2}>
@@ -50,6 +79,21 @@ const Expense:React.FC=()=> {
   )
 }
 const styles=StyleSheet.create({
+  icon:{
+  },
+  picked:{
+    color: '#fff'
+  },
+  pick:{
+    width: 343,
+    height: 100,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#1E1E1E',
+    borderRadius: 14,
+  },
+
+
   pressScreen:{ 
     backgroundColor: '#fff',
     width: 375,
