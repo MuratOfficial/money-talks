@@ -116,32 +116,7 @@ const PlanScreen = () => {
         <View className="h-20" />
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 bg-neutral-900 flex-row justify-around items-center h-16 border-t border-neutral-800">
-        <TouchableOpacity className="items-center">
-          <Ionicons name="home-outline" size={24} color="white" />
-          <Text className="text-white text-xs mt-1">Главная</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity className="items-center">
-          <Feather name="bar-chart-2" size={24} color="white" />
-          <Text className="text-white text-xs mt-1">Финансы</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center">
-          <MaterialIcons name="event-note" size={24} color="white" />
-          <Text className="text-white text-xs mt-1">ЛФП</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center">
-          <Ionicons name="diamond-outline" size={24} color="#4ade80" />
-          <Text className="text-green-400 text-xs mt-1">Инвестиции</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center">
-          <FontAwesome name="user-o" size={24} color="white" />
-          <Text className="text-white text-xs mt-1">Профиль</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
