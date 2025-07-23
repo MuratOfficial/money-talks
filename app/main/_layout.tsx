@@ -16,7 +16,7 @@ export default function RootLayout(): ReactElement {
   const segments = useSegments();
 
   // Определяем активный экран
-  const activeRoute = segments[0] || '/main';
+  const activeRoute = (segments[1] ? segments[1] : segments[0]) || "main";
 
   // Данные для кнопок навигации
   const navButtons: NavButton[] = [
