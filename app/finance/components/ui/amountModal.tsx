@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-// доработать css!!!!
+import {View,Text,Modal,TextInput,TouchableOpacity,StyleSheet,} from 'react-native';
+import { HiOutlineBackspace } from "react-icons/hi2";
+import { MdOutlineDone } from "react-icons/md";
+import { GoXCircleFill } from "react-icons/go";
+
+
 type Props = {
   visible: boolean;
   onClose: () => void;
   onSubmit: (amount: string) => void;
+ title: string;
+  children?: React.ReactNode;
 };
 
-const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
+const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => {
   const [amount, setAmount] = useState<string>('');
 
   const handlePress = (value: string) => {
@@ -34,7 +33,11 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
     <Modal animationType="slide" transparent={true} visible={visible} >
       <View style={styles.modalBackground}>
         <View style={styles.container}>
-          <Text style={styles.title}>Продукты</Text>
+          <View style={styles.close}><Text style={styles.title}>{title}</Text>
+                    <TouchableOpacity  onPress={onClose}>
+            <GoXCircleFill size={25} color='#999'/>
+          </TouchableOpacity>
+          </View>
           <Text style={styles.amount}>{amount || '0'} ₸</Text>
 
           <View style={styles.keyboard}>
@@ -52,15 +55,13 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
                 }}
               >
                 <Text style={styles.keyText}>
-                  {key === 'del' ? '⌫' : key === 'ok' ? '✓' : key}
+                  {key === 'del' ? <HiOutlineBackspace size={27}/> : key === 'ok' ? <MdOutlineDone size={26}/> : key}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <TouchableOpacity onPress={onClose} style={styles.close}>
-            <Text style={{ color: '#999' }}>✕</Text>
-          </TouchableOpacity>
+
         </View>
       </View>
     </Modal>
@@ -72,61 +73,67 @@ export default AmountModal;
 const styles = StyleSheet.create({
   modalBackground: {
     width: 375,
-    
     backgroundColor: 'rgba(0,0,0,0.4)',
-    // justifyContent: 'flex-start',
     borderRadius: 14,
-    top: 325
-    
-   
-   
-
+    top: 355
   },
   container: {
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#1C1C1E',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    padding: 24,
+    padding: 0,
+    
   },
   title: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 17,
     marginBottom: 10,
+    fontFamily: 'InterSemiBold',
+    lineHeight: 22,
+    letterSpacing: -0.41,
   },
   amount: {
     color: '#fff',
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
     textAlign: 'center',
-    marginVertical: 12,
+    height: 110,
+    paddingTop: 34,
+    
   },
   keyboard: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    height: 256,
+    gap: 5,
+
   },
   key: {
-    width: '30%',
-    margin: '1.5%',
-    aspectRatio: 1,
-    backgroundColor: '#444',
+    width: 117,
+    height: 60,
+    backgroundColor: '#6F6F70',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 5,
   },
   keyText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 25,
   },
   okButton: {
     backgroundColor: '#4CAF50',
   },
   delButton: {
-    backgroundColor: '#666',
+    backgroundColor: '#1C1C1E',
   },
   close: {
-    alignItems: 'center',
-    marginTop: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  height: 57,
+  paddingLeft: 16,
+  paddingRight: 16,
+  paddingTop: 30,
   },
 });
 

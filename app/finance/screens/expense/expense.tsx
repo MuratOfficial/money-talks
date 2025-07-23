@@ -45,27 +45,38 @@ const Expense:React.FC=()=> {
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
 
+
+
+
+       {/*  */}
       <View style={styles.pick}>
         <Text style={styles.picked}>Picked Item(Продукты)</Text>
-       
-        <TouchableOpacity onPress={handleOpenModal}>
+     
+
+        <View style={styles.icon}>
+          <TouchableOpacity onPress={handleOpenModal}>
           <AmountModal
+          title='Продукты'
           visible={isModalVisible}
-  onClose={() => setModalVisible(false)}
-  onSubmit={(amount) => {
-    console.log('Вы ввели сумму:', amount);
-    setModalVisible(false);
-  }}></AmountModal>
+          onClose={() => setModalVisible(false)}
+          onSubmit={(amount) => {
+          console.log('Вы ввели сумму:', amount);
+          setModalVisible(false);
+  }}>     </AmountModal>
           <LuCirclePlus size={20} color='#fff'></LuCirclePlus>
         </TouchableOpacity>
         <TouchableOpacity>
            <BsPencilSquare size={20} color='#fff'></BsPencilSquare>
         </TouchableOpacity>
-     
+        </View>
+        
       </View>
 {/*компонент pick временный, необходимо вывести в отдельный компонент  */}
            </View>
   
+
+
+
                <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет расходов</Text>
       <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                                       денежные потоки</Text>
@@ -80,17 +91,24 @@ const Expense:React.FC=()=> {
 }
 const styles=StyleSheet.create({
   icon:{
+    flexDirection: 'row',
+    gap: 10,
   },
   picked:{
-    color: '#fff'
+    color: '#fff',
+
+
   },
   pick:{
     width: 343,
-    height: 100,
+    height: 212,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     backgroundColor: '#1E1E1E',
     borderRadius: 14,
+        paddingTop: 14,
+    paddingLeft: 12,
+    paddingRight: 12,
   },
 
 
