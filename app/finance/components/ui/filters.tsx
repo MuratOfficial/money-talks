@@ -2,9 +2,13 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-// fix css
 
-export default function Filters() {
+
+type Props={
+onPress:()=>void
+
+}
+const Filters:React.FC<Props> = ({onPress}) => {
     const [filter, setFilter] = useState<'Обязательные' | 'Необязательные'>('Обязательные');
 
 return (
@@ -21,7 +25,7 @@ return (
               <Text style={styles.filterText}>Необязательные</Text>
       </TouchableOpacity>
 
-        <TouchableOpacity style={styles.dateRange}>
+        <TouchableOpacity onPress={onPress} style={styles.dateRange}>
           <Text style={styles.dateText}>За месяц</Text>
           <Ionicons name="swap-vertical" size={16} color="white" />
         </TouchableOpacity>
@@ -92,3 +96,4 @@ dateText: {
   }
 
 })
+export default Filters

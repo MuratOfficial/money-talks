@@ -8,20 +8,29 @@ import NavBar from '../../components/ui/navBar'
 import { LuCirclePlus } from "react-icons/lu";
 import { BsPencilSquare } from "react-icons/bs";
 import AmountModal from '../../components/ui/amountModal'
+import ModalSorting from '../../components/ui/sortingModal'
 
 
 const Expense:React.FC=()=> {
- const [isModalVisible, setModalVisible]= useState(false);
+//  const [blurScreen, setBlurScreen]= useState(false) сделай blur screen!!!!!!!!!!!
+        //  {blurScreen && (<TouchableOpacity style={styles.blur} >
+        // </TouchableOpacity>)}
  const [layerVisible, setLayerVisible]= useState(true);
- const [showHint,setShowHint] = useState(true)
+ const [showHint,setShowHint] = useState(true);
+ const [isModalVisible, setModalVisible]= useState(false);
+ const [isSortVisible, setSortVisible] = useState(false);
  const handlePress = ()=>{
-    setShowHint(false);//hide hint
-    setLayerVisible(false);//hide Layer
-  }
-  const handleOpenModal=()=>{
-    setModalVisible(true)
+ setShowHint(false);//hide hint
+ setLayerVisible(false);//hide Layer
   }
 
+ const handleOpenModal=()=>{
+ setModalVisible(true)
+  }
+ const handleSortModalOpen=()=>{
+ setSortVisible(true)
+ 
+ }
 
   return (
   <Pressable onPress={handlePress} style={styles.pressScreen}>
@@ -39,20 +48,17 @@ const Expense:React.FC=()=> {
         
         {layerVisible && (<TouchableOpacity style={styles.visible} onPress={handlePress}>
         </TouchableOpacity>)}
-
            <View>
       <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
-      <Filters></Filters>
+      <Filters onPress={handleSortModalOpen}></Filters>
+              <ModalSorting
+                 visible={isSortVisible}
+                 onClose={()=> setSortVisible(false)}/>
 
-
-
-
-       {/*  */}
+{/*  */}
       <View style={styles.pick}>
         <Text style={styles.picked}>Picked Item(Продукты)</Text>
-     
-
         <View style={styles.icon}>
           <TouchableOpacity onPress={handleOpenModal}>
           <AmountModal
@@ -69,20 +75,17 @@ const Expense:React.FC=()=> {
            <BsPencilSquare size={20} color='#fff'></BsPencilSquare>
         </TouchableOpacity>
         </View>
-        
       </View>
 {/*компонент pick временный, необходимо вывести в отдельный компонент  */}
+
            </View>
-  
 
-
-
-               <View style={styles.container2}>
-      <Text style={styles.textBold} >У вас пока нет расходов</Text>
-      <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                                       денежные потоки</Text>
-        <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
-     </Link>
-               </View>
+            <View style={styles.container2}>
+                <Text style={styles.textBold} >У вас пока нет расходов</Text>
+                <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                                       денежные потоки</Text>
+                <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
+                </Link>
+            </View>
      
       </View>
     </View>
@@ -90,14 +93,24 @@ const Expense:React.FC=()=> {
   )
 }
 const styles=StyleSheet.create({
+  blur:{
+     position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#5B5B5B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    opacity: 0.5
+  },
   icon:{
     flexDirection: 'row',
     gap: 10,
   },
   picked:{
     color: '#fff',
-
-
   },
   pick:{
     width: 343,
@@ -110,8 +123,6 @@ const styles=StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
   },
-
-
   pressScreen:{ 
     backgroundColor: '#fff',
     width: 375,
@@ -142,7 +153,6 @@ container2:{
     fontSize: 14,
     letterSpacing: -0.41,
     fontFamily: 'SFProDisplayRegular'
-    
   },
   textBold:{
     color: '#fff',

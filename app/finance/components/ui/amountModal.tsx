@@ -3,13 +3,13 @@ import {View,Text,Modal,TextInput,TouchableOpacity,StyleSheet,} from 'react-nati
 import { HiOutlineBackspace } from "react-icons/hi2";
 import { MdOutlineDone } from "react-icons/md";
 import { GoXCircleFill } from "react-icons/go";
-
+import { BlurView } from 'react-native-blur';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   onSubmit: (amount: string) => void;
- title: string;
+  title: string;
   children?: React.ReactNode;
 };
 
@@ -23,14 +23,13 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
       setAmount(prev => prev + value);
     }
   };
-
   const handleSubmit = () => {
     onSubmit(amount);
     setAmount('');
   };
-
   return (
     <Modal animationType="slide" transparent={true} visible={visible} >
+
       <View style={styles.modalBackground}>
         <View style={styles.container}>
           <View style={styles.close}><Text style={styles.title}>{title}</Text>
@@ -39,7 +38,6 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
           </TouchableOpacity>
           </View>
           <Text style={styles.amount}>{amount || '0'} ₸</Text>
-
           <View style={styles.keyboard}>
             {['1','2','3','4','5','6','7','8','9','del','0','ok'].map((key, index) => (
               <TouchableOpacity
@@ -60,8 +58,7 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
               </TouchableOpacity>
             ))}
           </View>
-
-
+          <View ></View>
         </View>
       </View>
     </Modal>
@@ -71,18 +68,18 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
 export default AmountModal;
 
 const styles = StyleSheet.create({
+    absolute:{},
   modalBackground: {
     width: 375,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     borderRadius: 14,
-    top: 355
+    top: 425,
+    // left: 500,
   },
   container: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#1C1C1E', 
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 0,
-    
   },
   title: {
     color: '#fff',
@@ -98,20 +95,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     height: 110,
-    paddingTop: 34,
-    
+    paddingTop: 31,
   },
   keyboard: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    height: 256,
+    height: 285,
     gap: 5,
-
+    paddingBottom: 72,
+    paddingTop: 5,
+    backgroundColor:  '#151515'
   },
   key: {
     width: 117,
-    height: 60,
+    height: 50,
     backgroundColor: '#6F6F70',
     justifyContent: 'center',
     alignItems: 'center',
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   okButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#2AA651',
   },
   delButton: {
     backgroundColor: '#1C1C1E',
