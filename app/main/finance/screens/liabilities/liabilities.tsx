@@ -37,7 +37,7 @@ const [layerVisible, setLayerVisible]= useState(true);
       <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет пассивов</Text>
       <Text style={styles.text}>Добавьте ваши пассивы, начните отслеживать свои денежные потоки</Text>
-        <Link href={'/finance/screens/liabilities/addLiabilities'} > <AddButton/>
+        <Link href={'/main/finance/screens/liabilities/addLiabilities'} > <AddButton/>
      </Link>
       </View>
      

@@ -6,7 +6,7 @@ import { Link } from 'expo-router';
 export default function AnalysisButton() {
   return (
    
-       <Link href='/finance/screens/analysis/analysis'><TouchableOpacity>
+       <Link href='/main/finance/screens/analysis/analysis'><TouchableOpacity>
        <View style={styles.analysis}>
          <Image style={styles.analysisImg} source={require('./iconButton/analysis.png')}></Image>
          <Text style={styles.analysisText}>Анализ</Text>

@@ -1,10 +1,8 @@
-
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
 
-// Типы для навигационных кнопок
 type NavButton = {
   route: "/main" | '/main/finance' | '/main/lfp' | '/main/invest' | '/main/profile';
   iconName: React.ComponentProps<typeof Ionicons>['name'];
@@ -14,11 +12,8 @@ type NavButton = {
 export default function RootLayout(): ReactElement {
   const router = useRouter();
   const segments = useSegments();
-
-  // Определяем активный экран
   const activeRoute = (segments[1] ? segments[1] : segments[0]) || "main";
 
-  // Данные для кнопок навигации
   const navButtons: NavButton[] = [
     { route: '/main', iconName: 'home', label: 'Главная' },
     { route: '/main/finance', iconName: 'bar-chart-outline', label: 'Финансы' },
@@ -29,8 +24,10 @@ export default function RootLayout(): ReactElement {
 
   return (
     <View style={styles.container}>
-      {/* Основной контент */}
-      <Slot />
+      {/* Основной контент с padding снизу для навигации */}
+      <View style={styles.content}>
+        <Slot />
+      </View>
 
       {/* Нижняя навигация */}
       <View style={styles.bottomNav}>
@@ -43,7 +40,7 @@ export default function RootLayout(): ReactElement {
             <Ionicons
               name={button.iconName}
               size={24}
-              color={button.route.includes(activeRoute)  ? '#66BB6A' : '#666'}
+              color={button.route.includes(activeRoute) ? '#66BB6A' : '#666'}
             />
             <Text style={[
               styles.navLabel,
@@ -63,12 +60,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1a1a1a',
   },
+  content: {
+    flex: 1,
+    paddingBottom: 70, // Добавляем отступ равный высоте навигации
+  },
   bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     backgroundColor: '#2a2a2a',
     paddingVertical: 15,
     paddingHorizontal: 20,
     justifyContent: 'space-around',
+    height: 70, // Фиксированная высота навигации
   },
   navItem: {
     alignItems: 'center',

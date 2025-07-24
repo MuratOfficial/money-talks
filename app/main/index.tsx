@@ -52,7 +52,7 @@ const App = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} className='font-sans'>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
       
       {/* Header */}
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a1a',
+    paddingTop: 10
   },
   header: {
     flexDirection: 'row',
