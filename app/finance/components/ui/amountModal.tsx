@@ -3,7 +3,8 @@ import {View,Text,Modal,TextInput,TouchableOpacity,StyleSheet,} from 'react-nati
 import { HiOutlineBackspace } from "react-icons/hi2";
 import { MdOutlineDone } from "react-icons/md";
 import { GoXCircleFill } from "react-icons/go";
-import { BlurView } from 'react-native-blur';
+import { BlurView } from 'expo-blur';
+
 
 type Props = {
   visible: boolean;
@@ -29,7 +30,7 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
   };
   return (
     <Modal animationType="slide" transparent={true} visible={visible} >
-
+ <BlurView intensity={30} tint='light' style={styles.blur}>
       <View style={styles.modalBackground}>
         <View style={styles.container}>
           <View style={styles.close}><Text style={styles.title}>{title}</Text>
@@ -61,6 +62,7 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
           <View ></View>
         </View>
       </View>
+ </BlurView>
     </Modal>
   );
 };
@@ -68,18 +70,21 @@ const AmountModal: React.FC<Props> = ({ visible, onClose, onSubmit,title  }) => 
 export default AmountModal;
 
 const styles = StyleSheet.create({
-    absolute:{},
+  blur:{
+flex: 1,
+  },
+
   modalBackground: {
     width: 375,
-    borderRadius: 14,
     top: 425,
     // left: 500,
+    backgroundColor: '#fff',
+    borderRadius: 16,
   },
   container: {
-    backgroundColor: '#1C1C1E', 
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 0,
+     backgroundColor: '#1C1C1E', 
+     borderRadius: 16,
+     padding: 0,
   },
   title: {
     color: '#fff',
@@ -105,7 +110,10 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingBottom: 72,
     paddingTop: 5,
-    backgroundColor:  '#151515'
+    backgroundColor:  '#151515',
+    // backgroundColor: '#32a852',
+    borderRadius:16,
+    
   },
   key: {
     width: 117,

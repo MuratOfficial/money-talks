@@ -7,14 +7,13 @@ import Filters from '../../components/ui/filters'
 import NavBar from '../../components/ui/navBar'
 import { LuCirclePlus } from "react-icons/lu";
 import { BsPencilSquare } from "react-icons/bs";
-import AmountModal from '../../components/ui/amountModal'
 import ModalSorting from '../../components/ui/sortingModal'
+import AmountModal from '../../components/ui/amountModal'
+
+
 
 
 const Expense:React.FC=()=> {
-//  const [blurScreen, setBlurScreen]= useState(false) сделай blur screen!!!!!!!!!!!
-        //  {blurScreen && (<TouchableOpacity style={styles.blur} >
-        // </TouchableOpacity>)}
  const [layerVisible, setLayerVisible]= useState(true);
  const [showHint,setShowHint] = useState(true);
  const [isModalVisible, setModalVisible]= useState(false);
@@ -60,7 +59,17 @@ const Expense:React.FC=()=> {
       <View style={styles.pick}>
         <Text style={styles.picked}>Picked Item(Продукты)</Text>
         <View style={styles.icon}>
-          <TouchableOpacity onPress={handleOpenModal}>
+          <TouchableOpacity style={styles.small} onPress={handleOpenModal}>
+
+          <LuCirclePlus size={20} color='#fff'></LuCirclePlus>
+        </TouchableOpacity>
+        <TouchableOpacity>
+           <BsPencilSquare size={20} color='#fff'></BsPencilSquare>
+        </TouchableOpacity>
+        </View>
+      </View>
+      
+{/*компонент pick временный, необходимо вывести в отдельный компонент  */}
           <AmountModal
           title='Продукты'
           visible={isModalVisible}
@@ -69,15 +78,6 @@ const Expense:React.FC=()=> {
           console.log('Вы ввели сумму:', amount);
           setModalVisible(false);
   }}>     </AmountModal>
-          <LuCirclePlus size={20} color='#fff'></LuCirclePlus>
-        </TouchableOpacity>
-        <TouchableOpacity>
-           <BsPencilSquare size={20} color='#fff'></BsPencilSquare>
-        </TouchableOpacity>
-        </View>
-      </View>
-{/*компонент pick временный, необходимо вывести в отдельный компонент  */}
-
            </View>
 
             <View style={styles.container2}>
@@ -93,6 +93,10 @@ const Expense:React.FC=()=> {
   )
 }
 const styles=StyleSheet.create({
+  small:{
+    width: 20,
+    height:20,
+  },
   blur:{
      position: 'absolute',
     top: 0,
@@ -119,7 +123,7 @@ const styles=StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#1E1E1E',
     borderRadius: 14,
-        paddingTop: 14,
+    paddingTop: 14,
     paddingLeft: 12,
     paddingRight: 12,
   },
