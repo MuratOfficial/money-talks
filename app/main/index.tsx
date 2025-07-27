@@ -1,258 +1,160 @@
-
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 
-const App = () => {
-  const incomeCategories = [
-    { id: 1, name: 'Зарплата', icon: 'wallet', color: '#4FC3F7', amount: '500,000 ₸' },
-    { id: 2, name: 'Фриланс', icon: 'laptop', color: '#66BB6A', amount: '0 ₸' },
-    { id: 3, name: 'Депозит', icon: 'business', color: '#AB47BC', amount: '200,000 ₸' },
-    { id: 4, name: 'Дивиденды', icon: 'trending-up', color: '#FFA726', amount: '100,000 ₸' },
+const MainScreen = () => {
+
+    const handleGoal = (title:string) => {
+      if (title !== "Цели") {
+        return;
+      }
+      
+
+      router.replace('/main/goals/main');
+    };
+
+    const router = useRouter();
+  const [walletBalance] = useState('950 000 ₸');
+
+  const categories = [
+    {
+      title: 'Кошелек',
+      balance: walletBalance,
+      items: [
+        { name: 'Банковский счет', amount: '20 000 ₸', color: '#4FC3F7', icon: 'card' },
+        { name: 'Бумажные счеты', amount: '20 000 ₸', color: '#66BB6A', icon: 'document-text' },
+        { name: 'Валютные вклады', amount: '200 000 ₸', color: '#7986CB', icon: 'trending-up' },
+        { name: 'Пенсионные активы', amount: '700 000 ₸', color: '#FFB74D', icon: 'briefcase' }
+      ]
+    },
+    {
+      title: 'Доходы',
+      balance: '900 000 ₸',
+      items: [
+        { name: 'Зарплата', amount: '600 000 ₸', color: '#4FC3F7', icon: 'wallet' },
+        { name: 'Банк', amount: '50 000 ₸', color: '#66BB6A', icon: 'business' },
+        { name: 'Криптовалюта', amount: '200 000 ₸', color: '#7986CB', icon: 'logo-bitcoin' },
+        { name: 'Пенсия', amount: '200 000 ₸', color: '#FFB74D', icon: 'card' }
+      ]
+    },
+    {
+      title: 'Расходы',
+      balance: '79 500 ₸',
+      items: [
+        { name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag' },
+        { name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school' },
+        { name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait' },
+        { name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller' }
+      ]
+    },
+    {
+      title: 'Цели',
+      items: [
+        { name: 'Краткосрочные', color: '#29B6F6', icon: 'snow' },
+        { name: 'Среднесрочные', color: '#66BB6A', icon: 'medical' },
+        { name: 'Долгосрочные', color: '#7986CB', icon: 'time' }
+      ]
+    }
   ];
 
-  const expenseCategories = [
-    { id: 1, name: 'Продукты', icon: 'basket', color: '#4FC3F7', amount: '60,000 ₸' },
-    { id: 2, name: 'Транспорт', icon: 'car', color: '#66BB6A', amount: '20,000 ₸' },
-    { id: 3, name: 'Развлечения', icon: 'game-controller', color: '#AB47BC', amount: '200,000 ₸' },
-    { id: 4, name: 'Коммуналка', icon: 'home', color: '#FFA726', amount: '200,000 ₸' },
-  ];
-
-  const expenseCategories2 = [
-    { id: 5, name: 'Здоровье', icon: 'medical', color: '#4FC3F7', amount: '50,000 ₸' },
-    { id: 6, name: 'Образование', icon: 'school', color: '#66BB6A', amount: '0 ₸' },
-    { id: 7, name: 'Красота', icon: 'flower', color: '#AB47BC', amount: '0 ₸' },
-    { id: 8, name: 'Путешествия', icon: 'airplane', color: '#FFA726', amount: '0 ₸' },
-  ];
-
-  const goalCategories = [
-    { id: 1, name: 'Автомобиль', icon: 'car-sport', color: '#4FC3F7' },
-    { id: 2, name: 'Образование', icon: 'school', color: '#66BB6A' },
-    { id: 3, name: 'Путешествия', icon: 'airplane', color: '#AB47BC' },
-  ];
-
-  const CategoryItem = ({ item, showAmount = true }:{item?:any, showAmount?:boolean}) => (
-    <TouchableOpacity 
-      style={[styles.categoryItem, { backgroundColor: item.color }]}
+  const CategoryCard = ({ item, title }:any) => (
+    <TouchableOpacity
+      className="w-[23%] items-center mb-6"
       activeOpacity={0.8}
+      onPress={
+        ()=>{
+          handleGoal(title)
+        }
+      }
     >
-      <Ionicons name={item.icon} size={24} color="white" style={styles.categoryIcon} />
-      <Text style={styles.categoryName}>{item.name}</Text>
-      {showAmount && <Text style={styles.categoryAmount}>{item.amount}</Text>}
+      <View 
+        className="w-14 h-14 rounded-full items-center justify-center mb-2"
+        style={{ backgroundColor: item.color }}
+      >
+        <Ionicons name={item.icon} size={24} color="white" />
+      </View>
+      
+      <Text className="text-white text-xs font-['SFProDisplayMedium'] text-center mb-1">
+        {item.name}
+      </Text>
+      
+      {item.amount && (
+        <Text className="text-white text-xs font-['SFProDisplayBold'] text-center">
+          {item.amount}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 
-  const SectionTitle = ({ title, action }:{title:string, action:string}) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
-        <Text style={styles.actionText}>{action}</Text>
-      </TouchableOpacity>
+  const CategorySection = ({ category }:any) => (
+    <View className="mb-6">
+      <View className="flex-row items-center justify-between mb-4">
+        <View>
+          <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+            {category.title}
+          </Text>
+          {category.balance && (
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+              {category.balance}
+            </Text>
+          )}
+        </View>
+        
+        {category.title === 'Кошелек' ? (
+          <TouchableOpacity onPress={()=>router.replace('/main/wallet/add-wallet')} className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
+            <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
+              Добавить
+            </Text>
+            <Ionicons name="add" size={16} color="#FFF" />
+          </TouchableOpacity>
+        ) : category.title !== 'Цели' ? (
+          <TouchableOpacity className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
+            <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
+              Изменить
+            </Text>
+            <Ionicons name="chevron-down" size={16} color="#FFF" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+      
+      <View className="flex-row flex-wrap justify-between">
+        {category.items.map((item:any, index:number) => (
+          <CategoryCard key={index} item={item} title={category.title}/>
+        ))}
+      </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} className='font-sans'>
-      <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Главная</Text>
-        <TouchableOpacity style={styles.settingsButton} activeOpacity={0.8}>
-          <Ionicons name="settings-outline" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Wallet Balance */}
-      <View style={styles.walletCard}>
-        <View style={styles.walletHeader}>
-          <Text style={styles.walletTitle}>Список расходов, доходов, кошелька и целей</Text>
-          <TouchableOpacity style={styles.walletSettings} activeOpacity={0.8}>
-            <Ionicons name="settings-outline" size={20} color="#fff" />
-          </TouchableOpacity>
+    <LinearGradient
+      colors={['#1B5E20', '#000000']}
+      className="flex-1"
+    >
+      <SafeAreaView className="flex-1">
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-4 py-3">
+          <Text className="text-white text-xl font-['SFProDisplayBold']">
+            Главная
+          </Text>
+          
+   
         </View>
-        
-        <View style={styles.walletBalance}>
-          <Text style={styles.walletLabel}>Кошелек</Text>
-          <Text style={styles.walletAmount}>820,000 ₸</Text>
-        </View>
-      </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Income Section */}
-        <SectionTitle title="Доходы" action="Добавить" />
-        <View style={styles.categoryRow}>
-          {incomeCategories.map((item) => (
-            <CategoryItem key={item.id} item={item} />
+        <ScrollView 
+          className="flex-1 px-4"
+          showsVerticalScrollIndicator={false}
+        >
+          {categories.map((category, index) => (
+            <CategorySection key={index} category={category} />
           ))}
-        </View>
 
-        {/* Expense Section */}
-        <SectionTitle title="Расходы" action="Добавить" />
-        <View style={styles.categoryRow}>
-          {expenseCategories.map((item) => (
-            <CategoryItem key={item.id} item={item} />
-          ))}
-        </View>
-        <View style={styles.categoryRow}>
-          {expenseCategories2.map((item) => (
-            <CategoryItem key={item.id} item={item} />
-          ))}
-        </View>
-
-        {/* Goals Section */}
-        <SectionTitle title="Цели" action="Добавить" />
-        <View style={styles.categoryRow}>
-          {goalCategories.map((item) => (
-            <CategoryItem key={item.id} item={item} showAmount={false} />
-          ))}
-        </View>
-        
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
-
-      {/* Bottom Navigation */}
-     
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    paddingTop: 10
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#1a1a1a',
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  settingsButton: {
-    padding: 5,
-  },
-  walletCard: {
-    backgroundColor: '#66BB6A',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 15,
-    padding: 20,
-  },
-  walletHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  walletTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-    marginRight: 10,
-  },
-  walletSettings: {
-    padding: 5,
-  },
-  walletBalance: {
-    alignItems: 'center',
-  },
-  walletLabel: {
-    color: '#fff',
-    fontSize: 14,
-    opacity: 0.8,
-  },
-  walletAmount: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginTop: 5,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-    marginTop: 20,
-  },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  actionButton: {
-    backgroundColor: '#333',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  categoryItem: {
-    width: '48%',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 10,
-    alignItems: 'center',
-    minHeight: 100,
-    justifyContent: 'center',
-  },
-  categoryIcon: {
-    marginBottom: 8,
-  },
-  categoryName: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  categoryAmount: {
-    color: '#fff',
-    fontSize: 12,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  bottomSpacing: {
-    height: 20,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: '#2a2a2a',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    justifyContent: 'space-around',
-  },
-  navItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  navLabel: {
-    color: '#666',
-    fontSize: 10,
-    marginTop: 5,
-  },
-});
-
-export default App;
-
+export default MainScreen;

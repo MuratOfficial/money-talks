@@ -17,7 +17,7 @@ export default function RootLayout(): ReactElement {
   const navButtons: NavButton[] = [
     { route: '/main', iconName: 'home', label: 'Главная' },
     { route: '/main/finance', iconName: 'bar-chart-outline', label: 'Финансы' },
-    { route: '/main/lfp', iconName: 'bar-chart-outline', label: 'ЛФП' },
+    { route: '/main/lfp', iconName: 'list-circle-outline', label: 'ЛФП' },
     { route: '/main/invest', iconName: 'pie-chart-outline', label: 'Инвестиции' },
     { route: '/main/profile', iconName: 'person-outline', label: 'Профиль' },
   ];
@@ -58,7 +58,6 @@ export default function RootLayout(): ReactElement {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
   },
   content: {
     flex: 1,
@@ -70,7 +69,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#1D1F24',
     paddingVertical: 15,
     paddingHorizontal: 20,
     justifyContent: 'space-around',
