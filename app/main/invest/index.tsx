@@ -1,68 +1,105 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import PageHeader from '@/app/components/PageHeader';
-import Accordion from '@/app/components/Accordeon';
-import { Link, useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
-const PlanScreen = () => {
+interface AccordionItem {
+  id: string;
+  title: string;
+  content: string;
+}
 
+const InvestmentsPage: React.FC = () => {
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const router = useRouter();
 
-  const accordionData = [
+  const accordionData: AccordionItem[] = [
     {
+      id: '1',
       title: 'Риск-профиль инвестора',
-      description: 'Это характеристика, которая показывает, насколько инвестор готов рисковать своими деньгами ради достижения финансовых целей. Он зависит от готовности человека принимать риски, его финансовых целей, опыта и эмоциональной устойчивости.'
+      content: 'Это характеристика, которая показывает, насколько инвестор готов рисковать своими деньгами ради достижения финансовых целей. Он влияет на готовность человека принимать риски, его финансовых целей, опыта в инвестиционной деятельности. Риск-профиль помогает выбрать подходящие инвестиционные инструменты и стратегии.'
     },
     {
-      title: '5 видов риск-профилей',
-      description: 'Консервативный, умеренно-консервативный, сбалансированный, умеренно-агрессивный и агрессивный. Каждый тип соответствует разной степени риска и потенциальной доходности.'
+      id: '2',
+      title: 'Виды риск-профилей',
+      content: 'Консервативный - минимальные риски, небольшая доходность. Умеренный - сбалансированное соотношение риска и доходности. Агрессивный - высокие риски ради высокой потенциальной доходности.'
     },
     {
-      title: 'Почему это важно',
-      description: 'Правильное определение риск-профиля помогает выбрать инвестиционные инструменты, соответствующие вашей психологической готовности к риску и финансовым целям.'
+      id: '3',
+      title: 'Почему это важно?',
+      content: 'Определение риск-профиля помогает подобрать инвестиционную стратегию, которая соответствует вашим целям, временному горизонту и психологической готовности к рискам. Это основа для построения эффективного инвестиционного портфеля.'
     }
   ];
 
+  const toggleExpanded = (itemId: string) => {
+    setExpandedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const isExpanded = (itemId: string) => expandedItems.includes(itemId);
+
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      {/* Основной контент с прокруткой */}
-      <ScrollView 
-        contentContainerStyle={{ 
-          padding: 16,
-          paddingBottom: 80 // Добавляем отступ для кнопки
-        }}
-        showsVerticalScrollIndicator={false}
-        className="flex-1"
-      >
-        <PageHeader 
-          title="Инвестиции" 
-          description="Не знаете, что делать? Нажмите, здесь есть подсказки!" 
-        />
-
-        <View className="space-y-4 mb-4">
-          {accordionData.map((item, index) => (
-            <Accordion 
-              key={index}
-              title={item.title}
-              description={item.description}
-            />
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* Кнопка, закрепленная внизу */}
-      <View className="absolute bottom-0 left-0 right-0 px-4 pb-4 bg-black">
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
-        >
-          <Link href={'/test/test'} className="text-white font-['SFProDisplaySemiBold']">
-            Начать тест
-          </Link>
+  <View className="flex-1 bg-[#121212]">
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 py-3 pb-6">
+        <Text className="text-white text-xl font-semibold font-['SFProDisplayRegular']">
+          Инвестиции
+        </Text>
+        <TouchableOpacity className="p-1">
+          <MaterialIcons name="info-outline" size={24} color="#9CA3AF" />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      {/* Content */}
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        {accordionData.map((item) => (
+          <View key={item.id} className="mb-3">
+            <TouchableOpacity
+              onPress={() => toggleExpanded(item.id)}
+              className="bg-[#333333] rounded-xl p-4 flex-row items-center justify-between"
+              activeOpacity={0.7}
+            >
+              <Text className="text-white text-base font-medium flex-1 mr-3 font-['SFProDisplayRegular']">
+                {item.title}
+              </Text>
+              <View className="ml-2">
+                <MaterialIcons 
+                  name={isExpanded(item.id) ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+                  size={24} 
+                  color="#9CA3AF" 
+                />
+              </View>
+            </TouchableOpacity>
+            
+            {isExpanded(item.id) && (
+              <View className="bg-[#333333] rounded-b-lg px-4 pb-4 -mt-2">
+               
+                <Text className="text-gray-300 text-sm leading-6 font-['SFProDisplayRegular']">
+                  {item.content}
+                </Text>
+              </View>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Bottom Button */}
+      <View className="px-4 pb-8 pt-4">
+        <TouchableOpacity 
+          className="bg-green-600 rounded-xl py-4 items-center"
+          activeOpacity={0.8}
+          onPress={()=>router.replace('/test/test')}
+        >
+          <Text className="text-white text-base font-semibold font-['SFProDisplayRegular']">
+            Начать тест
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
-export default PlanScreen;
+export default InvestmentsPage;

@@ -3,10 +3,38 @@ import { View, Text, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import ConfirmationDrawer from '@/app/components/MiniDrawer';
+import Drawer from '@/app/components/Drawer';
 
 const ProfileScreen = () => {
+
+
+  const [showDrawerTheme, setShowDrawerTheme] = useState(false);
+  const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
+
+  const handleSortSelectTheme = (value:any) => {
+    setSelectedSortTheme(value);
+    console.log('Selected sort:', value);
+  };
+
+  const [showDrawerCurrency, setShowDrawerCurrency] = useState(false);
+  const [selectedSortCurrency, setSelectedSortCurrency] = useState('Тенге (₸)');
+
+  const handleSortSelectCurrency = (value:any) => {
+    setSelectedSortCurrency(value);
+    console.log('Selected sort:', value);
+  };
+
+    const [showLogoutDrawer, setShowLogoutDrawer] = useState(false);
   const router = useRouter();
   const [faceIdEnabled, setFaceIdEnabled] = useState(true);
+
+
+
+  const handleLogout = () => {
+    console.log('Выход из аккаунта');
+    // Логика выхода
+  };
 
   const menuItems = [
     {
@@ -21,21 +49,21 @@ const ProfileScreen = () => {
       title: 'Достижения',
       icon: 'diamond-outline',
       hasArrow: true,
-      onPress: () => console.log('Достижения pressed')
+      onPress: () => router.replace('/main/profile/achievements')
     },
     {
       id: 'currency',
       title: 'Выбор валюты',
       icon: 'camera-outline',
       hasArrow: true,
-      onPress: () => console.log('Выбор валюты pressed')
+      onPress: () => setShowDrawerCurrency(true)
     },
     {
       id: 'documents',
       title: 'Документы',
       icon: 'document-outline',
       hasArrow: true,
-      onPress: () => console.log('Документы pressed')
+      onPress: () => router.replace('/main/profile/documents')
     },
     {
       id: 'faceid',
@@ -50,32 +78,32 @@ const ProfileScreen = () => {
       title: 'Выбор темы',
       icon: 'phone-portrait-outline',
       hasArrow: true,
-      onPress: () => console.log('Выбор темы pressed')
+      onPress: () => setShowDrawerTheme(true)
     },
     {
       id: 'logout',
       title: 'Выйти из аккаунта',
       icon: 'exit-outline',
       hasArrow: true,
-      onPress: () => console.log('Выйти из аккаунта pressed')
+      onPress: () => setShowLogoutDrawer(true)
     }
   ];
 
   const MenuItem = ({ item }:{item:any}) => (
     <TouchableOpacity
       onPress={item.onPress}
-      className="bg-gray-800 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+      className="bg-white/20 rounded-xl p-3.5 mb-3 flex-row items-center justify-between"
       activeOpacity={0.7}
     >
       <View className="flex-row items-center">
         <Ionicons name={item.icon} size={20} color="white" />
-        <Text className="text-white text-base font-['SFProDisplayRegular'] ml-3">
+        <Text className="text-white text-sm font-['SFProDisplayRegular'] ml-3">
           {item.title}
         </Text>
       </View>
       
       {item.hasArrow && (
-        <Ionicons name="chevron-forward" size={20} color="#666" />
+        <Ionicons name="chevron-forward" size={20} color="#FFF" />
       )}
       
       {item.hasSwitch && (
@@ -103,17 +131,17 @@ const ProfileScreen = () => {
         {/* Profile Info */}
         <View className="items-center mb-8">
           {/* Avatar */}
-          <View className="w-20 h-20 bg-gray-700 rounded-full items-center justify-center mb-4">
+          <View className="w-24 h-24 bg-white/20 rounded-full items-center justify-center mb-4">
             <Ionicons name="person" size={32} color="white" />
           </View>
           
           {/* Name */}
-          <Text className="text-white text-lg font-['SFProDisplayMedium'] mb-2">
+          <Text className="text-white text-lg font-['SFProDisplayRegular'] mb-2">
             Алия Курмангалиева
           </Text>
           
           {/* Edit Button */}
-          <TouchableOpacity className="flex-row items-center">
+          <TouchableOpacity className="flex-row items-center" onPress={()=>router.replace('/main/profile/edit-profile')}>
             <Text className="text-[#4CAF50] text-base font-['SFProDisplayRegular'] mr-1">
               Редактировать
             </Text>
@@ -127,6 +155,34 @@ const ProfileScreen = () => {
             <MenuItem key={item.id} item={item} />
           ))}
         </View>
+        <Drawer 
+            title='Выбор темы'
+            visible={showDrawerTheme}
+            onClose={() => setShowDrawerTheme(false)}
+            onSelect={handleSortSelectTheme}
+            selectedValue={selectedSortTheme}
+            options={ ['Светлая', 'Темная']}
+            
+          />
+          <Drawer 
+            title='Выбор валюты'
+            visible={showDrawerCurrency}
+            onClose={() => setShowDrawerCurrency(false)}
+            onSelect={handleSortSelectCurrency}
+            selectedValue={selectedSortCurrency}
+            options={ ['Доллар ($)', 'Евро (€)', 'Дирхам ( د. إ)', 'Тенге (₸)', 'Лира (₺)', 'Рубль (₽)']}
+            
+          />
+
+        <ConfirmationDrawer
+          visible={showLogoutDrawer}
+          title="Выйти из аккаунта?"
+          onClose={() => setShowLogoutDrawer(false)}
+          onConfirm={handleLogout}
+          onCancel={() => console.log('Отменено')}
+          confirmText="Выйти"
+          cancelText="Отмена"
+        />
       </ScrollView>
     </SafeAreaView>
   );

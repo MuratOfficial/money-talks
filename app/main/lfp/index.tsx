@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Drawer from '@/app/components/Drawer';
+// import SortDrawerExample from '@/app/components/Drawer';
 
 const PersonalFinancialPlanScreen = () => {
   const router = useRouter();
+
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [selectedSort, setSelectedSort] = useState('1 год');
   
   // Form states
   const [planningHorizon, setPlanningHorizon] = useState('');
@@ -16,6 +21,11 @@ const PersonalFinancialPlanScreen = () => {
   const [activity, setActivity] = useState('');
   const [financialInfo, setFinancialInfo] = useState('');
   const [selectedYear, setSelectedYear] = useState('1 год');
+
+    const handleSortSelect = (value:any) => {
+    setSelectedSort(value);
+    console.log('Selected sort:', value);
+  };
   
   // Insurance states
   const [lifeInsurance, setLifeInsurance] = useState('500 000 ₸');
@@ -57,7 +67,7 @@ const PersonalFinancialPlanScreen = () => {
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        className="bg-gray-800 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+        className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
         placeholder={placeholder}
         placeholderTextColor="#666"
       />
@@ -67,7 +77,7 @@ const PersonalFinancialPlanScreen = () => {
   const DropdownButton = ({ value, onPress, isFirst = false, isLast = false }:any) => (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex-1 bg-gray-800 rounded-xl px-3 py-3 flex-row items-center justify-between ${
+      className={`flex-1 bg-white/10 rounded-xl px-3 py-3 flex-row items-center justify-between ${
         !isLast ? 'mr-2' : ''
       }`}
       activeOpacity={0.7}
@@ -98,8 +108,8 @@ const PersonalFinancialPlanScreen = () => {
   );
 
   const CircularProgress = ({ progress, color = '#4CAF50' }:any) => {
-    const radius = 20;
-    const strokeWidth = 3;
+    const radius = 35;
+    const strokeWidth = 6;
     const normalizedRadius = radius - strokeWidth * 2;
     const circumference = normalizedRadius * 2 * Math.PI;
     const strokeDasharray = `${circumference} ${circumference}`;
@@ -240,24 +250,40 @@ const PersonalFinancialPlanScreen = () => {
             ЛФП
           </Text>
           
-          <View className="flex-row items-center justify-between mb-4">
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-1">
-              {years.map((year) => (
-                <YearButton
-                  key={year}
-                  year={year}
-                  isSelected={selectedYear === year}
-                  onPress={() => setSelectedYear(year)}
-                />
-              ))}
-            </ScrollView>
-            
-            <TouchableOpacity className="ml-4 px-3 py-2 bg-gray-800 rounded-lg flex-row items-center">
-              <Text className="text-white text-sm font-['SFProDisplayMedium'] mr-2">
-                Обновить фин
+          <View className="flex-row items-center justify-between ">
+
+            <TouchableOpacity
+              onPress={() => setShowDrawer(true)}
+              className=" px-3 py-1.5 border border-white w-fit rounded-2xl flex flex-row items-center justify-center gap-2"
+            >
+              <Text className="text-white text-xs font-['SFProDisplayRegular']">
+                {selectedSort}
               </Text>
-              <View className="w-4 h-4 bg-red-500 rounded items-center justify-center">
-                <Ionicons name="refresh" size={10} color="white" />
+              <View className="w-4 h-4  rounded items-center justify-center">
+                      <Ionicons name="funnel-outline" size={14} color="white" />
+                    </View>
+            </TouchableOpacity>
+            <Drawer 
+              title='Сортировка'
+              visible={showDrawer}
+              onClose={() => setShowDrawer(false)}
+              onSelect={handleSortSelect}
+              selectedValue={selectedSort}
+              options={ ['1 год', '5 лет', '10  лет', '20 лет', '25 лет']}
+              
+              />
+        
+            
+            <TouchableOpacity className="ml-4 px-3 py-2 gap-2 rounded-lg flex-row items-center">
+              <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
+                Скачайте файл
+              </Text>
+              <View className="w-4 h-4  rounded items-center justify-center">
+                <Image 
+                  source={require('../../../assets/images/pdf.png')}
+                  className="w-6 h-6"
+                  resizeMode="contain"
+                />
               </View>
             </TouchableOpacity>
           </View>
@@ -269,7 +295,7 @@ const PersonalFinancialPlanScreen = () => {
             Расчет деталей
           </Text>
           
-          <View className="space-y-3">
+          <View className="space-y-3 p-3 rounded-xl bg-white/10">
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Расходы</Text>
               <View className="flex-row items-center">
@@ -299,7 +325,7 @@ const PersonalFinancialPlanScreen = () => {
             Расчет чистого капитала
           </Text>
           
-          <View className="space-y-3">
+          <View className="space-y-3 p-3 rounded-xl bg-white/10">
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Активы</Text>
               <View className="flex-row items-center">
@@ -331,7 +357,7 @@ const PersonalFinancialPlanScreen = () => {
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Подушка безопасности на 3 месяца
           </Text>
-          <View className="flex-row justify-between items-center">
+          <View className="flex-row justify-between items-center p-3 rounded-xl bg-white/10">
             <Text className="text-white text-sm font-['SFProDisplayRegular']">По постоянному расходу</Text>
             <Text className="text-white text-sm font-['SFProDisplayRegular']">{securityPillow}</Text>
           </View>
@@ -339,11 +365,11 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* Insurance Protection */}
         <View className="mb-6">
-          <Text className="text-white text-base font-['SFProDisplaySemiBold'] mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Страховая защита
           </Text>
           
-          <View className="space-y-3">
+          <View className="space-y-3 p-3 rounded-xl bg-white/10">
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Уход из жизни</Text>
               <Text className="text-white text-sm font-['SFProDisplayRegular']">{lifeInsurance}</Text>
@@ -385,7 +411,6 @@ const PersonalFinancialPlanScreen = () => {
           ))}
         </View>
 
-        <View className="h-20" />
       </ScrollView>
     </SafeAreaView>
   );

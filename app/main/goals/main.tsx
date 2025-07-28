@@ -63,8 +63,8 @@ const GoalsScreen = () => {
   );
 
   const CircularProgress = ({ progress }:any) => {
-    const radius = 30;
-    const strokeWidth = 4;
+       const radius = 35;
+    const strokeWidth = 6;
     const normalizedRadius = radius - strokeWidth * 2;
     const circumference = normalizedRadius * 2 * Math.PI;
     const strokeDasharray = `${circumference} ${circumference}`;

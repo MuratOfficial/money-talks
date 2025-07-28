@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+
+const AchievementsScreen = () => {
+  const router = useRouter();
+  const images = {
+    ach1: require('../../../assets/images/ach1.png'),
+    ach2: require('../../../assets/images/ach2.png'),
+    ach3: require('../../../assets/images/ach3.png'),
+    ach4: require('../../../assets/images/ach4.png'),
+    ach5: require('../../../assets/images/ach5.png'),
+    ach6: require('../../../assets/images/ach6.png'),
+    };
+
+  const menuItems = [
+    {
+      id: '1',
+      title: 'Первые шаги',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Лицензионное соглашение')
+    },
+    {
+      id: '2',
+      title: 'Дисциплина',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Онлайн оплата')
+    },
+    {
+      id: '3',
+      title: 'Месяц контроля',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Политика конфиденциальности')
+    },
+    {
+      id: '4',
+      title: 'Оптимизатор',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Политика конфиденциальности')
+    },
+    {
+      id: '5',
+      title: 'Накопитель',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Политика конфиденциальности')
+    },
+    {
+      id: '6',
+      title: 'Первая цель',
+      image: 'ach1',
+      hasArrow: true,
+      onPress: () => console.log('Политика конфиденциальности')
+    }
+    
+  ];
+
+  const MenuItem = ({ item }:{item:any}) => (
+    <TouchableOpacity
+      onPress={item.onPress}
+      className="  flex flex-col items-center justify-between"
+      activeOpacity={0.7}
+    >
+      <View className="flex aspect-square flex-row justify-center items-center w-full rounded-full">
+        <Image 
+            // source={images[item.image]}
+            className="w-12 h-12"
+            resizeMode="contain"
+        />
+      </View>
+      
+      <Text className="text-white/80 text-xs text-center font-['SFProDisplayRegular'] ml-3">
+          {item.title}
+        </Text>
+      
+
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView className="flex-1 bg-black">
+      <ScrollView 
+        className="flex-1 px-4"
+        showsVerticalScrollIndicator={false}
+      >
+         <View className="flex-row items-center  py-3 pb-6 w-full">
+                <TouchableOpacity  onPress={()=>router.replace('/main/profile')}>
+                   <Ionicons name="chevron-back" size={24} color="white" />
+                </TouchableOpacity>
+                <Text className="text-white text-center w-full text-lg font-semibold font-['SFProDisplayRegular']">
+                  Достижения
+                </Text>
+              </View>
+
+
+
+        {/* Menu Items */}
+        <View className="mb-4 grid grid-cols-3 gap-4">
+          {menuItems.map((item) => (
+            <MenuItem key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default AchievementsScreen;

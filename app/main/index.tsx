@@ -77,7 +77,7 @@ const MainScreen = () => {
         <Ionicons name={item.icon} size={24} color="white" />
       </View>
       
-      <Text className="text-white text-xs font-['SFProDisplayMedium'] text-center mb-1">
+      <Text className="text-white text-xs font-['SFProDisplayRegular'] text-center mb-1">
         {item.name}
       </Text>
       
