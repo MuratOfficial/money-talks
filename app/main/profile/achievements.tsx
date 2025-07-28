@@ -19,42 +19,42 @@ const AchievementsScreen = () => {
     {
       id: '1',
       title: 'Первые шаги',
-      image: 'ach1',
+      image: images["ach1"],
       hasArrow: true,
-      onPress: () => console.log('Лицензионное соглашение')
+      onPress: () => console.log('Онлайн оплата')
     },
     {
       id: '2',
       title: 'Дисциплина',
-      image: 'ach1',
+      image: images["ach2"],
       hasArrow: true,
       onPress: () => console.log('Онлайн оплата')
     },
     {
       id: '3',
       title: 'Месяц контроля',
-      image: 'ach1',
+      image: images["ach3"],
       hasArrow: true,
       onPress: () => console.log('Политика конфиденциальности')
     },
     {
       id: '4',
       title: 'Оптимизатор',
-      image: 'ach1',
+      image: images["ach4"],
       hasArrow: true,
       onPress: () => console.log('Политика конфиденциальности')
     },
     {
       id: '5',
       title: 'Накопитель',
-      image: 'ach1',
+      image: images["ach5"],
       hasArrow: true,
       onPress: () => console.log('Политика конфиденциальности')
     },
     {
       id: '6',
       title: 'Первая цель',
-      image: 'ach1',
+      image: images["ach6"],
       hasArrow: true,
       onPress: () => console.log('Политика конфиденциальности')
     }
@@ -69,7 +69,7 @@ const AchievementsScreen = () => {
     >
       <View className="flex aspect-square flex-row justify-center items-center w-full rounded-full">
         <Image 
-            // source={images[item.image]}
+            source={item.image}
             className="w-12 h-12"
             resizeMode="contain"
         />

@@ -5,7 +5,7 @@ import { Link } from 'expo-router';
 
 export default function IncomeButton() {
   return (
-     <Link href='/finance/screens/income/income'><TouchableOpacity>
+     <Link href='/main/finance/screens/income/income'><TouchableOpacity>
      <View style={styles.income}>
        <Image style={styles.incomeImg} source={require('./iconButton/income.png')}></Image>
        <Text style={styles.incomeText}>Доходы</Text>

@@ -4,9 +4,6 @@ import AddButton from '../../components/ui/addButton'
 
 import { Link } from 'expo-router'
 
-import SegmentPicker from '../../components/ui/segmentPicker'
-import Filters from '../../components/ui/filters'
-import CircleAddButton from '../../components/ui/circleAddButton'
 import NavBar from '../../components/ui/navBar'
 
 
@@ -38,13 +35,13 @@ export default function Assets() {
                 </TouchableOpacity>)}
         {/*  */}
         < View>
-      <NavBar link2='/finance/screens/assets/adviceAssets' link='/finance' title = 'Активы' ></NavBar>
+      <NavBar link2='/main/finance/screens/assets/adviceAssets' link='/finance' title = 'Активы' ></NavBar>
         </View>
   
       <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет aктивов</Text>
       <Text style={styles.text}>Добавьте ваши активы, начните отслеживать свои денежные потоки</Text>
-        <Link href={'/finance/screens/assets/addAssets'} > <AddButton/>
+        <Link href={'/main/finance/screens/assets/addAssets'} > <AddButton/>
      </Link>
       </View>
      

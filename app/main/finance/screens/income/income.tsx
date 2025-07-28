@@ -32,7 +32,7 @@ export default function Income() {
         </TouchableOpacity>)}
 {/*  */}
            <View>
-      <NavBar link2='/finance/screens/income/adviceIncome' link='/finance' title = 'Доходы' ></NavBar>
+      <NavBar link2='/main/finance/screens/income/adviceIncome' link='/finance' title = 'Доходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
            </View>
@@ -40,7 +40,7 @@ export default function Income() {
                <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет доходов</Text>
       <Text style={styles.text}>Добавьте ваши доходы, начните отслеживать свои денежные потоки</Text>
-        <Link href={'/finance/screens/income/addIncome'} > <AddButton/>
+        <Link href={'/main/finance/screens/income/addIncome'} > <AddButton/>
      </Link>
                </View>
      

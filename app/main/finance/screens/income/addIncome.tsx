@@ -16,7 +16,7 @@ const handlePress=()=>{
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
-       <BackButtonHeader link='/finance/screens/income/income'  title='Добавить доход'/>
+       <BackButtonHeader link='/main/finance/screens/income/income'  title='Добавить доход'/>
        <View style={styles.inputContainer}>
            <InputField title='Название' placeHolder='Введите название'/>
            <InputField title='Сумма' placeHolder='Введите сумму'/>

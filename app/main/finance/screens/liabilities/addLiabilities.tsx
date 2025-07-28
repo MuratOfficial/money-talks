@@ -13,7 +13,7 @@ const handlePress=()=>{
   return (
     <View style={styles.screen} >
      <View style={styles.container}>
-       <BackButtonHeader link='/finance/screens/liabilities/liabilities'  title='Добавить пассивы'/>
+       <BackButtonHeader link='/main/finance/screens/liabilities/liabilities'  title='Добавить пассивы'/>
        <View style={styles.inputContainer}>
            <InputField title='Название' placeHolder='Введите название'/>
            <InputField title='Текущая стоимость пассива' placeHolder='Введите стоимость'/>

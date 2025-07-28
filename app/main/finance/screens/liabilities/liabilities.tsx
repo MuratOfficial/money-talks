@@ -31,7 +31,7 @@ const [layerVisible, setLayerVisible]= useState(true);
                 </TouchableOpacity>)}
         {/*  */}
         < View>
-      <NavBar link2='/finance/screens/liabilities/adviceLiabilities' link='/finance' title = 'Пассивы' ></NavBar>
+      <NavBar link2='/main/finance/screens/liabilities/adviceLiabilities' link='/finance' title = 'Пассивы' ></NavBar>
         </View>
   
       <View style={styles.container2}>

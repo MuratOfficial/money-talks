@@ -5,7 +5,7 @@ import { Link } from 'expo-router';
 
 export default function LiabilitiesButton() {
   return (
-      <Link href='/finance/screens/liabilities/liabilities'><TouchableOpacity>
+      <Link href='/main/finance/screens/liabilities/liabilities'><TouchableOpacity>
       <View style={styles.liabilities}>
         <Image style={styles.liabilitiesImg} source={require('./iconButton/liabilities.png')}></Image>
         <Text style={styles.liabilitiesText}>Пассивы</Text>

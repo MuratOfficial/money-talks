@@ -16,7 +16,7 @@ const AdviceExpense:React.FC=()=> {
 return (
  <View style={styles.screen}>
     <View style={styles.container}>
-     <BackButtonHeader link='/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
+     <BackButtonHeader link='/main/finance/screens/expense/expense' title='Подсказки про расходы'></BackButtonHeader>
         <ScrollView   style={styles.textSection}>
         <Text style={styles.sectionTitle}>Расходы 💸</Text>
         <Text style={styles.text}>📌 

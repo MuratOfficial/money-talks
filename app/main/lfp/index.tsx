@@ -182,12 +182,7 @@ const PersonalFinancialPlanScreen = () => {
     <SafeAreaView className="flex-1 bg-black">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-        <TouchableOpacity 
-          onPress={() => router.back()}
-          className="p-2"
-        >
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </TouchableOpacity>
+       
         
         <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
           Личный финансовый план

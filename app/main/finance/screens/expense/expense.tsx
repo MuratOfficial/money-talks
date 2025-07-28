@@ -32,7 +32,7 @@ const Expense:React.FC=()=> {
         </TouchableOpacity>)}
 {/*  */}
            <View>
-      <NavBar link2='/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
+      <NavBar link2='/main/finance/screens/expense/adviceExpense' link='/finance' title = 'Расходы' ></NavBar>
       <SegmentPicker></SegmentPicker>
       <Filters></Filters>
            </View>
@@ -40,7 +40,7 @@ const Expense:React.FC=()=> {
                <View style={styles.container2}>
       <Text style={styles.textBold} >У вас пока нет расходов</Text>
       <Text style={styles.text}>Добавьте ваши расходы, начните отслеживать свои{`\n`}                            денежные потоки</Text>
-        <Link href={'/finance/screens/expense/addExpense'} > <AddButton/>
+        <Link href={'/main/finance/screens/expense/addExpense'} > <AddButton/>
      </Link>
                </View>
      

@@ -6,7 +6,7 @@ import { Link } from 'expo-router';
 export default function ExpenseButton() {
   return (
 
-    <Link href='/finance/screens/expense/expense'><TouchableOpacity>
+    <Link href='/main/finance/screens/expense/expense'><TouchableOpacity>
     <View style={styles.expenses}>
       <Image style={styles.expensesImg} source={require('./iconButton/expense.png')}>
 </Image>

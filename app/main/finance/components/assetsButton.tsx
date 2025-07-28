@@ -6,7 +6,7 @@ import { Link } from 'expo-router';
 export default function AssetsButton() {
   return (
  
-     <Link href='/finance/screens/assets/assets'><TouchableOpacity>
+     <Link href='/main/finance/screens/assets/assets'><TouchableOpacity>
      <View style={styles.assets}>
        <Image style={styles.assetsImg} source={require('./iconButton/assets.png')}></Image>
        <Text style={styles.assetsText}>Активы</Text>
