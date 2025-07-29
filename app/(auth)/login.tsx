@@ -25,13 +25,14 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Вход</Text>
+      <Text style={styles.header} className="font-['SFProDisplayRegular']">Вход</Text>
       
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
+        <Text className="font-['SFProDisplayRegular']" style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
           value={email}
+          className="font-['SFProDisplayRegular']"
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -40,8 +41,9 @@ export default function LoginScreen() {
       </View>
       
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Пароль</Text>
+        <Text className="font-['SFProDisplayRegular']" style={styles.label}>Пароль</Text>
         <TextInput
+        className="font-['SFProDisplayRegular']"
           style={styles.input} 
           value={password}
           onChangeText={setPassword}
@@ -55,11 +57,11 @@ export default function LoginScreen() {
         style={styles.loginButton} 
         onPress={handleLogin}
       >
-        <Text style={styles.loginButtonText}>Войти</Text>
+        <Text className="font-['SFProDisplayRegular']" style={styles.loginButtonText}>Войти</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity onPress={() => router.push('/(auth)')}>
-        <Text style={styles.forgotPassword}>Забыли пароль?</Text>
+      <TouchableOpacity onPress={() => router.push('/(auth)/forgotten')}>
+        <Text className="font-['SFProDisplayRegular']" style={styles.forgotPassword}>Забыли пароль?</Text>
       </TouchableOpacity>
     </View>
   );

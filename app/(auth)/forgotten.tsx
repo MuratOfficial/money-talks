@@ -1,38 +1,33 @@
-
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function ForgottenScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState('user12@gmail.com');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+
   const router = useRouter();
 
   const handleLogin = () => {
-    if (!email || !password) {
-      setError('Заполните все поля');
-      return;
-    }
-    
-    if (password.length < 6) { // Пример проверки
-      setError('Пароль неверный');
-      return;
-    }
-    
-    // Если вход успешен
-    router.replace('/(auth)');
+
+    router.replace('/(auth)/confirm');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Вход</Text>
+    <View className='flex-1 bg-black px-4'>
+      <View className="flex-row items-center  pt-12 pb-8">
+        <TouchableOpacity className="mr-4" onPress={()=>router.replace('/(auth)/login')}>
+          <MaterialIcons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.header} className="font-['SFProDisplayRegular'] ">Забыли пароль?</Text>
       
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
+      <View style={styles.inputContainer} className=''>
+        <Text className="font-['SFProDisplayRegular']" style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
           value={email}
+          className="font-['SFProDisplayRegular']"
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -40,28 +35,16 @@ export default function ForgottenScreen() {
         />
       </View>
       
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Пароль</Text>
-        <TextInput
-          style={styles.input} 
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholder='Введите пароль'
-        />
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      </View>
+
       
       <TouchableOpacity 
         style={styles.loginButton} 
         onPress={handleLogin}
+        className=''
       >
-        <Text style={styles.loginButtonText}>Войти</Text>
+        <Text className="font-['SFProDisplayRegular']" style={styles.loginButtonText}>Далее</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity onPress={() => router.push('/(auth)')}>
-        <Text style={styles.forgotPassword}>Забыли пароль?</Text>
-      </TouchableOpacity>
     </View>
   );
 }

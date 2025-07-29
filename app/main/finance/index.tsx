@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: 'SFProDisplaySemiBold',
-    fontSize: 24,
+    fontSize: 20,
     color: '#fff', 
     padding: 16,
     paddingBottom: 18,

@@ -184,7 +184,7 @@ const PersonalFinancialPlanScreen = () => {
       <View className="flex-row items-center justify-between px-4 py-3">
        
         
-        <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+        <Text className="text-white text-xl font-['SFProDisplaySemiBold']">
           Личный финансовый план
         </Text>
         

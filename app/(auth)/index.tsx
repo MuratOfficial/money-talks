@@ -86,15 +86,15 @@ export default function OnboardingScreen() {
     return (
       <Animated.View style={[styles.slide, { opacity }]}>
         <View style={styles.content}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.title} className="font-['SFProDisplayRegular']">{item.title}</Text>
+          <Text style={styles.description} className="font-['SFProDisplayRegular']">{item.description}</Text>
 
           {item.showBulletPoints && item.bulletPoints && (
             <View style={styles.bulletContainer}>
               {item.bulletPoints.map((point: string, idx: number) => (
                 <View key={idx} style={styles.bulletPoint}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.bulletText}>{point}</Text>
+                  <Text style={styles.bullet} className="font-['SFProDisplayRegular']">•</Text>
+                  <Text style={styles.bulletText} className="font-['SFProDisplayRegular']">{point}</Text>
                 </View>
               ))}
             </View>
@@ -168,7 +168,7 @@ export default function OnboardingScreen() {
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleNextOrStart}>
-          <Text style={styles.buttonText}>{buttonName}</Text>
+          <Text className="font-['SFProDisplayRegular']" style={styles.buttonText}>{buttonName}</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>

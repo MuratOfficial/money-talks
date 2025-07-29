@@ -14,11 +14,12 @@ interface DrawerProps {
   cancelText?: string;
   confirmButtonColor?: string;
   cancelButtonColor?: string;
+  animationType?:  "slide" | "none" | "fade" | undefined;
 }
 
 // const { height: screenHeight } = Dimensions.get('window');
 
-const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', options, title  }:DrawerProps) => {
+const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', options, title, animationType="slide"  }:DrawerProps) => {
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 
   const sortOptions = options;
@@ -52,7 +53,7 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
     <Modal
       visible={visible}
       transparent={true}
-      animationType="slide"
+      animationType={animationType}
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/50 backdrop-blur-sm">
@@ -107,38 +108,5 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
   );
 };
 
-// Usage Example Component
-// const SortDrawerExample = () => {
-//   const [showDrawer, setShowDrawer] = useState(false);
-//   const [selectedSort, setSelectedSort] = useState('1 год');
-
-//   const handleSortSelect = (value:any) => {
-//     setSelectedSort(value);
-//     console.log('Selected sort:', value);
-//   };
-
-//   return (
-//     <View className=" bg-black flex flex-row items-center justify-center w-fit">
-//       <TouchableOpacity
-//         onPress={() => setShowDrawer(true)}
-//         className=" px-3 py-1.5 border border-white w-fit rounded-2xl flex flex-row items-center justify-center gap-2"
-//       >
-//         <Text className="text-white text-xs font-['SFProDisplayRegular']">
-//            {selectedSort}
-//         </Text>
-//         <View className="w-4 h-4  rounded items-center justify-center">
-//                 <Ionicons name="funnel-outline" size={14} color="white" />
-//               </View>
-//       </TouchableOpacity>
-
-//       <SortDrawer
-//         visible={showDrawer}
-//         onClose={() => setShowDrawer(false)}
-//         onSelect={handleSortSelect}
-//         selectedValue={selectedSort}
-//       />
-//     </View>
-//   );
-// };
 
 export default Drawer;

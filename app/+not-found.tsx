@@ -10,7 +10,7 @@ export default function NotFoundScreen() {
       <ThemedView className="flex-1 items-center justify-center bg-black p-4">
         <ThemedText 
           type="title" 
-          className="text-center mb-8 text-white"
+          className="text-center mb-8 text-white font-['SFProDisplayRegular']"
         >
           Этой страницы не существует.
         </ThemedText>
@@ -21,7 +21,7 @@ export default function NotFoundScreen() {
         >
           <ThemedText 
             type="link" 
-            className="text-white text-center w-full"
+            className="text-white text-center w-full font-['SFProDisplayRegular']"
           >
             Вернуться на главную!
           </ThemedText>

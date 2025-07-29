@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Drawer from '@/app/components/Drawer';
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -10,6 +11,7 @@ const GoalsScreen = () => {
   const [selectedStatus, setSelectedStatus] = useState('Активные');
    const [showSortModal, setShowSortModal] = useState(false);
    const [selectedSort, setSelectedSort] = useState('По %');
+
 
   const termOptions = ['Краткосрочные', 'Среднесрочные', 'Долгосрочные'];
   const statusOptions = ['Завершенные', 'Активные'];
@@ -36,7 +38,7 @@ const GoalsScreen = () => {
       }`}
       activeOpacity={0.8}
     >
-      <Text className={`text-sm font-['SFProDisplayMedium'] ${
+      <Text className={`text-sm font-['SFProDisplayRegular'] ${
         isSelected ? 'text-white' : 'text-gray-400'
       }`}>
         {term}
@@ -54,7 +56,7 @@ const GoalsScreen = () => {
       }`}
       activeOpacity={0.8}
     >
-      <Text className={`text-sm font-['SFProDisplayMedium'] ${
+      <Text className={`text-sm font-['SFProDisplayRegular'] ${
         isSelected ? 'text-white' : 'text-gray-400'
       }`}>
         {status}
@@ -201,14 +203,14 @@ const GoalsScreen = () => {
       
       <View className="flex-row space-x-3">
         <TouchableOpacity className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
-          <Text className="text-white text-sm font-['SFProDisplayMedium'] mr-2">
+          <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
             Пополнить
           </Text>
           <Ionicons name="add-circle-outline" size={16} color="white" />
         </TouchableOpacity>
         
         <TouchableOpacity className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
-          <Text className="text-white text-sm font-['SFProDisplayMedium'] mr-2">
+          <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
             Редактировать
           </Text>
           <Ionicons name="pencil" size={16} color="white" />
@@ -272,7 +274,7 @@ return (
             className="px-4 py-2 rounded-full border border-gray-600 flex-row items-center ml-auto"
             onPress={() => setShowSortModal(true)}
           >
-            <Text className="text-gray-400 text-sm font-['SFProDisplayMedium'] mr-2">
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mr-2">
               Сортировка
             </Text>
             <Ionicons name="swap-vertical" size={16} color="#666" />
@@ -283,6 +285,8 @@ return (
         {goals.map((goal) => (
           <GoalCard key={goal.id} goal={goal} />
         ))}
+
+
       </ScrollView>
 
       {/* Add Goal Button */}

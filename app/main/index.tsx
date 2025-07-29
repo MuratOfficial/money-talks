@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import Drawer from '../components/Drawer';
+import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
 
@@ -16,40 +18,37 @@ const MainScreen = () => {
       router.replace('/main/goals/main');
     };
 
+
+    
+   
+     const [showDrawerFilter, setShowDrawerFilter] = useState(false);
+     const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+
+  const handleSortSelectFilter = (value:any) => {
+    setSelectedSortFilter(value);
+    console.log('Selected sort:', value);
+  };
+  
+  
+
     const router = useRouter();
   const [walletBalance] = useState('950 000 ₸');
 
-  const categories = [
+    const { 
+    categories, 
+    wallets
+  } = useFinancialStore();
+
+  const categoriesWith = [
     {
+      id: 'wallet',
       title: 'Кошелек',
-      balance: walletBalance,
-      items: [
-        { name: 'Банковский счет', amount: '20 000 ₸', color: '#4FC3F7', icon: 'card' },
-        { name: 'Бумажные счеты', amount: '20 000 ₸', color: '#66BB6A', icon: 'document-text' },
-        { name: 'Валютные вклады', amount: '200 000 ₸', color: '#7986CB', icon: 'trending-up' },
-        { name: 'Пенсионные активы', amount: '700 000 ₸', color: '#FFB74D', icon: 'briefcase' }
-      ]
+      balance: '940 000 ₸',
+      items: wallets.map(x=>(
+        {id:x.id, name: x.name, amount: `${x.summ.toString()} ${x.currency}`, color: x.color, icon: x.icon || 'card'}
+      ))
     },
-    {
-      title: 'Доходы',
-      balance: '900 000 ₸',
-      items: [
-        { name: 'Зарплата', amount: '600 000 ₸', color: '#4FC3F7', icon: 'wallet' },
-        { name: 'Банк', amount: '50 000 ₸', color: '#66BB6A', icon: 'business' },
-        { name: 'Криптовалюта', amount: '200 000 ₸', color: '#7986CB', icon: 'logo-bitcoin' },
-        { name: 'Пенсия', amount: '200 000 ₸', color: '#FFB74D', icon: 'card' }
-      ]
-    },
-    {
-      title: 'Расходы',
-      balance: '79 500 ₸',
-      items: [
-        { name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag' },
-        { name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school' },
-        { name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait' },
-        { name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller' }
-      ]
-    },
+    ...categories,
     {
       title: 'Цели',
       items: [
@@ -111,9 +110,9 @@ const MainScreen = () => {
             <Ionicons name="add" size={16} color="#FFF" />
           </TouchableOpacity>
         ) : category.title !== 'Цели' ? (
-          <TouchableOpacity className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
+          <TouchableOpacity onPress={()=>setShowDrawerFilter(true)} className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
-              Изменить
+              {selectedSortFilter}
             </Text>
             <Ionicons name="chevron-down" size={16} color="#FFF" />
           </TouchableOpacity>
@@ -143,11 +142,22 @@ const MainScreen = () => {
    
         </View>
 
+                 <Drawer 
+                      title='Период'
+                      visible={showDrawerFilter}
+                      onClose={() => setShowDrawerFilter(false)}
+                      onSelect={handleSortSelectFilter}
+                      selectedValue={selectedSortFilter}
+                      options={ ['Сегодня', 'Неделя', 'Месяц', 'Год', 'Все']}
+                      animationType='fade'
+                      
+                      />
+
         <ScrollView 
           className="flex-1 px-4"
           showsVerticalScrollIndicator={false}
         >
-          {categories.map((category, index) => (
+          {categoriesWith.map((category, index) => (
             <CategorySection key={index} category={category} />
           ))}
 

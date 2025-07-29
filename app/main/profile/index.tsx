@@ -124,7 +124,7 @@ const ProfileScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Text className="text-white text-2xl font-['SFProDisplayBold'] mt-4 mb-8">
+        <Text className="text-white text-xl font-['SFProDisplayBold'] mt-3 mb-8">
           Профиль
         </Text>
 

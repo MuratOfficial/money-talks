@@ -3,34 +3,56 @@ import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import useFinancialStore from '@/hooks/useStore';
 
 const AddWalletScreen = () => {
   const router = useRouter();
   const [cardName, setCardName] = useState('Kaspi Gold');
-  const [selectedType, setSelectedType] = useState('Карта');
-  const [amount, setAmount] = useState('300 000 ₸');
+  const [selectedType, setSelectedType] = useState({ id: 'card', label: 'Карта', icon:'card', color: '#4FC3F7' });
+  const [amount, setAmount] = useState('300000');
   const [selectedCurrency, setSelectedCurrency] = useState('Доллар $');
 
+  const { 
+    wallets, 
+    addWallet,
+
+  } = useFinancialStore();
+
+  const handleAddItem = () => {
+    addWallet({
+
+    name: cardName,
+    type: selectedType.id,
+    summ: Number(amount),
+    currency: selectedCurrency[selectedCurrency.length - 1],
+    icon: selectedType.icon,
+    color:selectedType.color
+
+    });
+
+    router.replace('/main')
+  };
+
   const walletTypes = [
-    { id: 'card', label: 'Карта' },
-    { id: 'cash', label: 'Наличные' },
-    { id: 'deposit', label: 'Депозит' },
-    { id: 'broker', label: 'Брокерский...' }
+    { id: 'card', label: 'Карта', icon:'card', color: '#4FC3F7' },
+    { id: 'cash', label: 'Наличные', icon:'document-text', color: '#66BB6A' },
+    { id: 'deposit', label: 'Депозит', icon:'trending-up', color: '#7986CB' },
+    { id: 'broker', label: 'Брокерский счет', icon:'briefcase', color: '#FFB74D' }
   ];
 
   const currencies = [
     { id: 'kzt', label: 'Тенге KZT' },
     { id: 'usd', label: 'Доллар $' },
-    { id: 'eur', label: 'Евро' }
+    { id: 'eur', label: 'Евро €' }
   ];
 
   const RadioButton = ({ selected, onPress, label }:any) => (
     <TouchableOpacity
       onPress={onPress}
-      className="bg-gray-800 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+      className="bg-white/20 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
       activeOpacity={0.7}
     >
-      <Text className="text-white text-base font-['SFProDisplayRegular']">
+      <Text className="text-white text-base font-['SFProDisplayRegular'] line-clamp-1">
         {label}
       </Text>
       
@@ -72,7 +94,7 @@ const AddWalletScreen = () => {
           <TextInput
             value={cardName}
             onChangeText={setCardName}
-            className="bg-gray-800 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
+            className="bg-white/20 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите название"
             placeholderTextColor="#666"
           />
@@ -87,8 +109,8 @@ const AddWalletScreen = () => {
             {walletTypes.map((type) => (
               <View key={type.id} className="w-[48%] mb-3">
                 <RadioButton
-                  selected={selectedType === type.label}
-                  onPress={() => setSelectedType(type.label)}
+                  selected={selectedType.id === type.id}
+                  onPress={() => setSelectedType(type)}
                   label={type.label}
                 />
               </View>
@@ -104,7 +126,7 @@ const AddWalletScreen = () => {
           <TextInput
             value={amount}
             onChangeText={setAmount}
-            className="bg-gray-800 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
+            className="bg-white/20 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите сумму"
             placeholderTextColor="#666"
             keyboardType="numeric"
@@ -137,16 +159,7 @@ const AddWalletScreen = () => {
       {/* Save Button */}
       <View className="px-4 pb-4">
         <TouchableOpacity
-          onPress={() => {
-            // Handle save logic
-            console.log('Saving wallet:', {
-              name: cardName,
-              type: selectedType,
-              amount: amount,
-              currency: selectedCurrency
-            });
-            router.back();
-          }}
+          onPress={handleAddItem}
           activeOpacity={0.8}
           className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
         >
