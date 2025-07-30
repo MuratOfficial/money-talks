@@ -10,12 +10,17 @@ import useFinancialStore from '@/hooks/useStore';
 const MainScreen = () => {
 
     const handleGoal = (title:string) => {
-      if (title !== "Цели") {
-        return;
+      if (title === "Цели") {
+        router.replace('/main/goals/main');
       }
-      
+      if(title === "Доходы") {
+        router.replace('/main/finance/screens/income/income');
+      }
+      if(title === "Расходы") {
+        router.replace('/main/finance/screens/expense/expense');
+      }
 
-      router.replace('/main/goals/main');
+      
     };
 
 
@@ -35,10 +40,10 @@ const MainScreen = () => {
   
 
     const { 
-    categories, 
-    wallets,
-    walletBalance
-  } = useFinancialStore();
+      categories, 
+      wallets,
+      walletBalance
+    } = useFinancialStore();
 
 
   const categoriesWith = [
