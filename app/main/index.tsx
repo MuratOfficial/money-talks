@@ -32,18 +32,20 @@ const MainScreen = () => {
   
 
     const router = useRouter();
-  const [walletBalance] = useState('950 000 ₸');
+  
 
     const { 
     categories, 
-    wallets
+    wallets,
+    walletBalance
   } = useFinancialStore();
+
 
   const categoriesWith = [
     {
       id: 'wallet',
       title: 'Кошелек',
-      balance: '940 000 ₸',
+      balance: walletBalance,
       items: wallets.map(x=>(
         {id:x.id, name: x.name, amount: `${x.summ.toString()} ${x.currency}`, color: x.color, icon: x.icon || 'card'}
       ))
@@ -120,9 +122,13 @@ const MainScreen = () => {
       </View>
       
       <View className="flex-row flex-wrap justify-between">
-        {category.items.map((item:any, index:number) => (
+      {category.items.length === 0 ?
+        <Text className='w-full text-center text-white/60 text-sm'>
+          Нету данных в данной категорий
+        </Text> : category.items.map((item:any, index:number) => (
           <CategoryCard key={index} item={item} title={category.title}/>
-        ))}
+        ))
+      }
       </View>
     </View>
   );

@@ -15,7 +15,7 @@ const AddWalletScreen = () => {
   const { 
     wallets, 
     addWallet,
-
+    getWalletBalance
   } = useFinancialStore();
 
   const handleAddItem = () => {
@@ -29,7 +29,7 @@ const AddWalletScreen = () => {
     color:selectedType.color
 
     });
-
+    getWalletBalance();
     router.replace('/main')
   };
 
@@ -41,7 +41,7 @@ const AddWalletScreen = () => {
   ];
 
   const currencies = [
-    { id: 'kzt', label: 'Тенге KZT' },
+    { id: 'kzt', label: 'Тенге ₸' },
     { id: 'usd', label: 'Доллар $' },
     { id: 'eur', label: 'Евро €' }
   ];

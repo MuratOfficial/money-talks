@@ -43,7 +43,9 @@ export interface AppState {
   
   // Финансовые данные
   categories: FinancialCategory[];
+ 
   totalBalance: string;
+   walletBalance:string;
   wallets: Wallet[];
 
   // Настройки
@@ -75,6 +77,7 @@ export interface AppState {
   // Вычисляемые значения
   getTotalBalance: () => number;
   getCategoryBalance: (categoryId: string) => number;
+  getWalletBalance: () => void;
   
   // Действия с настройками
   setTheme: (theme: 'light' | 'dark') => void;
@@ -146,10 +149,11 @@ export const useFinancialStore = create<AppState>()(
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
+      walletBalance: '0 ₸',
       theme: 'dark',
       language: 'ru',
       currency: '₸',
-        wallets:[],
+      wallets:[],
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -289,10 +293,31 @@ export const useFinancialStore = create<AppState>()(
         }, 0);
       },
 
+      getWalletBalance: ()=>{
+         
+        const {wallets} = get();
+
+        const filtered = wallets.filter(x=>x.currency.includes('₸'));
+        if(!filtered || filtered.length === 0)
+          return "0 ₸"
+        
+        const allSumm = wallets.reduce((sum, item)=>{
+          return sum + item.summ
+        }, 0)
+
+
+        set({walletBalance:`${allSumm} ₸`})
+      
+      },
+        
+        
+       
+
       // Настройки
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
-      setCurrency: (currency) => set({ currency })
+      setCurrency: (currency) => set({ currency }),
+
     }),
     {
       name: 'financial-app-storage', // имя в storage
