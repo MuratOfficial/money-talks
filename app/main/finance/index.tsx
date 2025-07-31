@@ -11,29 +11,28 @@ import {
 
 interface FinanceCardProps {
   title: string;
-   iconName: string;
-  iconLibrary: 'ionicons' | 'material';
+   iconName: any;
   onPress: () => void;
 }
 
 // Переместил images в начало файла для лучшей читаемости
-// const images = {
-//   img1: require('@/assets/images/expence.png'),
-//   img2: require('@/assets/images/income.png'),
-//   img3: require('@/assets/images/assets.png'),
-//   img4: require('@/assets/images/liabilities.png'),
-//   img5: require('@/assets/images/analysis.png'),
-// };
+const images = {
+  img1: require('../../../assets/images/img1.png'),
+  img2: require('../../../assets/images/img2.png'),
+  img3: require('../../../assets/images/img3.png'),
+  img4: require('../../../assets/images/img4.png'),
+  img5: require('../../../assets/images/img5.png'),
+};
 
-const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName, iconLibrary, onPress }) => {
+const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress }) => {
 
 
   const renderIcon = () => {
-    if (iconLibrary === 'ionicons') {
-      return <Ionicons name={iconName as any} size={48} color="#F9FAFB" />;
-    } else {
-      return <MaterialIcons name={iconName as any} size={48} color="#F9FAFB" />;
-    }
+    return <Image 
+                        source={iconName}
+                        className="w-6 h-6"
+                        resizeMode="contain"
+                      />
   };
 
   return (
@@ -42,8 +41,9 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName, iconLibrary
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <View className="flex-1 justify-center items-start p-4">
+      <View className="flex-1 justify-between items-start p-4">
           {renderIcon()}
+          
         <Text className="text-gray-50 text-sm mt-3 text-left font-['SFProDisplayRegular']">
           {title}
         </Text>
@@ -60,37 +60,33 @@ const FinanceApp: React.FC = () => {
   const financeItems = [
     {
       title: 'Расходы',
-      iconName: 'pie-chart',
-      iconLibrary: 'ionicons' as const,
+      iconName: images["img1"]
     },
     {
       title: 'Доходы',
-      iconName: 'bar-chart',
-      iconLibrary: 'ionicons' as const,
+      iconName: images["img2"]
     },
     {
       title: 'Активы',
-      iconName: 'trending-up',
-      iconLibrary: 'ionicons' as const,
+      iconName: images["img3"],
     },
     {
       title: 'Пассивы',
-      iconName: 'account-balance-wallet',
-      iconLibrary: 'material' as const,
+      iconName: images["img4"]
     },
     {
       title: 'Анализ',
-      iconName: 'analytics',
-      iconLibrary: 'ionicons' as const,
+      iconName: images["img5"]
     },
   ];
 
   return (
     <SafeAreaView className="flex-1 bg-black">
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      
-      <View className="px-6 py-3">
-        <Text className="text-lg text-white font-['SFProDisplaySemiBold']">
+ 
+   
+      <View className="px-4 py-3">
+        <Text className="text-xl text-white font-['SFProDisplaySemiBold']">
           Финансы
         </Text>
       </View>
@@ -102,7 +98,6 @@ const FinanceApp: React.FC = () => {
               key={index}
               title={item.title}
               iconName={item.iconName}
-              iconLibrary={item.iconLibrary}
               onPress={() => handleCardPress(item.title)}
             />
           ))}

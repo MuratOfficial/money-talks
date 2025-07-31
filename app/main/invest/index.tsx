@@ -42,10 +42,10 @@ const InvestmentsPage: React.FC = () => {
   const isExpanded = (itemId: string) => expandedItems.includes(itemId);
 
   return (
-  <View className="flex-1 bg-[#121212]">
+  <View className="flex-1 bg-black">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3 pb-6">
-        <Text className="text-white text-xl font-semibold font-['SFProDisplayRegular']">
+      <View className="flex-row items-start justify-between px-4 py-3 pb-6">
+        <Text className="text-white text-xl font-['SFProDisplaySemiBold']">
           Инвестиции
         </Text>
         <TouchableOpacity className="p-1">
