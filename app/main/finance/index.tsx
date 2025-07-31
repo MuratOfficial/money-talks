@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
   View,
@@ -57,26 +58,34 @@ const FinanceApp: React.FC = () => {
     console.log(`Pressed ${cardName}`);
     // Здесь можно добавить навигацию к соответствующему экрану
   };
-  const financeItems = [
+
+  const router = useRouter();
+
+  const financeItems:FinanceCardProps[] = [
     {
       title: 'Расходы',
-      iconName: images["img1"]
+      iconName: images["img1"],
+      onPress: () => router.replace('/main/finance/expences/main')
     },
     {
       title: 'Доходы',
-      iconName: images["img2"]
+      iconName: images["img2"],
+      onPress: () => router.replace('/main/finance/expences/main')
     },
     {
       title: 'Активы',
       iconName: images["img3"],
+      onPress: () => router.replace('/main/finance/expences/main')
     },
     {
       title: 'Пассивы',
-      iconName: images["img4"]
+      iconName: images["img4"],
+      onPress: () => router.replace('/main/finance/expences/main')
     },
     {
       title: 'Анализ',
-      iconName: images["img5"]
+      iconName: images["img5"],
+      onPress: () => router.replace('/main/finance/expences/main')
     },
   ];
 
@@ -98,7 +107,7 @@ const FinanceApp: React.FC = () => {
               key={index}
               title={item.title}
               iconName={item.iconName}
-              onPress={() => handleCardPress(item.title)}
+              onPress={item.onPress}
             />
           ))}
         </View>
