@@ -54,10 +54,7 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress })
 };
 
 const FinanceApp: React.FC = () => {
-  const handleCardPress = (cardName: string) => {
-    console.log(`Pressed ${cardName}`);
-    // Здесь можно добавить навигацию к соответствующему экрану
-  };
+
 
   const router = useRouter();
 
@@ -70,22 +67,22 @@ const FinanceApp: React.FC = () => {
     {
       title: 'Доходы',
       iconName: images["img2"],
-      onPress: () => router.replace('/main/finance/expences/main')
+      onPress: () => router.replace('/main/finance/incomes/main')
     },
     {
       title: 'Активы',
       iconName: images["img3"],
-      onPress: () => router.replace('/main/finance/expences/main')
+      onPress: () => router.replace('/main/finance/actives/main')
     },
     {
       title: 'Пассивы',
       iconName: images["img4"],
-      onPress: () => router.replace('/main/finance/expences/main')
+      onPress: () => router.replace('/main/finance/passives/main')
     },
     {
       title: 'Анализ',
       iconName: images["img5"],
-      onPress: () => router.replace('/main/finance/expences/main')
+      onPress: () => router.replace('/main/finance/analyze/main')
     },
   ];
 
