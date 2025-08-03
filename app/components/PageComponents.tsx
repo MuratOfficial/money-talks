@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
+import Drawer from './Drawer';
 
 interface PageComponentProps {
   title: string;
@@ -25,26 +26,32 @@ interface PageComponentProps {
   tab1?:string;
   tab2?:string;
   addLink?:Href;
+  assets?:Asset[];
+  assetName?:string;
 }
 
 interface Asset {
   id: string;
   name: string;
   amount: number;
-  yield: number;
+  yield?: number;
 }
 
-const PageComponent = ({title, emptyDesc, emptyTitle, categories, tab1, tab2, addLink}:PageComponentProps) => {
+const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
   const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('3months');
   const router = useRouter();
+  const [showDrawerFilter, setShowDrawerFilter] = useState(false);
+  const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
 
-   const liquidAssets: Asset[] = [
-    { id: '1', name: 'Деньги в сейфе', amount: 5000000, yield: 0 },
-    { id: '2', name: 'Безналичные', amount: 100000, yield: 0 },
-    { id: '3', name: 'Наличные', amount: 100000, yield: 0 },
-  ];
+
+   const handleSortSelectFilter = (value:any) => {
+    setSelectedSortFilter(value);
+    console.log('Selected sort:', value);
+  };
+  
+
+   const liquidAssets: Asset[] = assets || []
 
   const illiquidAssets: Asset[] = [
     // Можно добавить неликвидные активы
@@ -168,15 +175,11 @@ const PageComponent = ({title, emptyDesc, emptyTitle, categories, tab1, tab2, ad
             {categories && periods.map((period) => (
               <TouchableOpacity
                 key={period.id}
-                className={`px-2 py-1 rounded-full border flex-row items-center ${
-                  selectedPeriod === period.id
-                    ? 'bg-[#2AA651] border-[#2AA651]'
-                    : 'border-gray-600 bg-transparent'
-                }`}
-                onPress={() => setSelectedPeriod(period.id)}
+                className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
+                onPress={() => setShowDrawerFilter(true)}
               >
                 <Text className={`text-xs mr-1 text-white font-["SFProDisplayRegular"] `}>
-                  {period.label}
+                  {selectedSortFilter}
                 </Text>
                 <Ionicons 
                   name="chevron-down" 
@@ -190,58 +193,59 @@ const PageComponent = ({title, emptyDesc, emptyTitle, categories, tab1, tab2, ad
       </View>
 
       {
-        currentAssets ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        currentAssets.length>0 ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Total Assets */}
-        <View className="mb-6 flex-row items-center justify-between">
-          <Text className="text-gray-400 text-sm mb-1">
-            Мои активы
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+            {assetName}
           </Text>
-          <Text className="text-emerald-400 text-xl font-semibold">
+          <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
             {formatAmount(totalAmount)}
           </Text>
         </View>
 
         {/* Assets List */}
-        <View className="bg-gray-800 rounded-xl p-4">
+        <View className="bg-white/10 rounded-xl px-3">
           {currentAssets.map((asset, index) => ( 
             <View key={asset.id}>
               <View className="flex-row items-center justify-between py-3">
                 <View className="flex-1">
-                  <Text className="text-white text-base font-medium mb-1">
+                  <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
                     {asset.name}
                   </Text>
-                  <Text className="text-gray-400 text-sm">
+
+                  {asset.yield && <Text className="text-gray-400 text-xs font-['SFProDisplayRegular']">
                     Доходность {asset.yield}%
-                  </Text>
+                  </Text>}
+                 
                 </View>
                 
                 <View className="flex-row items-center">
-                  <Text className="text-white text-base font-medium mr-3">
+                  <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
                     {formatAmount(asset.amount)}
                   </Text>
                   
                   <TouchableOpacity 
                     onPress={() => handleAssetInfo(asset.id)}
-                    className="p-1 mr-2"
+                    className=" mr-2"
                   >
                     <Ionicons name="information-circle-outline" size={20} color="#9CA3AF" />
                   </TouchableOpacity>
                   
                   <TouchableOpacity 
                     onPress={() => handleEditAsset(asset.id)}
-                    className="p-1"
+                    className=""
                   >
                     <Ionicons name="create-outline" size={20} color="#9CA3AF" />
                   </TouchableOpacity>
                 </View>
               </View>
               
-              {index < currentAssets.length - 1 && (
-                <View className="h-px bg-gray-700 my-1" />
-              )}
+              
             </View>
           ))}
         </View>
+        
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
         <Text className="text-white text-base font-['SFProDisplayRegular'] mb-3 text-center">
          {emptyTitle }
@@ -262,9 +266,29 @@ const PageComponent = ({title, emptyDesc, emptyTitle, categories, tab1, tab2, ad
           <Ionicons name="add-circle-outline" size={18} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
+      
 
-      } 
-
+      }
+      
+      {currentAssets.length>0 && <View className="absolute bottom-6 right-6">
+        <TouchableOpacity
+          className="w-14 h-14 bg-[#2AA651] rounded-full justify-center items-center shadow-lg"
+          onPress={handleAddExpense}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add" size={28} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>} 
+       <Drawer 
+          title='Период'
+          visible={showDrawerFilter}
+          onClose={() => setShowDrawerFilter(false)}
+          onSelect={handleSortSelectFilter}
+          selectedValue={selectedSortFilter}
+          options={ ['Сегодня', 'За месяц', 'За год']}
+          animationType='fade'
+          
+          />
       
     </SafeAreaView>
   );

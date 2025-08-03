@@ -1,14 +1,13 @@
+import AddForm from '@/app/components/AddForm';
 import React, { useState } from 'react';
 
-import PageComponent from '@/app/components/PageComponents';
-import AddExpenseScreen from '@/app/components/AddForm';
 
-const ExpensesScreen: React.FC = () => {
+const AddExpensesScreen: React.FC = () => {
 
 
   return (
-    <AddExpenseScreen />
+    <AddForm backLink={'/main/finance/expences/main'} name='Добавить расход' />
   );
 };
 
-export default ExpensesScreen;
+export default AddExpensesScreen;

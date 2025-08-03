@@ -11,20 +11,14 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 
-interface CategoryItem {
-  id: string;
-  name: string;
-  icon: string;
-  iconLibrary: 'ionicons' | 'material';
-  color: string;
-}
 
-interface AddFormProps{
+
+interface AddPassivesFormProps{
   backLink?: Href;
   name?: string;
 }
 
-const AddForm = ({backLink, name}:AddFormProps) => {
+const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -32,23 +26,9 @@ const AddForm = ({backLink, name}:AddFormProps) => {
 
   const router = useRouter();
 
-  const categories: CategoryItem[] = [
-    { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#3B82F6' },
-    { id: 'bank', name: 'Банк', icon: 'account-balance', iconLibrary: 'material', color: '#10B981' },
-    { id: 'phone', name: 'Телефон', icon: 'phone-portrait', iconLibrary: 'ionicons', color: '#8B5CF6' },
-    { id: 'bitcoin', name: 'Криpto', icon: 'logo-bitcoin', iconLibrary: 'ionicons', color: '#F59E0B' },
-    { id: 'export', name: 'Экспорт', icon: 'share-outline', iconLibrary: 'ionicons', color: '#06B6D4' },
-    { id: 'wifi', name: 'WiFi', icon: 'wifi', iconLibrary: 'ionicons', color: '#10B981' },
-    { id: 'play', name: 'Развлечения', icon: 'play', iconLibrary: 'ionicons', color: '#EC4899' },
-    { id: 'restaurant', name: 'Еда', icon: 'restaurant', iconLibrary: 'ionicons', color: '#F97316' },
-    { id: 'shopping', name: 'Покупки', icon: 'bag-handle', iconLibrary: 'ionicons', color: '#06B6D4' },
-    { id: 'fitness', name: 'Спорт', icon: 'fitness', iconLibrary: 'ionicons', color: '#84CC16' },
-    { id: 'warning', name: 'Предупреждение', icon: 'warning', iconLibrary: 'ionicons', color: '#3B82F6' },
-    { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#F59E0B' },
-  ];
 
   const handleBack = () => {
-    router.replace(backLink || "/main/finance")
+    router.replace(backLink || "/main/finance/passives/main")
   };
 
   const handleAddExpense = () => {
@@ -80,18 +60,6 @@ const AddForm = ({backLink, name}:AddFormProps) => {
       </View>
     );
 
-  const renderIcon = (category: CategoryItem) => {
-    const iconProps = {
-      size: 24,
-      color: '#FFFFFF',
-    };
-
-    if (category.iconLibrary === 'ionicons') {
-      return <Ionicons name={category.icon as any} {...iconProps} />;
-    } else {
-      return <MaterialIcons name={category.icon as any} {...iconProps} />;
-    }
-  };
 
   const isFormValid = title.trim() && amount.trim() && selectedCategory;
 
@@ -106,7 +74,7 @@ const AddForm = ({backLink, name}:AddFormProps) => {
         </TouchableOpacity>
         
         <Text className="text-white text-base font-['SFProDisplaySemiBold'] mx-auto">
-          {name}
+         Добавить пассивы
         </Text>
       </View>
 
@@ -119,34 +87,18 @@ const AddForm = ({backLink, name}:AddFormProps) => {
           placeholder="Введите название"
         />
         <InputField
-          label="Сумма"
+          label="Текущая сумма пассива"
           value={planningHorizon}
           onChangeText={setPlanningHorizon}
           placeholder="Введите сумму"
         />
+        <InputField
+          label="Расход на содержание пассива в год"
+          value={planningHorizon}
+          onChangeText={setPlanningHorizon}
+          placeholder="Введите расход пассива"
+        />
 
-        {/* Category Selection */}
-        <View className="mb-8">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-            Выберите значок
-          </Text>
-          
-          <View className="flex-row flex-wrap justify-between">
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                className={`w-16 h-16 rounded-full justify-center items-center mb-4 ${
-                  selectedCategory === category.id ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''
-                }`}
-                style={{ backgroundColor: category.color }}
-                onPress={() => setSelectedCategory(category.id)}
-                activeOpacity={0.8}
-              >
-                {renderIcon(category)}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
       </ScrollView>
 
       {/* Add Button */}
@@ -170,4 +122,4 @@ const AddForm = ({backLink, name}:AddFormProps) => {
   );
 };
 
-export default AddForm;
+export default AddPassivesForm;

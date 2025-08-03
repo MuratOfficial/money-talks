@@ -14,10 +14,10 @@ const MainScreen = () => {
         router.replace('/main/goals/main');
       }
       if(title === "Доходы") {
-        router.replace('/main/finance/screens/income/income');
+        router.replace('/main/finance/incomes/main');
       }
       if(title === "Расходы") {
-        router.replace('/main/finance/screens/expense/expense');
+        router.replace('/main/finance/expences/main');
       }
 
       
