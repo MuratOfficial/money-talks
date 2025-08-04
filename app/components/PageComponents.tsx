@@ -28,6 +28,8 @@ interface PageComponentProps {
   addLink?:Href;
   assets?:Asset[];
   assetName?:string;
+  isAnalyze?:boolean;
+  analyzeList?: AnalyzeList[]
 }
 
 interface Asset {
@@ -37,12 +39,20 @@ interface Asset {
   yield?: number;
 }
 
-const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
+interface AnalyzeList {
+   name: string;
+   id: string;
+   item:Asset[]
+}
+
+const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
   const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
   const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+
+  const currentAnalyzeList = analyzeList || [];
 
 
    const handleSortSelectFilter = (value:any) => {
@@ -86,10 +96,7 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
   };
 
 
-  const periods = [
-    { id: '3months', label: 'За месяц' },
-    // Можно добавить другие периоды
-  ];
+
 
   const handleAddExpense = () => {
     router.replace(addLink || "/main/finance")
@@ -172,9 +179,8 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
               </TouchableOpacity>
             ))}
             
-            {categories && periods.map((period) => (
+            {categories && 
               <TouchableOpacity
-                key={period.id}
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
@@ -187,10 +193,41 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
                   color="#FFF" 
                 />
               </TouchableOpacity>
-            ))}
+            }
           </View>
         </ScrollView>
       </View>
+
+      {/* Analyze block */}
+
+      {isAnalyze && <View className="mx-4 mb-2">
+        <ScrollView  className="flex-1 " showsVerticalScrollIndicator={false}>
+          <View className="flex-row w-full justify-between items-center">
+           
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+            {assetName}
+          </Text>
+            
+              <TouchableOpacity
+                className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
+                onPress={() => setShowDrawerFilter(true)}
+              >
+                <Text className={`text-xs mr-1 text-white font-["SFProDisplayRegular"] `}>
+                  {selectedSortFilter}
+                </Text>
+                <Ionicons 
+                  name="filter-outline" 
+                  size={14} 
+                  color="#FFF" 
+                />
+              </TouchableOpacity>
+       
+          </View>
+        </ScrollView>
+      </View>}
+
+      
+
 
       {
         currentAssets.length>0 ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
@@ -246,6 +283,54 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
           ))}
         </View>
         
+      </ScrollView> : currentAnalyzeList.length > 0 ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        {/* Total Assets */}
+        
+
+        {/* Assets List */}
+        
+          {currentAnalyzeList.map((asset, index) => ( 
+            <View key={index}>
+              <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+            {asset.name}
+          </Text>
+          <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+            {formatAmount(totalAmount)}
+          </Text>
+        </View>
+          <View className="bg-white/10 rounded-xl px-3 mb-3">
+            {asset.item.map((el, index) => ( 
+            <View key={el.id} >
+              <View className="flex-row items-center justify-between py-3">
+                <View className="flex-1">
+                  <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                    {el.name}
+                  </Text>
+
+                 
+                 
+                </View>
+                
+                <View className="flex-row items-center">
+                  <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                    {formatAmount(el.amount)}
+                  </Text>
+                  
+                
+                </View>
+              </View>
+              
+              
+            </View>
+          ))}
+             </View>
+
+            </View>
+            
+          ))}
+       
+        
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
         <Text className="text-white text-base font-['SFProDisplayRegular'] mb-3 text-center">
          {emptyTitle }
@@ -254,8 +339,7 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
         <Text className="text-white/60 text-xs text-center font-['SFProDisplayRegular'] mb-8 leading-5">
           {emptyDesc}
         </Text>
-        
-        <TouchableOpacity
+        {isAnalyze === true ? "" : <TouchableOpacity
           className="border-2 border-white rounded-2xl px-8 py-1 flex-row items-center"
           onPress={handleAddExpense}
           activeOpacity={0.8}
@@ -264,8 +348,10 @@ const PageComponent = ({title, assetName, emptyDesc, emptyTitle, categories, tab
             Добавить
           </Text>
           <Ionicons name="add-circle-outline" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>}
+        
+        
+      </View> 
       
 
       }
