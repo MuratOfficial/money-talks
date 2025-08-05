@@ -29,7 +29,8 @@ interface PageComponentProps {
   assets?:Asset[];
   assetName?:string;
   isAnalyze?:boolean;
-  analyzeList?: AnalyzeList[]
+  analyzeList?: AnalyzeList[];
+  diagramLink?:Href
 }
 
 interface Asset {
@@ -45,7 +46,7 @@ interface AnalyzeList {
    item:Asset[]
 }
 
-const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
+const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
   const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
   const router = useRouter();
@@ -122,9 +123,10 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, emptyD
         </Text>
         
         <View className="flex-row">
-          <TouchableOpacity className="p-2 mr-1">
-            <Ionicons name="refresh" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
+          {diagramLink && <TouchableOpacity className="p-2 mr-1" onPress={()=>router.replace(diagramLink)}>
+            <Ionicons name="pie-chart-outline" size={20} color="#FFFFFF" />
+          </TouchableOpacity>}
+          
           <TouchableOpacity className="p-2">
             <Ionicons name="information-circle-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>
