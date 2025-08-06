@@ -6,7 +6,7 @@ const AddExpensesScreen: React.FC = () => {
 
 
   return (
-    <AddForm backLink={'/main/finance/expences/main'} name='Добавить расход' />
+    <AddForm backLink={'/main/finance/expences/main'} type='expence' name='Добавить расход' />
   );
 };
 

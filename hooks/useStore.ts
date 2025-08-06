@@ -35,6 +35,15 @@ export interface Wallet {
     color?: string;
 }
 
+export interface Asset {
+  id: string;
+  name: string;
+  amount: number;
+  yield?: number;
+  icon?: string;
+  color?: string;
+}
+
 export interface AppState {
   // Пользователь
   user: User | null;
@@ -43,6 +52,9 @@ export interface AppState {
   
   // Финансовые данные
   categories: FinancialCategory[];
+  expences: Asset[];
+  incomes: Asset[];
+  actives: Asset[];
  
   totalBalance: string;
    walletBalance:string;
@@ -79,6 +91,13 @@ export interface AppState {
   getCategoryBalance: (categoryId: string) => number;
   getWalletBalance: () => void;
   
+  // Расходы Доходы
+  addExpences: (expence: Omit<Asset, 'id'> ) => void;
+  addIncomes: (income: Omit<Asset, 'id'> ) => void;
+
+  // Активы
+  addActives: (active: Omit<Asset, 'id'> ) => void;
+
   // Действия с настройками
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (language: 'ru' | 'en' | 'kz') => void;
@@ -154,6 +173,9 @@ export const useFinancialStore = create<AppState>()(
       language: 'ru',
       currency: '₸',
       wallets:[],
+      expences: [],
+      incomes:[],
+      actives:[],
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -206,6 +228,83 @@ export const useFinancialStore = create<AppState>()(
       deleteCategory: (categoryId) => set((state) => ({
         categories: state.categories.filter(category => category.id !== categoryId)
       })),
+
+      // Расходы
+      addExpences: (expence) => set((state) => {
+        const newExpence: Asset = {
+          ...expence,
+          id:state.generateId()
+        };
+
+        const newExpences = [...state.expences, newExpence]
+
+      
+
+          const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
+
+              state.updateCategory('expence', {
+                  title: 'Расходы',
+                  balance: `${totalAmount} ₸`,
+                  items: newExpences.map(x=>(
+              {
+                id:x.id,
+                icon:x.icon || "bag",
+                name: x.name, amount: `${x.amount} ₸`, color: x?.color || "#E91E63"
+              }
+            ))
+          }
+          )
+          return {
+          expences: newExpences
+        };
+        
+      }),
+      addActives:(active) => set((state) => {
+        const newActive: Asset = {
+          ...active,
+          id:state.generateId()
+        };
+
+        const newActives = [...state.actives, newActive]
+
+        
+          return {
+          actives: newActives
+        };
+        
+      }),
+
+      // Доходы
+      addIncomes: (income) => set((state) => {
+        const newIncome: Asset = {
+          ...income,
+          id:state.generateId()
+        };
+
+        const newIncomes = [...state.incomes, newIncome]
+
+      
+
+          const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
+
+              state.updateCategory('income', {
+                  title: 'Доходы',
+                  balance: `${totalAmount} ₸`,
+                  items: newIncomes.map(x=>(
+              {
+                id:x.id,
+                icon:x.icon || "bag",
+                name: x.name, amount: `${x.amount} ₸`, color: x?.color || "#E91E63"
+              }
+            ))
+          }
+          )
+          return {
+          incomes: newIncomes
+        };
+        
+      }),
+      
 
       // Wallet
 
@@ -363,63 +462,6 @@ export const useSettings = () => useFinancialStore((state) => ({
   currency: state.currency 
 }));
 
-// // Пример использования в компоненте
-// export const FinancialDashboard: React.FC = () => {
-//   const { 
-//     categories, 
-//     addFinancialItem, 
-//     updateFinancialItem, 
-//     deleteFinancialItem,
-//     getTotalBalance,
-//     formatAmount 
-//   } = useFinancialStore();
 
-//   const handleAddItem = () => {
-//     addFinancialItem('wallet', {
-//       name: 'Новый счет',
-//       amount: '50 000 ₸',
-//       color: '#4FC3F7',
-//       icon: 'card'
-//     });
-//   };
-
-//   const handleUpdateItem = (categoryId: string, itemId: string) => {
-//     updateFinancialItem(categoryId, itemId, {
-//       amount: '100 000 ₸'
-//     });
-//   };
-
-//   const totalBalance = getTotalBalance();
-
-//   return (
-//     <View className="p-4">
-//       <Text className="text-white text-xl mb-4">
-//         Общий баланс: {formatAmount(totalBalance)}
-//       </Text>
-      
-//       {categories.map((category) => (
-//         <View key={category.id} className="mb-6">
-//           <Text className="text-white text-lg font-bold mb-2">
-//             {category.title} - {category.balance}
-//           </Text>
-          
-//           {category.items.map((item) => (
-//             <View key={item.id} className="flex-row justify-between p-3 bg-gray-800 rounded mb-2">
-//               <Text className="text-white">{item.name}</Text>
-//               <Text className="text-white">{item.amount}</Text>
-//             </View>
-//           ))}
-//         </View>
-//       ))}
-      
-//       <TouchableOpacity 
-//         onPress={handleAddItem}
-//         className="bg-green-600 p-3 rounded"
-//       >
-//         <Text className="text-white text-center">Добавить счет</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
 
 export default useFinancialStore;

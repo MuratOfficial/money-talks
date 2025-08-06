@@ -38,6 +38,7 @@ interface Asset {
   name: string;
   amount: number;
   yield?: number;
+  icon?:string
 }
 
 interface AnalyzeList {
@@ -249,7 +250,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
             <View key={asset.id}>
               <View className="flex-row items-center justify-between py-3">
                 <View className="flex-1">
-                  <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                  <Text className="text-white text-sm mb-1 font-['SFProDisplayRegular']">
                     {asset.name}
                   </Text>
 
@@ -268,14 +269,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                     onPress={() => handleAssetInfo(asset.id)}
                     className=" mr-2"
                   >
-                    <Ionicons name="information-circle-outline" size={20} color="#9CA3AF" />
+                    <Ionicons name="add-circle-outline" size={20} color="#FFF" />
                   </TouchableOpacity>
                   
                   <TouchableOpacity 
                     onPress={() => handleEditAsset(asset.id)}
                     className=""
                   >
-                    <Ionicons name="create-outline" size={20} color="#9CA3AF" />
+                    <Ionicons name="create-outline" size={20} color="#FFF" />
                   </TouchableOpacity>
                 </View>
               </View>

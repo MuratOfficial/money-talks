@@ -11,24 +11,19 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 
-
-
-interface AddActivesFormProps{
-  backLink?: Href;
-  name?: string;
-}
-
-const AddActivesForm = ({backLink, name}:AddActivesFormProps) => {
+const AddActivesForm = () => {
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [planningHorizon, setPlanningHorizon] = useState('');
+  const [inc, setInc] = useState('');
+
+  
 
   const router = useRouter();
 
 
   const handleBack = () => {
-    router.replace(backLink || "/main/finance/actives/main")
+    router.replace( "/main/finance/actives/main")
   };
 
   const handleAddExpense = () => {
@@ -42,23 +37,11 @@ const AddActivesForm = ({backLink, name}:AddActivesFormProps) => {
       amount: parseFloat(amount),
       category: selectedCategory,
     });
-    // Логика добавления расхода
+
+
   };
 
-    const InputField = ({ label, value, onChangeText, placeholder }:any) => (
-      <View className="mb-4">
-        <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-          {label}
-        </Text>
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-          placeholder={placeholder}
-          placeholderTextColor="#666"
-        />
-      </View>
-    );
+
 
 
   const isFormValid = title.trim() && amount.trim() && selectedCategory;
@@ -79,25 +62,55 @@ const AddActivesForm = ({backLink, name}:AddActivesFormProps) => {
       </View>
 
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Название
+          </Text>
+          <TextInput
+            value={title}
+            onChangeText={setTitle}
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите название"
+            placeholderTextColor="#666"
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+          
+        </View>
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Текущая сумма
+          </Text>
+          <TextInput
+            value={amount}
+            onChangeText={setAmount}
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите сумму"
+            placeholderTextColor="#666"
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+          
+        </View>
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Доход в год
+          </Text>
+          <TextInput
+            value={inc}
+            onChangeText={setInc}
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите доход"
+            placeholderTextColor="#666"
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+          
+        </View>
         
-        <InputField
-          label="Название"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите название"
-        />
-        <InputField
-          label="Текущая сумма"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите сумму"
-        />
-        <InputField
-          label="Доход в год"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите доход"
-        />
+      
+        
 
       </ScrollView>
 

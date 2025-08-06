@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import PageComponent from '@/app/components/PageComponents';
+import useFinancialStore from '@/hooks/useStore';
 
 const ExpensesScreen: React.FC = () => {
 
@@ -10,15 +11,12 @@ const ExpensesScreen: React.FC = () => {
     { id: 'notRequired', label: 'Необязательные' },
   ];
 
+  const {expences} = useFinancialStore();
+
 
   return (
     <PageComponent categories={categories} 
-    assets={[{ id: '1', name: 'Продукты', amount: 100000 },
-    { id: '2', name: 'Образование', amount: 100000},
-    { id: '3', name: 'Транспорт', amount: 100000},
-      { id: '4', name: 'Отдых и развлечения', amount: 100000},
-      { id: '5', name: 'Кафе и рестораны', amount: 100000},
-  ]}
+    assets={expences}
     addLink={'/main/finance/expences/add-expence'} diagramLink={'/main/finance/expences/diagram'} assetName='1 янв' title='Расходы' tab1='Регулярные' tab2='Нерегулярные' emptyTitle='У вас пока нет расходов' emptyDesc='Добавьте ваши расходы, начните отслеживать свои денежные потоки'/>
   );
 };

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
+import useFinancialStore from '@/hooks/useStore';
 
 interface CategoryItem {
   id: string;
@@ -22,15 +23,16 @@ interface CategoryItem {
 interface AddFormProps{
   backLink?: Href;
   name?: string;
+  type?: "income" | "expence";
 }
 
-const AddForm = ({backLink, name}:AddFormProps) => {
-  const [title, setTitle] = useState<string>('');
-  const [amount, setAmount] = useState<string>('');
+const AddForm = ({backLink, name, type}:AddFormProps) => {
+  const [title, setTitle] = useState('');
+  const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [planningHorizon, setPlanningHorizon] = useState('');
 
   const router = useRouter();
+  const {addExpences, addIncomes} = useFinancialStore()
 
   const categories: CategoryItem[] = [
     { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#3B82F6' },
@@ -51,34 +53,34 @@ const AddForm = ({backLink, name}:AddFormProps) => {
     router.replace(backLink || "/main/finance")
   };
 
-  const handleAddExpense = () => {
+
+
+  const handleAdd = () => {
     if (!title.trim() || !amount.trim() || !selectedCategory) {
       console.log('Заполните все поля');
       return;
     }
-    
-    console.log('Добавить расход:', {
-      title: title.trim(),
-      amount: parseFloat(amount),
-      category: selectedCategory,
-    });
-    // Логика добавления расхода
-  };
 
-    const InputField = ({ label, value, onChangeText, placeholder }:any) => (
-      <View className="mb-4">
-        <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-          {label}
-        </Text>
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-          placeholder={placeholder}
-          placeholderTextColor="#666"
-        />
-      </View>
-    );
+    if(type==="income"){
+        addIncomes({
+        name: title,
+        amount: parseFloat(amount),
+        icon: categories.find(x=>x.id===selectedCategory)?.icon,
+        color:  categories.find(x=>x.id===selectedCategory)?.color,
+      })
+    }
+
+    if(type==="expence"){
+        addExpences({
+        name: title,
+        amount: parseFloat(amount),
+        icon: categories.find(x=>x.id===selectedCategory)?.icon,
+        color:  categories.find(x=>x.id===selectedCategory)?.color,
+      })
+    }
+
+    router.replace(backLink || '/main/finance')
+  };
 
   const renderIcon = (category: CategoryItem) => {
     const iconProps = {
@@ -112,18 +114,39 @@ const AddForm = ({backLink, name}:AddFormProps) => {
 
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         
-        <InputField
-          label="Название"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите название"
-        />
-        <InputField
-          label="Сумма"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите сумму"
-        />
+       
+            <View className="mb-4">
+              <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                Название
+              </Text>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                placeholder="Введите название"
+                placeholderTextColor="#666"
+                keyboardType="default"
+                autoCapitalize="none"
+              />
+              
+            </View>
+            <View className="mb-4">
+              <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                Сумма
+              </Text>
+              <TextInput
+                value={amount}
+                onChangeText={setAmount}
+                className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                placeholder="Введите сумму"
+                placeholderTextColor="#666"
+                keyboardType="decimal-pad"
+                autoCapitalize="none"
+              />
+              
+            </View>
+
+ 
 
         {/* Category Selection */}
         <View className="mb-8">
@@ -151,9 +174,9 @@ const AddForm = ({backLink, name}:AddFormProps) => {
 
       {/* Add Button */}
       <View className='px-2 pb-2'>
-            <TouchableOpacity
+        <TouchableOpacity
           className={`w-full mb-2 py-4 rounded-xl items-center justify-center bg-[#4CAF50] `}
-          onPress={handleAddExpense}
+          onPress={handleAdd}
           disabled={!isFormValid}
           activeOpacity={0.8}
         >
@@ -162,10 +185,7 @@ const AddForm = ({backLink, name}:AddFormProps) => {
             Добавить
           </Text>
         </TouchableOpacity>
-
       </View>
-        
-     
     </SafeAreaView>
   );
 };
