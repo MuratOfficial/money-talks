@@ -259,6 +259,9 @@ export const useFinancialStore = create<AppState>()(
         };
         
       }),
+
+      // АКтивы
+
       addActives:(active) => set((state) => {
         const newActive: Asset = {
           ...active,

@@ -245,7 +245,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
         </View>
 
         {/* Assets List */}
-        <View className="bg-white/10 rounded-xl px-3">
+        <View className="bg-white/10 rounded-xl px-3 mb-2">
           {currentAssets.map((asset, index) => ( 
             <View key={asset.id}>
               <View className="flex-row items-center justify-between py-3">

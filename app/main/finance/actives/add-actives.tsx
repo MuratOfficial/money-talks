@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
+import useFinancialStore from '@/hooks/useStore';
 
 const AddActivesForm = () => {
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [inc, setInc] = useState('');
 
-  
+  const {addActives} = useFinancialStore();
 
   const router = useRouter();
 
@@ -27,24 +27,22 @@ const AddActivesForm = () => {
   };
 
   const handleAddExpense = () => {
-    if (!title.trim() || !amount.trim() || !selectedCategory) {
-      console.log('Заполните все поля');
-      return;
-    }
     
-    console.log('Добавить расход:', {
-      title: title.trim(),
+    
+    addActives({
+      name: title,
       amount: parseFloat(amount),
-      category: selectedCategory,
-    });
+      yield: parseFloat(inc)
+    })
 
+    router.replace("/main/finance/actives/main")
 
   };
 
 
 
 
-  const isFormValid = title.trim() && amount.trim() && selectedCategory;
+  const isFormValid = title.trim() && amount.trim();
 
   return (
     <SafeAreaView className="flex-1 bg-black">
