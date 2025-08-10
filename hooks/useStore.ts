@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Типы данных
 export interface FinancialItem {
@@ -26,13 +27,13 @@ export interface User {
 }
 
 export interface Wallet {
-    id:string;
-    name:string;
-    type: string;
-    summ: number;
-    currency: string;
-    icon?: string;
-    color?: string;
+  id: string;
+  name: string;
+  type: string;
+  summ: number;
+  currency: string;
+  icon?: string;
+  color?: string;
 }
 
 export interface Asset {
@@ -57,7 +58,7 @@ export interface AppState {
   actives: Asset[];
  
   totalBalance: string;
-   walletBalance:string;
+  walletBalance: string;
   wallets: Wallet[];
 
   // Настройки
@@ -92,11 +93,11 @@ export interface AppState {
   getWalletBalance: () => void;
   
   // Расходы Доходы
-  addExpences: (expence: Omit<Asset, 'id'> ) => void;
-  addIncomes: (income: Omit<Asset, 'id'> ) => void;
+  addExpences: (expence: Omit<Asset, 'id'>) => void;
+  addIncomes: (income: Omit<Asset, 'id'>) => void;
 
   // Активы
-  addActives: (active: Omit<Asset, 'id'> ) => void;
+  addActives: (active: Omit<Asset, 'id'>) => void;
 
   // Действия с настройками
   setTheme: (theme: 'light' | 'dark') => void;
@@ -110,7 +111,6 @@ export interface AppState {
 
 // Начальные данные
 const initialCategories: FinancialCategory[] = [
-
   {
     id: 'income',
     title: 'Доходы',
@@ -146,16 +146,17 @@ const initialCategories: FinancialCategory[] = [
       }
     ]
   },
-  {id:'expence',
-      title: 'Расходы',
-      balance: '79 500 ₸',
-      items: [
-        {id:'payments', name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag' },
-        {id:'education', name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school' },
-        {id:'tech', name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait' },
-        { name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller', id:'entertainment' }
-      ]
-    },
+  {
+    id: 'expence',
+    title: 'Расходы',
+    balance: '79 500 ₸',
+    items: [
+      { id: 'payments', name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag' },
+      { id: 'education', name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school' },
+      { id: 'tech', name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait' },
+      { id: 'entertainment', name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller' }
+    ]
+  },
 ];
 
 // Создание Zustand Store с персистентностью
@@ -172,10 +173,11 @@ export const useFinancialStore = create<AppState>()(
       theme: 'dark',
       language: 'ru',
       currency: '₸',
-      wallets:[],
+      wallets: [],
       expences: [],
-      incomes:[],
-      actives:[],
+      incomes: [],
+      actives: [],
+      
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -223,8 +225,6 @@ export const useFinancialStore = create<AppState>()(
         )
       })),
 
-      
-
       deleteCategory: (categoryId) => set((state) => ({
         categories: state.categories.filter(category => category.id !== categoryId)
       })),
@@ -233,99 +233,87 @@ export const useFinancialStore = create<AppState>()(
       addExpences: (expence) => set((state) => {
         const newExpence: Asset = {
           ...expence,
-          id:state.generateId()
+          id: state.generateId()
         };
 
-        const newExpences = [...state.expences, newExpence]
+        const newExpences = [...state.expences, newExpence];
+        const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
 
-      
-
-          const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
-
-              state.updateCategory('expence', {
-                  title: 'Расходы',
-                  balance: `${totalAmount} ₸`,
-                  items: newExpences.map(x=>(
-              {
-                id:x.id,
-                icon:x.icon || "bag",
-                name: x.name, amount: `${x.amount} ₸`, color: x?.color || "#E91E63"
-              }
-            ))
-          }
-          )
-          return {
+        state.updateCategory('expence', {
+          title: 'Расходы',
+          balance: `${totalAmount} ₸`,
+          items: newExpences.map(x => ({
+            id: x.id,
+            icon: x.icon || "bag",
+            name: x.name, 
+            amount: `${x.amount} ₸`, 
+            color: x?.color || "#E91E63"
+          }))
+        });
+        
+        return {
           expences: newExpences
         };
-        
       }),
 
-      // АКтивы
-
-      addActives:(active) => set((state) => {
+      // Активы
+      addActives: (active) => set((state) => {
         const newActive: Asset = {
           ...active,
-          id:state.generateId()
+          id: state.generateId()
         };
 
-        const newActives = [...state.actives, newActive]
-
+        const newActives = [...state.actives, newActive];
         
-          return {
+        return {
           actives: newActives
         };
-        
       }),
 
       // Доходы
       addIncomes: (income) => set((state) => {
         const newIncome: Asset = {
           ...income,
-          id:state.generateId()
+          id: state.generateId()
         };
 
-        const newIncomes = [...state.incomes, newIncome]
+        const newIncomes = [...state.incomes, newIncome];
+        const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
 
-      
-
-          const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
-
-              state.updateCategory('income', {
-                  title: 'Доходы',
-                  balance: `${totalAmount} ₸`,
-                  items: newIncomes.map(x=>(
-              {
-                id:x.id,
-                icon:x.icon || "bag",
-                name: x.name, amount: `${x.amount} ₸`, color: x?.color || "#E91E63"
-              }
-            ))
-          }
-          )
-          return {
+        state.updateCategory('income', {
+          title: 'Доходы',
+          balance: `${totalAmount} ₸`,
+          items: newIncomes.map(x => ({
+            id: x.id,
+            icon: x.icon || "bag",
+            name: x.name, 
+            amount: `${x.amount} ₸`, 
+            color: x?.color || "#E91E63"
+          }))
+        });
+        
+        return {
           incomes: newIncomes
         };
-        
       }),
-      
 
-      // Wallet
-
+      // Кошельки
       setWallets: (wallets) => set({ wallets }),
 
       addWallet: (walletData) => set((state) => {
-        const newwallet: Wallet = {
+        const newWallet: Wallet = {
           ...walletData,
           id: state.generateId()
         };
         
         return {
-          wallets: [...state.wallets, newwallet]
+          wallets: [...state.wallets, newWallet]
         };
       }),
 
+      // ✅ ИСПРАВЛЕНО: Теперь обновляем wallets, а не categories
       updateWallet: (walletId, updates) => set((state) => ({
-        categories: state.categories.map(wallet => 
+        wallets: state.wallets.map(wallet => 
           wallet.id === walletId 
             ? { ...wallet, ...updates }
             : wallet
@@ -395,25 +383,21 @@ export const useFinancialStore = create<AppState>()(
         }, 0);
       },
 
-      getWalletBalance: ()=>{
-         
-        const {wallets} = get();
-
-        const filtered = wallets.filter(x=>x.currency.includes('₸'));
-        if(!filtered || filtered.length === 0)
-          return "0 ₸"
+      getWalletBalance: () => {
+        const { wallets } = get();
+        const filtered = wallets.filter(x => x.currency.includes('₸'));
         
-        const allSumm = wallets.reduce((sum, item)=>{
-          return sum + item.summ
-        }, 0)
+        if (!filtered || filtered.length === 0) {
+          set({ walletBalance: "0 ₸" });
+          return;
+        }
+        
+        const allSumm = wallets.reduce((sum, item) => {
+          return sum + item.summ;
+        }, 0);
 
-
-        set({walletBalance:`${allSumm} ₸`})
-      
+        set({ walletBalance: `${allSumm} ₸` });
       },
-        
-        
-       
 
       // Настройки
       setTheme: (theme) => set({ theme }),
@@ -422,28 +406,38 @@ export const useFinancialStore = create<AppState>()(
 
     }),
     {
-      name: 'financial-app-storage', // имя в storage
+      name: 'financial-app-storage',
       storage: createJSONStorage(() => ({
-        getItem: (name) => {
-          // В React Native используйте AsyncStorage
-          // import AsyncStorage from '@react-native-async-storage/async-storage';
-          // return AsyncStorage.getItem(name);
-          
-          // Для примера используем localStorage (только для веб)
-          return localStorage.getItem(name);
+        getItem: async (name) => {
+          try {
+            return await AsyncStorage.getItem(name);
+          } catch (error) {
+            console.error('Error getting item from AsyncStorage:', error);
+            return null;
+          }
         },
-        setItem: (name, value) => {
-          // return AsyncStorage.setItem(name, value);
-          localStorage.setItem(name, value);
+        setItem: async (name, value) => {
+          try {
+            await AsyncStorage.setItem(name, value);
+          } catch (error) {
+            console.error('Error setting item to AsyncStorage:', error);
+          }
         },
-        removeItem: (name) => {
-          // return AsyncStorage.removeItem(name);
-          localStorage.removeItem(name);
+        removeItem: async (name) => {
+          try {
+            await AsyncStorage.removeItem(name);
+          } catch (error) {
+            console.error('Error removing item from AsyncStorage:', error);
+          }
         }
       })),
       partialize: (state) => ({
         user: state.user,
         categories: state.categories,
+        wallets: state.wallets,
+        expences: state.expences,
+        incomes: state.incomes,
+        actives: state.actives,
         theme: state.theme,
         language: state.language,
         currency: state.currency
@@ -464,7 +458,5 @@ export const useSettings = () => useFinancialStore((state) => ({
   language: state.language, 
   currency: state.currency 
 }));
-
-
 
 export default useFinancialStore;
