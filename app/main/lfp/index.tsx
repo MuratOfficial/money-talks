@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Drawer from '@/app/components/Drawer';
+
+import Svg, { Circle } from 'react-native-svg';
 // import SortDrawerExample from '@/app/components/Drawer';
 
 const PersonalFinancialPlanScreen = () => {
@@ -107,49 +109,55 @@ const PersonalFinancialPlanScreen = () => {
     </TouchableOpacity>
   );
 
-  const CircularProgress = ({ progress, color = '#4CAF50' }:any) => {
-    const radius = 35;
-    const strokeWidth = 6;
-    const normalizedRadius = radius - strokeWidth * 2;
-    const circumference = normalizedRadius * 2 * Math.PI;
-    const strokeDasharray = `${circumference} ${circumference}`;
-    const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-    return (
-      <View className="relative">
-        <svg
-          height={radius * 2}
-          width={radius * 2}
-          className="transform -rotate-90"
-        >
-          <circle
-            stroke="#374151"
-            fill="transparent"
-            strokeWidth={strokeWidth}
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-          />
-          <circle
-            stroke={color}
-            fill="transparent"
-            strokeWidth={strokeWidth}
-            strokeDasharray={strokeDasharray}
-            style={{ strokeDashoffset }}
-            strokeLinecap="round"
-            r={normalizedRadius}
-            cx={radius}
-            cy={radius}
-          />
-        </svg>
-        <View className="absolute inset-0 items-center justify-center">
-          <Text className="text-white text-xs font-['SFProDisplayBold']">
-            {progress}%
-          </Text>
-        </View>
+const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; color:string}) => {
+  const size = 70;
+  const strokeWidth = 6;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * Math.PI * 2;
+  const strokeDashoffset = circumference - (circumference * progress) / 100;
+
+  return (
+    <View style={{ 
+      width: size, 
+      height: size, 
+      justifyContent: 'center', 
+      alignItems: 'center' 
+    }}>
+      <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
+        {/* Фоновый круг */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#374151"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        
+        {/* Прогресс круг */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+        />
+      </Svg>
+      
+      {/* Текст с процентами */}
+      <View style={{ position: 'absolute' }}>
+        <Text className="text-white text-xs font-['SFProDisplayBold']">
+          {progress}%
+        </Text>
       </View>
-    );
-  };
+    </View>
+  );
+};
 
   const GoalCard = ({ goal }:any) => (
     <View className="bg-gray-800 rounded-xl p-4 mb-3">

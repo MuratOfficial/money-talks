@@ -109,7 +109,7 @@ const ChartScreen = ({backLink}:ChartScreenProps) => {
                   }`}
                   onPress={() => setSelectedPeriod(period.key as any)}
                 >
-                  <Text className={`text-xs font-["SFProDisplayRegular"] text-white ${
+                  <Text className={`text-xs font-['SFProDisplayRegular'] text-white ${
                     selectedPeriod === period.key ? 'font-medium' : ''
                   }`}>
                     {period.label}

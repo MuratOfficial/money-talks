@@ -31,7 +31,7 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress })
   const renderIcon = () => {
     return <Image 
                         source={iconName}
-                        className="w-6 h-6"
+                        className="w-20 h-20"
                         resizeMode="contain"
                       />
   };

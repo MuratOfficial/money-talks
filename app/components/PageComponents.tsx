@@ -143,7 +143,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
             }`}
             onPress={() => setActiveTab('regular')}
           >
-            <Text className={`text-center text-xs font-["SFProDisplayRegular"] text-white`}>
+            <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
               {tab1}
             </Text>
           </TouchableOpacity>
@@ -154,7 +154,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
             }`}
             onPress={() => setActiveTab('irregular')}
           >
-            <Text className={`text-center text-xs font-["SFProDisplayRegular"] text-white`}>
+            <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
               {tab2}
             </Text>
           </TouchableOpacity>
@@ -176,7 +176,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                 }`}
                 onPress={() => setSelectedCategory(category.id)}
               >
-                <Text className={`text-xs font-["SFProDisplayRegular"] text-white`}>
+                <Text className={`text-xs font-['SFProDisplayRegular'] text-white`}>
                   {category.label}
                 </Text>
               </TouchableOpacity>
@@ -187,7 +187,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 text-white font-["SFProDisplayRegular"] `}>
+                <Text className={`text-xs mr-1 text-white font-['SFProDisplayRegular'] `}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 
@@ -215,7 +215,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 text-white font-["SFProDisplayRegular"] `}>
+                <Text className={`text-xs mr-1 text-white font-['SFProDisplayRegular'] `}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 

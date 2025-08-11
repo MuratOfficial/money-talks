@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   StatusBar,
   TextInput,
   ScrollView,
+  Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { Href, useRouter } from 'expo-router';
+import { Href, router } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 
 interface CategoryItem {
@@ -31,8 +33,16 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-  const router = useRouter();
-  const {addExpences, addIncomes} = useFinancialStore()
+  const {addIncomes, addExpences} = useFinancialStore();
+
+  const handleCategorySelect = (categoryId: string) => {
+    try {
+      setSelectedCategory(categoryId);
+      console.log('Selected category:', categoryId);
+    } catch (error) {
+      console.error('Error selecting category:', error);
+    }
+  };
 
   const categories: CategoryItem[] = [
     { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#3B82F6' },
@@ -49,37 +59,62 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
     { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#F59E0B' },
   ];
 
-  const handleBack = () => {
-    router.replace(backLink || "/main/finance")
+  const handleGoBack = () => {
+    try {
+      if (backLink) {
+        router.replace(backLink);
+      } else {
+        router.back();
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback на замену маршрута
+      router.replace('/main/finance');
+    }
   };
 
-
-
   const handleAdd = () => {
-    if (!title.trim() || !amount.trim() || !selectedCategory) {
-      console.log('Заполните все поля');
+    if (!title.trim() || !amount.trim() ) {
+      Alert.alert('Ошибка', 'Заполните все поля');
       return;
     }
 
-    if(type==="income"){
+    try {
+      const selectedCat = categories.find(x => x.id === selectedCategory);
+      
+      if(type === "income"){
         addIncomes({
-        name: title,
-        amount: parseFloat(amount),
-        icon: categories.find(x=>x.id===selectedCategory)?.icon,
-        color:  categories.find(x=>x.id===selectedCategory)?.color,
-      })
-    }
+          name: title,
+          amount: parseFloat(amount),
+          icon: selectedCat?.icon,
+          color: selectedCat?.color,
+        });
+      }
 
-    if(type==="expence"){
+      if(type === "expence"){
         addExpences({
-        name: title,
-        amount: parseFloat(amount),
-        icon: categories.find(x=>x.id===selectedCategory)?.icon,
-        color:  categories.find(x=>x.id===selectedCategory)?.color,
-      })
-    }
+          name: title,
+          amount: parseFloat(amount),
+          icon: selectedCat?.icon,
+          color: selectedCat?.color,
+        });
+      }
 
-    router.replace(backLink || '/main/finance')
+      // Для Android используем больший timeout
+      const timeout = Platform.OS === 'android' ? 300 : 100;
+      
+      setTimeout(() => {
+        try {
+          router.replace(backLink || '/main/finance');
+        } catch (navError) {
+          console.error('Navigation error:', navError);
+        }
+      }, timeout);
+      
+    } catch (error) {
+      console.error('Error adding item:', error);
+      Alert.alert('Ошибка', 'Не удалось добавить элемент');
+    }
   };
 
   const renderIcon = (category: CategoryItem) => {
@@ -95,7 +130,9 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
     }
   };
 
-  const isFormValid = title.trim() && amount.trim() && selectedCategory;
+  // const isFormValid = title.trim() && amount.trim() && selectedCategory;
+
+    const isFormValid = title.trim() && amount.trim();
 
   return (
     <SafeAreaView className="flex-1 bg-black">
@@ -103,7 +140,11 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
+        <TouchableOpacity 
+          className="p-2 -ml-2"
+          onPress={handleGoBack}
+          activeOpacity={0.7}
+        >
           <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         
@@ -115,38 +156,35 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         
        
-            <View className="mb-4">
-              <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-                Название
-              </Text>
-              <TextInput
-                value={title}
-                onChangeText={setTitle}
-                className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-                placeholder="Введите название"
-                placeholderTextColor="#666"
-                keyboardType="default"
-                autoCapitalize="none"
-              />
-              
-            </View>
-            <View className="mb-4">
-              <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-                Сумма
-              </Text>
-              <TextInput
-                value={amount}
-                onChangeText={setAmount}
-                className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-                placeholder="Введите сумму"
-                placeholderTextColor="#666"
-                keyboardType="decimal-pad"
-                autoCapitalize="none"
-              />
-              
-            </View>
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Название
+          </Text>
+          <TextInput
+            value={title}
+            onChangeText={setTitle}
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите название"
+            placeholderTextColor="#666"
+            keyboardType="default"
+            autoCapitalize="none"
+          />
+        </View>
 
- 
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Сумма
+          </Text>
+          <TextInput
+            value={amount}
+            onChangeText={setAmount}
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите сумму"
+            placeholderTextColor="#666"
+            keyboardType="decimal-pad"
+            autoCapitalize="none"
+          />
+        </View>
 
         {/* Category Selection */}
         <View className="mb-8">
@@ -162,7 +200,7 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
                   selectedCategory === category.id ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''
                 }`}
                 style={{ backgroundColor: category.color }}
-                onPress={() => setSelectedCategory(category.id)}
+                // onPress={() => handleCategorySelect(category.id)}
                 activeOpacity={0.8}
               >
                 {renderIcon(category)}
@@ -175,13 +213,14 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
       {/* Add Button */}
       <View className='px-2 pb-2'>
         <TouchableOpacity
-          className={`w-full mb-2 py-4 rounded-xl items-center justify-center bg-[#4CAF50] `}
+          className={`w-full mb-2 py-4 rounded-xl items-center justify-center ${
+            isFormValid ? 'bg-[#4CAF50]' : 'bg-gray-600'
+          }`}
           onPress={handleAdd}
           disabled={!isFormValid}
           activeOpacity={0.8}
         >
-          <Text className={`text-white text-base font-['SFProDisplaySemiBold'] 
-            `}>
+          <Text className={`text-white text-base font-['SFProDisplaySemiBold']`}>
             Добавить
           </Text>
         </TouchableOpacity>

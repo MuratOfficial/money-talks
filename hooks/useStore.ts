@@ -239,20 +239,27 @@ export const useFinancialStore = create<AppState>()(
         const newExpences = [...state.expences, newExpence];
         const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
 
-        state.updateCategory('expence', {
-          title: 'Расходы',
-          balance: `${totalAmount} ₸`,
-          items: newExpences.map(x => ({
-            id: x.id,
-            icon: x.icon || "bag",
-            name: x.name, 
-            amount: `${x.amount} ₸`, 
-            color: x?.color || "#E91E63"
-          }))
-        });
+        // ИСПРАВЛЕНИЕ: Обновляем категорию через прямое изменение state
+        const updatedCategories = state.categories.map(category => 
+          category.id === 'expence' 
+            ? {
+                ...category,
+                title: 'Расходы',
+                balance: `${totalAmount} ₸`,
+                items: newExpences.map(x => ({
+                  id: x.id,
+                  icon: x.icon || "bag",
+                  name: x.name, 
+                  amount: `${x.amount} ₸`, 
+                  color: x?.color || "#E91E63"
+                }))
+              }
+            : category
+        );
         
         return {
-          expences: newExpences
+          expences: newExpences,
+          categories: updatedCategories
         };
       }),
 
@@ -280,20 +287,27 @@ export const useFinancialStore = create<AppState>()(
         const newIncomes = [...state.incomes, newIncome];
         const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
 
-        state.updateCategory('income', {
-          title: 'Доходы',
-          balance: `${totalAmount} ₸`,
-          items: newIncomes.map(x => ({
-            id: x.id,
-            icon: x.icon || "bag",
-            name: x.name, 
-            amount: `${x.amount} ₸`, 
-            color: x?.color || "#E91E63"
-          }))
-        });
+        // ИСПРАВЛЕНИЕ: Обновляем категорию через прямое изменение state
+        const updatedCategories = state.categories.map(category => 
+          category.id === 'income' 
+            ? {
+                ...category,
+                title: 'Доходы',
+                balance: `${totalAmount} ₸`,
+                items: newIncomes.map(x => ({
+                  id: x.id,
+                  icon: x.icon || "bag",
+                  name: x.name, 
+                  amount: `${x.amount} ₸`, 
+                  color: x?.color || "#E91E63"
+                }))
+              }
+            : category
+        );
         
         return {
-          incomes: newIncomes
+          incomes: newIncomes,
+          categories: updatedCategories
         };
       }),
 
