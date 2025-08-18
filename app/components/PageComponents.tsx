@@ -31,6 +31,7 @@ interface PageComponentProps {
   isAnalyze?:boolean;
   analyzeList?: AnalyzeList[];
   diagramLink?:Href
+  isPassive?:boolean;
 }
 
 interface Asset {
@@ -47,7 +48,7 @@ interface AnalyzeList {
    item:Asset[]
 }
 
-const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
+const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
   const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
   const router = useRouter();
@@ -72,9 +73,26 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
   const currentAssets = activeTab === 'regular' ? liquidAssets : illiquidAssets;
   const totalAmount = currentAssets.reduce((sum, asset) => sum + asset.amount, 0);
 
-  const formatAmount = (amount: number): string => {
-    return new Intl.NumberFormat('ru-RU').format(amount) + ' ₸';
+  const getTotal = (assets:Asset[]): string => {
+    const sum = assets.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+
+    return new Intl.NumberFormat('ru-RU').format(sum) + ' ₸';
+  }
+
+  const formatAmount = (amount: number, amount2?:number): string => {
+
+    if(selectedCategory==="effect"){
+      return new Intl.NumberFormat('ru-RU').format(amount2 || 0) + ' %';
+    } else{
+      return new Intl.NumberFormat('ru-RU').format(amount) + ' ₸';
+    }
+
+    
   };
+
+  const handleCategory = (term:string) => {
+    setSelectedCategory(term);
+  }
 
 
   const handleInfo = () => {
@@ -174,7 +192,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                     ? 'bg-[#2AA651] border-[#2AA651]'
                     : 'border-gray-600 bg-transparent'
                 }`}
-                onPress={() => setSelectedCategory(category.id)}
+                onPress={()=> handleCategory(category.id)}
               >
                 <Text className={`text-xs font-['SFProDisplayRegular'] text-white`}>
                   {category.label}
@@ -239,9 +257,10 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
             {assetName}
           </Text>
-          <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+          {selectedCategory !== "effect" && <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
             {formatAmount(totalAmount)}
-          </Text>
+          </Text>}
+          
         </View>
 
         {/* Assets List */}
@@ -254,7 +273,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                     {asset.name}
                   </Text>
 
-                  {asset.yield && <Text className="text-gray-400 text-xs font-['SFProDisplayRegular']">
+                  {asset.yield && !isPassive && <Text className="text-gray-400 text-xs font-['SFProDisplayRegular']">
                     Доходность {asset.yield}%
                   </Text>}
                  
@@ -262,7 +281,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
                 
                 <View className="flex-row items-center">
                   <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
-                    {formatAmount(asset.amount)}
+                    {formatAmount(asset.amount, asset.yield)}
                   </Text>
                   
                   <TouchableOpacity 
@@ -299,7 +318,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, assetName, diagra
             {asset.name}
           </Text>
           <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
-            {formatAmount(totalAmount)}
+            {getTotal(asset.item)}
           </Text>
         </View>
           <View className="bg-white/10 rounded-xl px-3 mb-3">

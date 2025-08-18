@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
+import useFinancialStore from '@/hooks/useStore';
 
 
 
@@ -21,47 +22,37 @@ interface AddPassivesFormProps{
 const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [planningHorizon, setPlanningHorizon] = useState('');
 
   const router = useRouter();
+
+  const {addPassives} = useFinancialStore();
 
 
   const handleBack = () => {
     router.replace(backLink || "/main/finance/passives/main")
   };
 
-  const handleAddExpense = () => {
-    if (!title.trim() || !amount.trim() || !selectedCategory) {
+  const handleAdd = () => {
+    if (!title.trim() || !amount.trim() || !planningHorizon) {
       console.log('Заполните все поля');
       return;
     }
-    
-    console.log('Добавить расход:', {
-      title: title.trim(),
+
+    addPassives({
+      name: title,
       amount: parseFloat(amount),
-      category: selectedCategory,
-    });
-    // Логика добавления расхода
+      yield: parseFloat(planningHorizon)
+    })
+    
+   router.replace("/main/finance/passives/main")
+    
   };
 
-    const InputField = ({ label, value, onChangeText, placeholder }:any) => (
-      <View className="mb-4">
-        <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-          {label}
-        </Text>
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-          placeholder={placeholder}
-          placeholderTextColor="#666"
-        />
-      </View>
-    );
 
 
-  const isFormValid = title.trim() && amount.trim() && selectedCategory;
+
+  const isFormValid = title.trim() && amount.trim() && planningHorizon;
 
   return (
     <SafeAreaView className="flex-1 bg-black">
@@ -79,25 +70,54 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       </View>
 
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+
+                <View className="mb-4">
+                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                    Название
+                  </Text>
+                  <TextInput
+                    value={title}
+                    onChangeText={setTitle}
+                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    placeholder="Введите название"
+                    placeholderTextColor="#666"
+                    keyboardType="default"
+                    autoCapitalize="none"
+                  />
+                  
+                </View>
+                <View className="mb-4">
+                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                    Текущая сумма пассива
+                  </Text>
+                  <TextInput
+                    value={amount}
+                    onChangeText={setAmount}
+                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    placeholder="Введите сумму"
+                    placeholderTextColor="#666"
+                    keyboardType="default"
+                    autoCapitalize="none"
+                  />
+                  
+                </View>
+                <View className="mb-4">
+                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                    Расход на содержание пассива в год
+                  </Text>
+                  <TextInput
+                    value={planningHorizon}
+                    onChangeText={setPlanningHorizon}
+                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    placeholder="Введите расход пассива"
+                    placeholderTextColor="#666"
+                    keyboardType="default"
+                    autoCapitalize="none"
+                  />
+                  
+                </View>
         
-        <InputField
-          label="Название"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите название"
-        />
-        <InputField
-          label="Текущая сумма пассива"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите сумму"
-        />
-        <InputField
-          label="Расход на содержание пассива в год"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите расход пассива"
-        />
+
 
       </ScrollView>
 
@@ -105,7 +125,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       <View className='px-2 pb-2'>
             <TouchableOpacity
           className={`w-full mb-2 py-4 rounded-xl items-center justify-center bg-[#4CAF50] `}
-          onPress={handleAddExpense}
+          onPress={handleAdd}
           disabled={!isFormValid}
           activeOpacity={0.8}
         >

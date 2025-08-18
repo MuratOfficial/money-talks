@@ -56,6 +56,7 @@ export interface AppState {
   expences: Asset[];
   incomes: Asset[];
   actives: Asset[];
+  passives: Asset[];
  
   totalBalance: string;
   walletBalance: string;
@@ -98,6 +99,9 @@ export interface AppState {
 
   // Активы
   addActives: (active: Omit<Asset, 'id'>) => void;
+
+  // Пассивы
+  addPassives: (active: Omit<Asset, 'id'>) => void;
 
   // Действия с настройками
   setTheme: (theme: 'light' | 'dark') => void;
@@ -177,6 +181,7 @@ export const useFinancialStore = create<AppState>()(
       expences: [],
       incomes: [],
       actives: [],
+      passives:[],
       
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
@@ -274,6 +279,19 @@ export const useFinancialStore = create<AppState>()(
         
         return {
           actives: newActives
+        };
+      }),
+
+      addPassives: (passive)=>set((state)=>{
+        const newPassive: Asset = {
+          ...passive,
+          id: state.generateId()
+        };
+
+        const newPassives = [...state.passives, newPassive];
+        
+        return {
+          passives: newPassives
         };
       }),
 
