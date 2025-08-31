@@ -57,6 +57,9 @@ export interface AppState {
   incomes: Asset[];
   actives: Asset[];
   passives: Asset[];
+
+  // Редактирование ассет
+  currentAsset: Asset | null;
  
   totalBalance: string;
   walletBalance: string;
@@ -107,6 +110,9 @@ export interface AppState {
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (language: 'ru' | 'en' | 'kz') => void;
   setCurrency: (currency: '₸' | '$' | '€') => void;
+
+  // Редактирование ассета
+  setCurrentAsset: (asset:Asset)=>void,
   
   // Утилиты
   formatAmount: (amount: number) => string;
@@ -182,7 +188,7 @@ export const useFinancialStore = create<AppState>()(
       incomes: [],
       actives: [],
       passives:[],
-      
+      currentAsset:null,
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -265,6 +271,18 @@ export const useFinancialStore = create<AppState>()(
         return {
           expences: newExpences,
           categories: updatedCategories
+        };
+      }),
+
+      // Редактирование текущего ассета
+      setCurrentAsset:(asset)=>set((state) => {
+        const changed: Asset = {
+          ...asset
+        };
+
+ 
+        return {
+          currentAsset: changed
         };
       }),
 

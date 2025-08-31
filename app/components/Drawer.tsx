@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Animated, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface DrawerProps {
   visible: boolean;
   title: string;
   onClose: () => void;
-  onSelect: (option:string) => void;
+  onSelect: (option: string) => void;
   selectedValue?: string;
   options: string[];
   onCancel?: () => void;
@@ -14,24 +14,30 @@ interface DrawerProps {
   cancelText?: string;
   confirmButtonColor?: string;
   cancelButtonColor?: string;
-  animationType?:  "slide" | "none" | "fade" | undefined;
+  animationType?: "slide" | "none" | "fade" | undefined;
 }
 
-// const { height: screenHeight } = Dimensions.get('window');
+const { height: screenHeight } = Dimensions.get('window');
 
-const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', options, title, animationType="slide"  }:DrawerProps) => {
+const Drawer: React.FC<DrawerProps> = ({ 
+  visible, 
+  onClose, 
+  onSelect, 
+  selectedValue = '5 лет', 
+  options, 
+  title, 
+  animationType = "slide"  
+}) => {
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 
   const sortOptions = options;
-
-  //['1 год', '5 лет', '10  лет', '20 лет', '25 лет']
 
   const handleSelect = () => {
     onSelect(selectedOption);
     onClose();
   };
 
-  const RadioOption = ({ option }:any) => (
+  const RadioOption = ({ option }: { option: string }) => (
     <TouchableOpacity
       onPress={() => setSelectedOption(option)}
       className="bg-[#333333] rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
@@ -49,6 +55,10 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
     </TouchableOpacity>
   );
 
+  // Вычисляем максимальную высоту для скролла
+  // Оставляем место для хедера, кнопки и отступов
+  const maxScrollHeight = screenHeight * 0.6; // 60% от высоты экрана
+
   return (
     <Modal
       visible={visible}
@@ -56,7 +66,7 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
       animationType={animationType}
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-end bg-black/50 backdrop-blur-sm">
+      <View className="flex-1 justify-end bg-black/50">
         {/* Backdrop */}
         <TouchableOpacity 
           className="flex-1" 
@@ -65,10 +75,7 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
         />
         
         {/* Drawer Content */}
-        <View 
-          className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4"
- 
-        >
+        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
           {/* Handle Bar */}
           <View className="w-10 h-1 bg-gray-600 rounded-full self-center mb-6" />
           
@@ -85,18 +92,23 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
             </TouchableOpacity>
           </View>
 
-          {/* Options */}
-          <View className="">
+          {/* Options - с ограничением высоты и прокруткой */}
+          <ScrollView 
+            style={{ maxHeight: maxScrollHeight }}
+            showsVerticalScrollIndicator={true}
+            className="mb-4"
+            contentContainerStyle={{ paddingBottom: 10 }}
+          >
             {sortOptions.map((option) => (
               <RadioOption key={option} option={option} />
             ))}
-          </View>
+          </ScrollView>
 
           {/* Select Button */}
           <TouchableOpacity
             onPress={handleSelect}
             activeOpacity={0.8}
-            className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
+            className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center mt-2"
           >
             <Text className="text-white text-base font-['SFProDisplaySemiBold']">
               Выбрать
@@ -107,6 +119,5 @@ const Drawer = ({ visible, onClose, onSelect, selectedValue = '5 лет', option
     </Modal>
   );
 };
-
 
 export default Drawer;

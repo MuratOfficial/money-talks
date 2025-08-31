@@ -55,26 +55,52 @@ const PersonalFinancialPlanScreen = () => {
       progress: 0
     }
   ]);
+
+  const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x=>x.toString());
+  const months: string[] = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  ];
+
+  const currentYear: number = new Date().getFullYear();
+  const years: string[] = Array.from({ length: 100 }, (_, i) => currentYear - i).map(x=>x.toString());
   
   const [securityPillow, setSecurityPillow] = useState('1 000 000 ₸');
 
-  const years = ['1 год', '2 года', '3 года', '5 лет'];
-  const riskProfiles = ['Консервативный', 'Умеренный', 'Агрессивный'];
+   const handleSortSelectDay = (value:any) => {
+    setSelectedSortDay(value);
+    console.log('Selected sort:', value);
+  };
+   const handleSortSelectMonth = (value:any) => {
+    setSelectedSortMonth(value);
+    console.log('Selected sort:', value);
+  };
+   const handleSortSelectYear = (value:any) => {
+    setSelectedSortYear(value);
+    console.log('Selected sort:', value);
+  };
 
-  const InputField = ({ label, value, onChangeText, placeholder }:any) => (
-    <View className="mb-4">
-      <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-        {label}
-      </Text>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-        placeholder={placeholder}
-        placeholderTextColor="#666"
-      />
-    </View>
-  );
+  const [showDrawerDay, setShowDrawerDay] = useState(false);
+  const [selectedSortDay, setSelectedSortDay] = useState('День');
+  const [showDrawerMonth, setShowDrawerMonth] = useState(false);
+  const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
+  const [showDrawerYear, setShowDrawerYear] = useState(false);
+  const [selectedSortYear, setSelectedSortYear] = useState('Год');
+
+  // const InputField = ({ label, value, onChangeText, placeholder }:any) => (
+  //   <View className="mb-4">
+  //     <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+  //       {label}
+  //     </Text>
+  //     <TextInput
+  //       value={value}
+  //       onChangeText={onChangeText}
+  //       className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+  //       placeholder={placeholder}
+  //       placeholderTextColor="#666"
+  //     />
+  //   </View>
+  // );
 
   const DropdownButton = ({ value, onPress, isFirst = false, isLast = false }:any) => (
     <TouchableOpacity
@@ -91,23 +117,6 @@ const PersonalFinancialPlanScreen = () => {
     </TouchableOpacity>
   );
 
-  const YearButton = ({ year, isSelected, onPress }:any) => (
-    <TouchableOpacity
-      onPress={onPress}
-      className={`px-4 py-2 rounded-full mr-3 ${
-        isSelected 
-          ? 'bg-gray-600' 
-          : 'bg-gray-800'
-      }`}
-      activeOpacity={0.8}
-    >
-      <Text className={`text-sm font-['SFProDisplayMedium'] ${
-        isSelected ? 'text-white' : 'text-gray-400'
-      }`}>
-        {year}
-      </Text>
-    </TouchableOpacity>
-  );
 
 
 const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; color:string}) => {
@@ -203,21 +212,23 @@ const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; colo
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
-        {/* Planning Horizon */}
-        <InputField
-          label="Горизонт планирования"
-          value={planningHorizon}
-          onChangeText={setPlanningHorizon}
-          placeholder="Введите горизонт планирования"
-        />
+
 
         {/* FIO */}
-        <InputField
-          label="ФИО"
-          value={fio}
-          onChangeText={setFio}
-          placeholder="Введите ФИО"
-        />
+
+           <View className="mb-4">
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+              ФИО
+            </Text>
+            <TextInput
+              value={fio}
+              onChangeText={setFio}
+              className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+              placeholder="Введите ФИО"
+              placeholderTextColor="#666"
+            />
+          </View>
+  
 
         {/* Birth Date */}
         <View className="mb-4">
@@ -225,29 +236,44 @@ const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; colo
             Дата рождения
           </Text>
           <View className="flex-row">
-            <DropdownButton value={birthDay} onPress={() => console.log('Day')} />
-            <DropdownButton value={birthMonth} onPress={() => console.log('Month')} />
-            <DropdownButton value={birthYear} onPress={() => console.log('Year')} isLast />
+            <DropdownButton value={selectedSortDay} onPress={() => setShowDrawerDay(true)} />
+            <DropdownButton value={selectedSortMonth} onPress={() => setShowDrawerMonth(true)} />
+            <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
           </View>
         </View>
 
         {/* Activity */}
-        <InputField
-          label="Деятельность"
-          value={activity}
-          onChangeText={setActivity}
-          placeholder="Введите деятельность"
-        />
+        <View className="mb-4">
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+              Деятельность
+            </Text>
+            <TextInput
+              value={activity}
+              onChangeText={setActivity}
+              className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+              placeholder="Введите деятельность"
+              placeholderTextColor="#666"
+            />
+          </View>
+
 
         {/* Financial Info */}
-        <InputField
-          label="Финансово-зависимые люди"
-          value={financialInfo}
-          onChangeText={setFinancialInfo}
-          placeholder="Введите информацию"
-        />
 
-        {/* Year Selection */}
+        <View className="mb-4">
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+              Финансово-зависимые люди
+            </Text>
+            <TextInput
+              value={financialInfo}
+              onChangeText={setFinancialInfo}
+              className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+              placeholder="Введите количество"
+              keyboardType="number-pad"
+              placeholderTextColor="#666"
+            />
+          </View>
+
+
         <View className="mb-6">
           <Text className="text-white text-lg font-['SFProDisplaySemiBold'] mb-4">
             ЛФП
@@ -413,6 +439,37 @@ const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; colo
             <GoalCard key={goal.id} goal={goal} />
           ))}
         </View>
+
+        <Drawer 
+          title='День'
+          visible={showDrawerDay}
+          onClose={() => setShowDrawerDay(false)}
+          onSelect={handleSortSelectDay}
+          selectedValue={selectedSortDay}
+          options={days}
+          animationType='fade'
+          
+          />
+          <Drawer 
+          title='Месяц'
+          visible={showDrawerMonth}
+          onClose={() => setShowDrawerMonth(false)}
+          onSelect={handleSortSelectMonth}
+          selectedValue={selectedSortMonth}
+          options={months}
+          animationType='fade'
+          
+          />
+          <Drawer 
+          title='Год'
+          visible={showDrawerYear}
+          onClose={() => setShowDrawerYear(false)}
+          onSelect={handleSortSelectYear}
+          selectedValue={selectedSortYear}
+          options={ years}
+          animationType='fade'
+          
+          />
 
       </ScrollView>
     </SafeAreaView>

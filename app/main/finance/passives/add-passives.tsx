@@ -49,9 +49,6 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
     
   };
 
-
-
-
   const isFormValid = title.trim() && amount.trim() && planningHorizon;
 
   return (
