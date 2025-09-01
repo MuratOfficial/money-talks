@@ -3,12 +3,22 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-nativ
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import ConfirmationDrawer from '@/app/components/MiniDrawer';
-import Drawer from '@/app/components/Drawer';
+import useFinancialStore from '@/hooks/useStore';
 
 const EditProfilePage: React.FC = () => {
-  const [name, setName] = useState('First User');
-  const [email, setEmail] = useState('user12@gmail.com');
-  const [password, setPassword] = useState('************');
+
+  const {user, updateUserProfile} = useFinancialStore();
+
+  const initialName = user?.name || "Unknown";
+  const initialEmail = user?.email || "unknown@gmail.com";
+  const initialPassword = user?.password || "password";
+
+
+  const [name, setName] = useState(initialName);
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState(initialPassword);
+
+
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [showDeleteDrawer, setShowDeleteDrawer] = useState(false);
@@ -16,7 +26,8 @@ const EditProfilePage: React.FC = () => {
 
   const handleSave = () => {
     // Логика сохранения профиля
-    console.log('Сохранение профиля');
+    updateUserProfile({name:name, email:email, password:password});
+    router.push("/main/profile")
   };
 
   const handleDeleteAccount = () => {

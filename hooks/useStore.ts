@@ -22,6 +22,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string;
   avatar?: string;
   riskProfile?: 'conservative' | 'moderate' | 'aggressive';
 }
@@ -64,6 +65,7 @@ export interface AppState {
   totalBalance: string;
   walletBalance: string;
   wallets: Wallet[];
+
 
   // Настройки
   theme: 'light' | 'dark';
@@ -174,7 +176,7 @@ export const useFinancialStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Начальное состояние
-      user: null,
+      user: {name:"Uknown", password:"password", email:"user12@gamil.com", id:"initial"},
       isAuthenticated: false,
       isLoading: false,
       categories: initialCategories,
@@ -323,7 +325,6 @@ export const useFinancialStore = create<AppState>()(
         const newIncomes = [...state.incomes, newIncome];
         const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
 
-        // ИСПРАВЛЕНИЕ: Обновляем категорию через прямое изменение state
         const updatedCategories = state.categories.map(category => 
           category.id === 'income' 
             ? {
@@ -361,7 +362,6 @@ export const useFinancialStore = create<AppState>()(
         };
       }),
 
-      // ✅ ИСПРАВЛЕНО: Теперь обновляем wallets, а не categories
       updateWallet: (walletId, updates) => set((state) => ({
         wallets: state.wallets.map(wallet => 
           wallet.id === walletId 

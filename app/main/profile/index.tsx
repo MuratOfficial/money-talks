@@ -5,12 +5,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import Drawer from '@/app/components/Drawer';
+import useFinancialStore from '@/hooks/useStore';
 
 const ProfileScreen = () => {
 
 
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
   const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
+
+  const {user} = useFinancialStore();
+
+  const profileName = user?.name || "Unknown";
 
   const handleSortSelectTheme = (value:any) => {
     setSelectedSortTheme(value);
@@ -137,7 +142,7 @@ const ProfileScreen = () => {
           
           {/* Name */}
           <Text className="text-white text-lg font-['SFProDisplayRegular'] mb-2">
-            Алия Курмангалиева
+            {profileName}
           </Text>
           
           {/* Edit Button */}
