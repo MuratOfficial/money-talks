@@ -6,8 +6,42 @@ import { useRouter } from 'expo-router';
 import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import Drawer from '@/app/components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
+import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
 
 const ProfileScreen = () => {
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
+
+  const adviceItems = [
+    {
+      id: '1',
+      question: 'Что такое финансовая грамотность?',
+      answer: 'Финансовая грамотность — это знание и умение управлять своими финансами: бюджетирование, сбережение, инвестиции, управление долгами и планирование будущего.'
+    },
+    {
+      id: '2',
+      question: 'Зачем мне нужна финансовая грамотность?',
+      answer: 'Финансовая грамотность помогает принимать обоснованные решения о деньгах, избегать долгов, создавать сбережения и достигать финансовых целей. Это основа для финансовой независимости и стабильности.'
+    },
+    {
+      id: '3',
+      question: 'С чего начать путь к финансовой грамотности?',
+      answer: 'Начните с ведения учета доходов и расходов, создания бюджета и постановки финансовых целей. Изучайте основы инвестирования, читайте книги по финансам и следите за своими тратами.'
+    },
+    {
+      id: '4',
+      question: 'Как правильно вести бюджет?',
+      answer: 'Записывайте все доходы и расходы, категоризируйте траты, планируйте расходы на месяц вперед. Следуйте правилу 50/30/20: 50% на необходимые расходы, 30% на желания, 20% на сбережения и инвестиции.'
+    },
+    {
+      id: '5',
+      question: 'Что делать с долгами?',
+      answer: 'Сначала погасите долги с высокой процентной ставкой. Создайте план погашения, избегайте новых долгов, рассмотрите возможность рефинансирования. Не берите кредиты на потребительские товары без крайней необходимости.'
+    }
+  ];
 
 
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
@@ -47,7 +81,7 @@ const ProfileScreen = () => {
       title: 'Советы',
       icon: 'library-outline',
       hasArrow: true,
-      onPress: () => console.log('Советы pressed')
+      onPress: () => openModal()
     },
     {
       id: 'achievements',
@@ -177,6 +211,13 @@ const ProfileScreen = () => {
             selectedValue={selectedSortCurrency}
             options={ ['Доллар ($)', 'Евро (€)', 'Дирхам ( د. إ)', 'Тенге (₸)', 'Лира (₺)', 'Рубль (₽)']}
             
+          />
+
+           <AdviceAccordionModal
+            visible={modalVisible}
+            onClose={closeModal}
+            title="Советы"
+            items={adviceItems}
           />
 
         <ConfirmationDrawer

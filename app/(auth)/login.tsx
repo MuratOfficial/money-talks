@@ -63,6 +63,9 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={() => router.push('/(auth)/forgotten')}>
         <Text className="font-['SFProDisplayRegular']" style={styles.forgotPassword}>Забыли пароль?</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+        <Text className="font-['SFProDisplayRegular']" style={styles.forgotPassword}>Зарегистрироваться</Text>
+      </TouchableOpacity>
     </View>
   );
 }

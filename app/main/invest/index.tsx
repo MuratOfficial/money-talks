@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import InfoModal from '@/app/components/Hint';
 
 interface AccordionItem {
   id: string;
@@ -12,6 +13,36 @@ interface AccordionItem {
 const InvestmentsPage: React.FC = () => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const router = useRouter();
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
+
+  const markdownContent = `
+## Доходы 💰
+
+### Активный доход
+**Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
+
+### Пассивный доход  
+**Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
+
+### Источники дохода
+**Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
+
+#### 1. Регулярные доходы:
+- Зарплата, пенсия, аренда или плата
+- *Стоит стремиться увеличить источники регулярных доходов*
+
+#### 2. Нерегулярные доходы:
+- Подарки, подработка  
+- *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
+
+---
+
+> 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
+`;
 
   const accordionData: AccordionItem[] = [
     {
@@ -48,7 +79,7 @@ const InvestmentsPage: React.FC = () => {
         <Text className="text-white text-xl font-['SFProDisplaySemiBold']">
           Инвестиции
         </Text>
-        <TouchableOpacity className="p-1">
+        <TouchableOpacity className="p-1" onPress={openModal}>
           <MaterialIcons name="info-outline" size={24} color="#9CA3AF" />
         </TouchableOpacity>
       </View>
@@ -98,6 +129,15 @@ const InvestmentsPage: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <InfoModal 
+        visible={modalVisible} 
+        onClose={closeModal}
+        title="Подсказки про доходы"
+        content={markdownContent}
+        linkUrl="https://web.telegram.org/a/#-1002352034763_2"
+        linkText="Видеоурок на Telegram"
+      />
     </View>
   );
 };

@@ -16,13 +16,13 @@ const PassivesScreen: React.FC = () => {
       name:"Доходы",
       item:incomes
     },
-    {id:"expences",
-      name:"Расходы",
-      item:expences
+    {id:"passives",
+      name:"Пассивы",
+      item:passives
     },
-    {id:"expences",
-      name:"Расходы",
-      item:expences
+    {id:"actives",
+      name:"Активы",
+      item:actives
     },
   ]
 

@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
+import InfoModal from './Hint';
 
 interface PageComponentProps {
   title: string;
@@ -54,6 +55,37 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+
+  const [modalVisible, setModalVisible] = useState(false);
+  
+    const openModal = () => setModalVisible(true);
+    const closeModal = () => setModalVisible(false);
+  
+    const markdownContent = `
+  ## Доходы 💰
+  
+  ### Активный доход
+  **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
+  
+  ### Пассивный доход  
+  **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
+  
+  ### Источники дохода
+  **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
+  
+  #### 1. Регулярные доходы:
+  - Зарплата, пенсия, аренда или плата
+  - *Стоит стремиться увеличить источники регулярных доходов*
+  
+  #### 2. Нерегулярные доходы:
+  - Подарки, подработка  
+  - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
+  
+  ---
+  
+  > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
+  `;
+  
 
   const currentAnalyzeList = analyzeList || [];
 
@@ -146,8 +178,8 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
             <Ionicons name="pie-chart-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>}
           
-          <TouchableOpacity className="p-2">
-            <Ionicons name="information-circle-outline" size={20} color="#FFFFFF" />
+          <TouchableOpacity className="p-2" onPress={openModal}>
+            <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -397,6 +429,15 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           animationType='fade'
           
           />
+
+          <InfoModal 
+        visible={modalVisible} 
+        onClose={closeModal}
+        title="Подсказки про доходы"
+        content={markdownContent}
+        linkUrl="https://web.telegram.org/a/#-1002352034763_2"
+        linkText="Видеоурок на Telegram"
+      />
       
     </SafeAreaView>
   );
