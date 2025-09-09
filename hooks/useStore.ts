@@ -23,7 +23,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  avatar?: string;
+  avatar?: string | null;
   riskProfile?: 'conservative' | 'moderate' | 'aggressive';
 }
 

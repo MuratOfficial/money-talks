@@ -1,101 +1,80 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity } from 'react-native';
+import TestComponent from '../components/TestComponent';
 
-const TestScreen = () => {
-  const router = useRouter();
-  const [selectedAge, setSelectedAge] = useState('30-39');
+const TestScreen: React.FC = () => {
+  const [showTest, setShowTest] = useState(false);
 
-  const ageOptions = [
-    { id: '18-29', label: 'A. 18-29' },
-    { id: '30-39', label: 'B. 30-39' },
-    { id: '40-49', label: 'C. 40-49' },
-    { id: '50-59', label: 'D. 50-59' },
-    { id: '60+', label: 'E. 60 и старше' }
+  const sampleQuestions = [
+    {
+      id: 1,
+      question: "Каков ваш текущий возраст (годы)?",
+      options: ["А: 18-29", "В: 30-39", "С: 40-49", "D: 50-59", "E: 60 и старше"],
+      correctAnswer: 0
+    },
+    {
+      id: 2,
+      question: "Какой у вас опыт инвестирования?",
+      options: ["Новичок", "1-3 года", "3-5 лет", "5-10 лет", "Более 10 лет"],
+      correctAnswer: 2
+    },
+    {
+      id: 3,
+      question: "Какую сумму вы готовы инвестировать?",
+      options: ["До 100 000₽", "100 000 - 500 000₽", "500 000 - 1 000 000₽", "Более 1 000 000₽"],
+      correctAnswer: 1
+    },
+    {
+      id: 4,
+      question: "Как долго вы планируете инвестировать?",
+      options: ["До 1 года", "1-3 года", "3-5 лет", "5-10 лет", "Более 10 лет"],
+      correctAnswer: 3
+    },
+    {
+      id: 5,
+      question: "Как вы отреагируете на падение портфеля на 20%?",
+      options: [
+        "Немедленно продам все активы",
+        "Буду беспокоиться, но не продам",
+        "Подожду восстановления",
+        "Докуплю еще активов",
+        "Это нормальная ситуация"
+      ],
+      correctAnswer: 2
+    }
   ];
 
-  const handleNext = () => {
-    // Логика перехода к следующему вопросу
-    console.log('Selected age:', selectedAge);
-    // router.push('/test/question2');
+  const handleTestComplete = (result: any) => {
+    console.log('Test completed:', result);
+    // Здесь можно сохранить результат или отправить на сервер
   };
 
+  if (showTest) {
+    return (
+      <TestComponent
+        questions={sampleQuestions}
+        testTitle="Тест"
+        onClose={() => setShowTest(false)}
+        onComplete={handleTestComplete}
+      />
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3">
-        <TouchableOpacity 
-          onPress={() => router.replace('/main/invest')}
-          className="p-2"
-        >
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </TouchableOpacity>
-        
-        <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
-          Тест
-        </Text>
-        
-        <View className="w-8" />
-      </View>
-
-      {/* Instruction */}
-      <View className="px-4 mb-6">
-        <View className="flex-row items-center">
-          <Ionicons name="information-circle-outline" size={16} color="#888" />
-          <Text className="text-gray-400 text-sm ml-2 font-['SFProDisplayRegular']">
-            Пройдите тест чтобы определить свой тип инвестора
-          </Text>
-        </View>
-      </View>
-
-      {/* Content */}
-      <ScrollView 
-        className="flex-1 px-4"
-        showsVerticalScrollIndicator={false}
+    <View className="flex-1 bg-gray-100 items-center justify-center px-4">
+      <Text className="text-gray-800 text-xl font-semibold mb-4 text-center">
+        Тест на определение типа инвестора
+      </Text>
+      <TouchableOpacity
+        onPress={() => setShowTest(true)}
+        className="bg-blue-600 px-8 py-4 rounded-2xl"
+        activeOpacity={0.8}
       >
-        {/* Question */}
-        <Text className="text-white text-lg font-['SFProDisplayRegular'] mb-8">
-          1. Каков ваш текущий возраст (годы)?
+        <Text className="text-white text-lg font-semibold">
+          Начать тест
         </Text>
-
-        {/* Answer Options */}
-        <View className="space-y-4 mb-8">
-          {ageOptions.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              onPress={() => setSelectedAge(option.id)}
-              className="flex-row items-center justify-between bg-gray-800 rounded-xl px-4 py-4"
-              activeOpacity={0.7}
-            >
-              <Text className="text-white text-base font-['SFProDisplayRegular']">
-                {option.label}
-              </Text>
-              
-              <View className="w-6 h-6 rounded-full border-2 border-gray-500 items-center justify-center">
-                {selectedAge === option.id && (
-                  <View className="w-3 h-3 rounded-full bg-white" />
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* Next Button */}
-      <View className="px-4 pb-4">
-        <TouchableOpacity
-          onPress={handleNext}
-          activeOpacity={0.8}
-          className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
-        >
-          <Text className="text-white text-base font-['SFProDisplaySemiBold']">
-            Далее
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </TouchableOpacity>
+    </View>
   );
 };
 

@@ -26,7 +26,7 @@ const Drawer: React.FC<DrawerProps> = ({
   selectedValue = '5 лет', 
   options, 
   title, 
-  animationType = "slide"  
+  animationType = "none"  
 }) => {
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 

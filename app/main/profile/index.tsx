@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -7,6 +7,7 @@ import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import Drawer from '@/app/components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
+import FaceIDModal from '@/app/components/FaceIDModal';
 
 const ProfileScreen = () => {
 
@@ -14,6 +15,18 @@ const ProfileScreen = () => {
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
+
+  const [showFaceID, setShowFaceID] = useState(false);
+
+  const handleFaceIDSuccess = () => {
+    setShowFaceID(false);
+    Alert.alert('Успешно!', 'Face ID аутентификация прошла успешно');
+  };
+
+  const handleFaceIDError = () => {
+    setShowFaceID(false);
+    Alert.alert('Ошибка', 'Face ID не удалось распознать. Попробуйте снова.');
+  };
 
   const adviceItems = [
     {
@@ -59,6 +72,8 @@ const ProfileScreen = () => {
   const [showDrawerCurrency, setShowDrawerCurrency] = useState(false);
   const [selectedSortCurrency, setSelectedSortCurrency] = useState('Тенге (₸)');
 
+  const avatarUri = user?.avatar || null; 
+
   const handleSortSelectCurrency = (value:any) => {
     setSelectedSortCurrency(value);
     console.log('Selected sort:', value);
@@ -66,7 +81,6 @@ const ProfileScreen = () => {
 
     const [showLogoutDrawer, setShowLogoutDrawer] = useState(false);
   const router = useRouter();
-  const [faceIdEnabled, setFaceIdEnabled] = useState(true);
 
 
 
@@ -109,8 +123,8 @@ const ProfileScreen = () => {
       title: 'Face ID',
       icon: 'finger-print-outline',
       hasSwitch: true,
-      switchValue: faceIdEnabled,
-      onSwitchChange: setFaceIdEnabled
+      switchValue: showFaceID,
+      onSwitchChange: setShowFaceID
     },
     {
       id: 'theme',
@@ -162,6 +176,13 @@ const ProfileScreen = () => {
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
+
+         <FaceIDModal
+            visible={showFaceID}
+            onClose={() => setShowFaceID(false)}
+            onSuccess={handleFaceIDSuccess}
+            onError={handleFaceIDError}
+          />
         {/* Header */}
         <Text className="text-white text-xl font-['SFProDisplayBold'] mt-3 mb-8">
           Профиль
@@ -170,9 +191,24 @@ const ProfileScreen = () => {
         {/* Profile Info */}
         <View className="items-center mb-8">
           {/* Avatar */}
-          <View className="w-24 h-24 bg-white/20 rounded-full items-center justify-center mb-4">
-            <Ionicons name="person" size={32} color="white" />
-          </View>
+
+          {avatarUri ? (
+              <>
+                <Image 
+                  source={{ uri: avatarUri }} 
+                  className="w-24 h-24 rounded-full"
+                  resizeMode="cover"
+                />
+                
+              </>
+            ) : (
+
+              <View className="w-24 h-24 bg-[#333333] rounded-full items-center justify-center mb-4 relative">
+                <Ionicons name="person" size={32} color="white" />
+              </View>
+              
+            )}
+          
           
           {/* Name */}
           <Text className="text-white text-lg font-['SFProDisplayRegular'] mb-2">
@@ -210,8 +246,10 @@ const ProfileScreen = () => {
             onSelect={handleSortSelectCurrency}
             selectedValue={selectedSortCurrency}
             options={ ['Доллар ($)', 'Евро (€)', 'Дирхам ( د. إ)', 'Тенге (₸)', 'Лира (₺)', 'Рубль (₽)']}
-            
+        
           />
+
+         
 
            <AdviceAccordionModal
             visible={modalVisible}
@@ -230,6 +268,7 @@ const ProfileScreen = () => {
           cancelText="Отмена"
         />
       </ScrollView>
+      
     </SafeAreaView>
   );
 };

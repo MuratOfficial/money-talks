@@ -39,7 +39,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       statusBarTranslucent
     >
       <View className="flex-1 bg-black/50 justify-end">
