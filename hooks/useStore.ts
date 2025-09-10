@@ -58,6 +58,7 @@ export interface AppState {
   incomes: Asset[];
   actives: Asset[];
   passives: Asset[];
+  currentGoalType: string;
 
   // Редактирование ассет
   currentAsset: Asset | null;
@@ -119,6 +120,10 @@ export interface AppState {
   // Утилиты
   formatAmount: (amount: number) => string;
   generateId: () => string;
+
+  // Цели
+
+  setGoalFilter:(type:string)=>void
 }
 
 // Начальные данные
@@ -178,6 +183,7 @@ export const useFinancialStore = create<AppState>()(
       // Начальное состояние
       user: {name:"Uknown", password:"password", email:"user12@gamil.com", id:"initial"},
       isAuthenticated: false,
+      currentGoalType:"Краткосрочные",
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
@@ -216,6 +222,14 @@ export const useFinancialStore = create<AppState>()(
       updateUserProfile: (updates) => set((state) => ({
         user: state.user ? { ...state.user, ...updates } : null
       })),
+
+      // Цели
+
+      setGoalFilter:(type) => set((state)=> { 
+        return {
+          currentGoalType: type
+        }
+       }),
 
       // Финансы - Категории
       setCategories: (categories) => set({ categories }),

@@ -188,7 +188,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text className="text-white text-xl font-semibold font-['SFProDisplayRegular']">
+        <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
           {testTitle}
         </Text>
         <View className="w-6" />

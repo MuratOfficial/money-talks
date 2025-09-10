@@ -9,8 +9,19 @@ import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
 
-    const handleGoal = (title:string) => {
+  const {setGoalFilter} = useFinancialStore();
+
+    const handleGoal = (title:string, type?:string) => {
       if (title === "Цели") {
+        if(type==="Краткосрочные"){
+          setGoalFilter("Краткосрочные")
+        }
+        if(type==="Среднесрочные"){
+          setGoalFilter("Среднесрочные")
+        }
+        if(type==="Долгосрочные"){
+          setGoalFilter("Долгосрочные")
+        }
         router.replace('/main/goals/main');
       }
       if(title === "Доходы") {
@@ -23,8 +34,6 @@ const MainScreen = () => {
       
     };
 
-
-    
    
      const [showDrawerFilter, setShowDrawerFilter] = useState(false);
      const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
@@ -59,9 +68,9 @@ const MainScreen = () => {
     {
       title: 'Цели',
       items: [
-        { name: 'Краткосрочные', color: '#29B6F6', icon: 'snow' },
-        { name: 'Среднесрочные', color: '#66BB6A', icon: 'medical' },
-        { name: 'Долгосрочные', color: '#7986CB', icon: 'time' }
+        { name: 'Краткосрочные', color: '#29B6F6', icon: 'nuclear-outline' },
+        { name: 'Среднесрочные', color: '#66BB6A', icon: 'earth-outline' },
+        { name: 'Долгосрочные', color: '#7986CB', icon: 'golf-outline' }
       ]
     }
   ];
@@ -72,7 +81,7 @@ const MainScreen = () => {
       activeOpacity={0.8}
       onPress={
         ()=>{
-          handleGoal(title)
+          handleGoal(title, item.name)
         }
       }
     >
