@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from './Drawer';
+import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore';
 
 interface AddGoalFormProps {
   onClose?: () => void;
-  onSave?: (goalData: GoalData) => void;
+  onSave?: (goalId: string) => void;
+  editGoalId?: string;
 }
 
 interface GoalData {
@@ -29,7 +31,9 @@ interface GoalData {
   monthlyInvestment: string;
 }
 
-const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave }) => {
+const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }) => {
+  const { addGoal, updateGoal, getGoalById, } = useFinancialStore(); 
+  
   const [formData, setFormData] = useState<GoalData>({
     name: '',
     type: 'medium',
@@ -44,82 +48,138 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave }) => {
     monthlyInvestment: '',
   });
 
+  const [showDrawerDay, setShowDrawerDay] = useState(false);
+  const [selectedSortDay, setSelectedSortDay] = useState('День');
+  const [showDrawerMonth, setShowDrawerMonth] = useState(false);
+  const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
+  const [showDrawerYear, setShowDrawerYear] = useState(false);
+  const [selectedSortYear, setSelectedSortYear] = useState('Год');
+
   const goalTypes = [
     { key: 'short', label: 'Краткосрочный' },
     { key: 'medium', label: 'Среднесрочный' },
     { key: 'long', label: 'Долгосрочный' },
   ];
 
-
   const currencies = [
     { key: 'KZT', label: 'Тенге KZT' },
     { key: 'USD', label: 'Доллар $' },
   ];
 
-  const handleSave = () => {
-    if (formData.name && formData.amount) {
-    //   onSave(formData);
-    }
-  };
-
-    const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x=>x.toString());
+  const days: string[] = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
   const months: string[] = [
     'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
   ];
 
   const currentYear: number = new Date().getFullYear();
-  const years: string[] = Array.from({ length: 100 }, (_, i) => currentYear - i).map(x=>x.toString());
+  const years: string[] = Array.from({ length: 100 }, (_, i) => (currentYear + 50 - i).toString());
 
-    const [showDrawerDay, setShowDrawerDay] = useState(false);
-    const [selectedSortDay, setSelectedSortDay] = useState('День');
-    const [showDrawerMonth, setShowDrawerMonth] = useState(false);
-    const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
-    const [showDrawerYear, setShowDrawerYear] = useState(false);
-    const [selectedSortYear, setSelectedSortYear] = useState('Год');
+  useEffect(() => {
+    if (editGoalId) {
+      const existingGoal = getGoalById(editGoalId);
+      if (existingGoal) {
+        setFormData({
+          name: existingGoal.name,
+          type: existingGoal.type,
+          timeframe: { period: 'day', value: '' }, // Адаптируйте под вашу структуру
+          currency: existingGoal.currency,
+          amount: existingGoal.amount,
+          inflationRate: existingGoal.inflationRate,
+          returnRate: existingGoal.returnRate,
+          monthlyInvestment: existingGoal.monthlyInvestment,
+        });
+        setSelectedSortDay(existingGoal.timeframe.day);
+        setSelectedSortMonth(existingGoal.timeframe.month);
+        setSelectedSortYear(existingGoal.timeframe.year);
+      }
+    }
+  }, [editGoalId]);
 
-      const handleSortSelectDay = (value:any) => {
+  const handleSave = () => {
+    if (!canSave) return;
+
+    try {
+      // Конвертируем данные формы в формат store
+      const goalData = convertFormDataToGoal(
+        formData,
+        selectedSortDay,
+        selectedSortMonth,
+        selectedSortYear
+      );
+
+      let goalId: string;
+
+      if (editGoalId) {
+        // Обновление существующей цели
+        const success = updateGoal(editGoalId, goalData);
+        if (success) {
+          goalId = editGoalId;
+        } else {
+          throw new Error('Не удалось обновить цель');
+        }
+        goalId = editGoalId; 
+      } else {
+        // Создание новой цели
+        goalId = addGoal(goalData);
+        goalId = 'temp-id'; // Временно для примера
+      }
+
+      // Вызываем callback с ID цели
+      onSave?.(goalId);
+      onClose?.();
+
+    } catch (error) {
+      console.error('Ошибка при сохранении цели:', error);
+      // добавить показ ошибки пользователю
+    }
+  };
+
+  const handleSortSelectDay = (value: string) => {
     setSelectedSortDay(value);
-    };
-    
-    const handleSortSelectMonth = (value:any) => {
-        setSelectedSortMonth(value);
-    };
-    
-    const handleSortSelectYear = (value:any) => {
-        setSelectedSortYear(value);
-    };
+  };
+  
+  const handleSortSelectMonth = (value: string) => {
+    setSelectedSortMonth(value);
+  };
+  
+  const handleSortSelectYear = (value: string) => {
+    setSelectedSortYear(value);
+  };
 
+  const canSave = formData.name.trim() !== '' && 
+                  formData.amount.trim() !== '' &&
+                  selectedSortDay !== 'День' &&
+                  selectedSortMonth !== 'Месяц' &&
+                  selectedSortYear !== 'Год';
 
-  const canSave = formData.name.trim() !== '' && formData.amount.trim() !== '';
-
-    const DropdownButton = ({ value, onPress, isFirst = false, isLast = false }:any) => (
-      <TouchableOpacity
-        onPress={onPress}
-        className={`flex-1 px-4 py-3 rounded-2xl border flex-row justify-between bg-gray-700 border-gray-500 ${
-          !isLast ? 'mr-2' : ''
-        }`}
-        activeOpacity={0.7}
-      >
-        <Text className="text-white text-sm font-['SFProDisplayRegular']">
-          {value}
-        </Text>
-        <Ionicons name="chevron-down" size={16} color="white" />
-      </TouchableOpacity>
-    );
+  const DropdownButton = ({ value, onPress, isLast = false }: any) => (
+    <TouchableOpacity
+      onPress={onPress}
+      className={`flex-1 px-4 py-3 rounded-2xl border flex-row justify-between bg-gray-700 border-gray-500 ${
+        !isLast ? 'mr-2' : ''
+      }`}
+      activeOpacity={0.7}
+    >
+      <Text className="text-white text-sm font-['SFProDisplayRegular']">
+        {value}
+      </Text>
+      <Ionicons name="chevron-down" size={16} color="white" />
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-black">
       {/* Header */}
-       <View className="flex-row items-center justify-between px-4 py-3 pt-4">
-              <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-                <Ionicons name="chevron-back" size={24} color="white" />
-              </TouchableOpacity>
-              <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
-                Добавить цель
-              </Text>
-              <View className="w-6" />
-            </View>
+      <View className="flex-row items-center justify-between px-4 py-3 pt-4">
+        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+          <Ionicons name="chevron-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
+          {editGoalId ? 'Редактировать цель' : 'Добавить цель'}
+        </Text>
+        <View className="w-6" />
+      </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 py-2">
@@ -181,10 +241,9 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave }) => {
               Срок достижения цели
             </Text>
             <View className="flex-row gap-3">
-      
               <DropdownButton value={selectedSortDay} onPress={() => setShowDrawerDay(true)} />
-            <DropdownButton value={selectedSortMonth} onPress={() => setShowDrawerMonth(true)} />
-            <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
+              <DropdownButton value={selectedSortMonth} onPress={() => setShowDrawerMonth(true)} />
+              <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
             </View>
           </View>
 
@@ -303,40 +362,40 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave }) => {
           <Text className={`text-base font-['SFProDisplaySemiBold'] ${
             canSave ? 'text-white' : 'text-gray-400'
           }`}>
-            Добавить
+            {editGoalId ? 'Сохранить' : 'Добавить'}
           </Text>
         </TouchableOpacity>
       </View>
 
       <Drawer 
-          title='День'
-          visible={showDrawerDay}
-          onClose={() => setShowDrawerDay(false)}
-          onSelect={handleSortSelectDay}
-          selectedValue={selectedSortDay}
-          options={days}
-          animationType='fade'
-        />
-        
-        <Drawer 
-          title='Месяц'
-          visible={showDrawerMonth}
-          onClose={() => setShowDrawerMonth(false)}
-          onSelect={handleSortSelectMonth}
-          selectedValue={selectedSortMonth}
-          options={months}
-          animationType='fade'
-        />
-        
-        <Drawer 
-          title='Год'
-          visible={showDrawerYear}
-          onClose={() => setShowDrawerYear(false)}
-          onSelect={handleSortSelectYear}
-          selectedValue={selectedSortYear}
-          options={years}
-          animationType='fade'
-        />
+        title='День'
+        visible={showDrawerDay}
+        onClose={() => setShowDrawerDay(false)}
+        onSelect={handleSortSelectDay}
+        selectedValue={selectedSortDay}
+        options={days}
+        animationType='fade'
+      />
+      
+      <Drawer 
+        title='Месяц'
+        visible={showDrawerMonth}
+        onClose={() => setShowDrawerMonth(false)}
+        onSelect={handleSortSelectMonth}
+        selectedValue={selectedSortMonth}
+        options={months}
+        animationType='fade'
+      />
+      
+      <Drawer 
+        title='Год'
+        visible={showDrawerYear}
+        onClose={() => setShowDrawerYear(false)}
+        onSelect={handleSortSelectYear}
+        selectedValue={selectedSortYear}
+        options={years}
+        animationType='fade'
+      />
     </SafeAreaView>
   );
 };

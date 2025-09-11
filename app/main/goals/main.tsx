@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import useFinancialStore from '@/hooks/useStore';
+import useFinancialStore, { Goal } from '@/hooks/useStore';
 import InfoModal from '@/app/components/Hint';
 
 const GoalsScreen = () => {
   const router = useRouter();
-  const {currentGoalType} = useFinancialStore();
+  const {currentGoalType, goals, pickEditGoal} = useFinancialStore();
 
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -40,6 +40,11 @@ const GoalsScreen = () => {
       const openModal = () => setModalVisible(true);
       const closeModal = () => setModalVisible(false);
 
+      const handleEdit = (id:string) =>{
+        pickEditGoal(id);
+        router.push("/main/goals/add-goal")
+      }
+
   const [selectedTerm, setSelectedTerm] = useState(currentGoalType || 'Краткосрочные');
   const [selectedStatus, setSelectedStatus] = useState('Активные');
    const [showSortModal, setShowSortModal] = useState(false);
@@ -49,17 +54,68 @@ const GoalsScreen = () => {
   const termOptions = ['Краткосрочные', 'Среднесрочные', 'Долгосрочные'];
   const statusOptions = ['Завершенные', 'Активные'];
 
-  const goals = [
-    {
-      id: 1,
-      title: 'Подушка безопасности',
-      deadline: 'Выберите срок',
-      progress: 0,
-      collected: '0 $',
-      target: '0 $',
-      isActive: true
+
+
+  // Функция фильтрации по срочности
+const filterGoalsByTerm = (goals: Goal[], term: string) => {
+  return goals.filter(goal => {
+    switch (term) {
+      case 'Краткосрочные':
+        return goal.type === 'short';
+      case 'Среднесрочные':
+        return goal.type === 'medium';
+      case 'Долгосрочные':
+        return goal.type === 'long';
+      default:
+        return true;
     }
-  ];
+  });
+};
+
+// Функция фильтрации по статусу (активные/завершенные)
+const filterGoalsByStatus = (goals: Goal[], status: string) => {
+  return goals.filter(goal => {
+    if (status === 'Активные') {
+      return Number(goal.progress) < 100;
+    } else if (status === 'Завершенные') {
+      return Number(goal.progress) >= 100;
+    }
+    return true;
+  });
+};
+
+// Функция сортировки
+const sortGoals = (goals: Goal[], sortType: string) => {
+  const sortedGoals = [...goals];
+  
+  switch (sortType) {
+    case 'По %':
+      return sortedGoals.sort((a, b) => b.progress! - a.progress!);
+    case 'По дате':
+      return sortedGoals.sort((a, b) => {
+        const dateA = new Date(Number(a.timeframe.year), Number(a.timeframe.day));
+        const dateB = new Date(Number(b.timeframe.year), Number(b.timeframe.day));
+        return dateA.getTime() - dateB.getTime();
+      });
+    default:
+      return sortedGoals;
+  }
+};
+
+// Использование в компоненте с useEffect
+const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
+
+useEffect(() => {
+  let result = goals;
+  
+  // Применяем фильтры последовательно
+  result = filterGoalsByTerm(result, selectedTerm);
+  result = filterGoalsByStatus(result, selectedStatus);
+  result = sortGoals(result, selectedSort);
+  
+  setFilteredGoals(result);
+}, [goals, selectedTerm, selectedStatus, selectedSort]);
+
 
   const TermButton = ({ term, isSelected, onPress }:any) => (
     <TouchableOpacity
@@ -216,18 +272,24 @@ const GoalsScreen = () => {
     </Modal>
   );
 
-  const GoalCard = ({ goal }:any) => (
+  const GoalCard = ( goal:Goal ) => (
     <View className="bg-gray-800 rounded-2xl p-4 mb-4">
       <View className="flex-row items-start justify-between mb-4">
         <View className="flex-1">
           <Text className="text-white text-lg font-['SFProDisplaySemiBold'] mb-2">
-            {goal.title}
+            {goal.name}
           </Text>
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
-            {goal.deadline}
-          </Text>
+          
+            {goal.timeframe ? 
+            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+              Срок достижения цели {goal.timeframe.day} {goal.timeframe.month} {goal.timeframe.year}
+            </Text>:<Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+              Выберите срок
+              </Text>}
+            
+          
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
-            Собрано {goal.collected} из {goal.target}
+            Собрано {goal.collected} из {goal.amount}
           </Text>
         </View>
         
@@ -242,7 +304,7 @@ const GoalsScreen = () => {
           <Ionicons name="add-circle-outline" size={16} color="white" />
         </TouchableOpacity>
         
-        <TouchableOpacity className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
+        <TouchableOpacity onPress={()=>handleEdit(goal.id)} className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
           <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
             Редактировать
           </Text>
@@ -315,8 +377,8 @@ return (
         </View>
 
         {/* Goals List */}
-        {goals.map((goal) => (
-          <GoalCard key={goal.id} goal={goal} />
+        {filteredGoals.map((goal) => (
+          <GoalCard key={goal.id} {...goal} />
         ))}
 
 

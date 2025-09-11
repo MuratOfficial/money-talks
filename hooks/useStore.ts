@@ -3,6 +3,41 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Типы данных
+export interface Goal {
+  id: string;
+  name: string;
+  type: 'short' | 'medium' | 'long';
+  timeframe: {
+    day: string;
+    month: string;
+    year: string;
+  };
+  currency: 'KZT' | 'USD';
+  amount: string;
+  collected?: string;
+  progress?:number;
+  inflationRate: string;
+  returnRate: string;
+  monthlyInvestment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface GoalFormData {
+  name: string;
+  type: 'short' | 'medium' | 'long';
+  timeframe: {
+    day: string;
+    month: string;
+    year: string;
+  };
+  currency: 'KZT' | 'USD';
+  amount: string;
+  inflationRate: string;
+  returnRate: string;
+  monthlyInvestment: string;
+}
+
 export interface FinancialItem {
   id: string;
   name: string;
@@ -60,13 +95,16 @@ export interface AppState {
   passives: Asset[];
   currentGoalType: string;
 
+  // Цели
+  goals: Goal[];
+  currentGoalChangeId: string;
+
   // Редактирование ассет
   currentAsset: Asset | null;
  
   totalBalance: string;
   walletBalance: string;
   wallets: Wallet[];
-
 
   // Настройки
   theme: 'light' | 'dark';
@@ -115,15 +153,20 @@ export interface AppState {
   setCurrency: (currency: '₸' | '$' | '€') => void;
 
   // Редактирование ассета
-  setCurrentAsset: (asset:Asset)=>void,
+  setCurrentAsset: (asset: Asset) => void;
   
   // Утилиты
   formatAmount: (amount: number) => string;
   generateId: () => string;
 
   // Цели
-
-  setGoalFilter:(type:string)=>void
+  setGoalFilter: (type: string) => void;
+  pickEditGoal: (id:string) => void;
+  addGoal: (goalData: GoalFormData) => string; // returns new goal id
+  updateGoal: (id: string, goalData: Partial<GoalFormData>) => boolean;
+  deleteGoal: (id: string) => boolean;
+  getGoalById: (id: string) => Goal | undefined;
+  getGoalsByType: (type: 'short' | 'medium' | 'long') => Goal[];
 }
 
 // Начальные данные
@@ -187,6 +230,7 @@ export const useFinancialStore = create<AppState>()(
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
+      currentGoalChangeId:"",
       walletBalance: '0 ₸',
       theme: 'dark',
       language: 'ru',
@@ -197,6 +241,7 @@ export const useFinancialStore = create<AppState>()(
       actives: [],
       passives:[],
       currentAsset:null,
+      goals: [], // Добавлено состояние для целей
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -224,12 +269,86 @@ export const useFinancialStore = create<AppState>()(
       })),
 
       // Цели
-
       setGoalFilter:(type) => set((state)=> { 
         return {
           currentGoalType: type
         }
        }),
+
+      // Новые функции для работы с целями
+      addGoal: (goalData: GoalFormData): string => {
+        const state = get();
+        const newGoal: Goal = {
+          id: state.generateId(),
+          ...goalData,
+          progress:0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        set((prevState) => ({
+          goals: [...prevState.goals, newGoal]
+        }));
+
+        return newGoal.id;
+      },
+
+      pickEditGoal: (id:string)=>{
+
+       
+        
+        set((prevState) => ({
+          currentGoalChangeId: id,
+        }));
+      },
+
+      updateGoal: (id: string, goalData: Partial<GoalFormData>): boolean => {
+        const { goals } = get();
+        const goalIndex = goals.findIndex((goal: Goal) => goal.id === id);
+        
+        if (goalIndex === -1) {
+          return false;
+        }
+
+        const updatedGoal: Goal = {
+          ...goals[goalIndex],
+          ...goalData,
+          updatedAt: new Date(),
+        };
+
+        set((state) => ({
+          goals: state.goals.map((goal: Goal, index: number) =>
+            index === goalIndex ? updatedGoal : goal
+          )
+        }));
+
+        return true;
+      },
+
+      deleteGoal: (id: string): boolean => {
+        const { goals } = get();
+        const goalExists = goals.some((goal: Goal) => goal.id === id);
+        
+        if (!goalExists) {
+          return false;
+        }
+
+        set((state) => ({
+          goals: state.goals.filter((goal: Goal) => goal.id !== id)
+        }));
+
+        return true;
+      },
+
+      getGoalById: (id: string): Goal | undefined => {
+        const { goals } = get();
+        return goals.find((goal: Goal) => goal.id === id);
+      },
+
+      getGoalsByType: (type: 'short' | 'medium' | 'long'): Goal[] => {
+        const { goals } = get();
+        return goals.filter((goal: Goal) => goal.type === type);
+      },
 
       // Финансы - Категории
       setCategories: (categories) => set({ categories }),
@@ -502,6 +621,8 @@ export const useFinancialStore = create<AppState>()(
         expences: state.expences,
         incomes: state.incomes,
         actives: state.actives,
+        passives: state.passives,
+        goals: state.goals, // Добавлено в persist
         theme: state.theme,
         language: state.language,
         currency: state.currency
@@ -522,5 +643,38 @@ export const useSettings = () => useFinancialStore((state) => ({
   language: state.language, 
   currency: state.currency 
 }));
+
+// Новые селекторы для целей
+export const useGoals = () => useFinancialStore((state) => state.goals);
+export const useGoalActions = () => useFinancialStore((state) => ({
+  addGoal: state.addGoal,
+  updateGoal: state.updateGoal,
+  deleteGoal: state.deleteGoal,
+  getGoalById: state.getGoalById,
+  getGoalsByType: state.getGoalsByType
+}));
+
+// Хелпер функция для конвертации данных формы
+export const convertFormDataToGoal = (
+  formData: any,
+  selectedDay: string,
+  selectedMonth: string,
+  selectedYear: string
+): GoalFormData => {
+  return {
+    name: formData.name,
+    type: formData.type,
+    timeframe: {
+      day: selectedDay,
+      month: selectedMonth,
+      year: selectedYear,
+    },
+    currency: formData.currency,
+    amount: formData.amount,
+    inflationRate: formData.inflationRate,
+    returnRate: formData.returnRate,
+    monthlyInvestment: formData.monthlyInvestment,
+  };
+};
 
 export default useFinancialStore;
