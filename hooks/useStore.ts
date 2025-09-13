@@ -31,6 +31,8 @@ export interface GoalFormData {
     month: string;
     year: string;
   };
+  collected?: string;
+  progress?:number;
   currency: 'KZT' | 'USD';
   amount: string;
   inflationRate: string;

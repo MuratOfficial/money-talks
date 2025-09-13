@@ -5,37 +5,41 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
 import InfoModal from '@/app/components/Hint';
+import TopUpModal from '@/app/components/TopUpModal';
 
 const GoalsScreen = () => {
   const router = useRouter();
-  const {currentGoalType, goals, pickEditGoal} = useFinancialStore();
+  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId} = useFinancialStore();
+
+  const [goalTitle, setTitle] = useState("");
 
     const [modalVisible, setModalVisible] = useState(false);
 
+
         const markdownContent = `
-  ## Доходы 💰
-  
-  ### Активный доход
-  **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
-  
-  ### Пассивный доход  
-  **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
-  
-  ### Источники дохода
-  **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
-  
-  #### 1. Регулярные доходы:
-  - Зарплата, пенсия, аренда или плата
-  - *Стоит стремиться увеличить источники регулярных доходов*
-  
-  #### 2. Нерегулярные доходы:
-  - Подарки, подработка  
-  - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
-  
-  ---
-  
-  > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
-  `;
+            ## Доходы 💰
+            
+            ### Активный доход
+            **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
+            
+            ### Пассивный доход  
+            **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
+            
+            ### Источники дохода
+            **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
+            
+            #### 1. Регулярные доходы:
+            - Зарплата, пенсия, аренда или плата
+            - *Стоит стремиться увеличить источники регулярных доходов*
+            
+            #### 2. Нерегулярные доходы:
+            - Подарки, подработка  
+            - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
+            
+            ---
+            
+            > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
+            `;
     
       const openModal = () => setModalVisible(true);
       const closeModal = () => setModalVisible(false);
@@ -45,10 +49,22 @@ const GoalsScreen = () => {
         router.push("/main/goals/add-goal")
       }
 
+      const handleTopUp = (id:string, title: string) => {
+        pickEditGoal(id);
+        setTitle(title);
+        setShowTopUpModal(true);
+      }
+
+      // const handleTopUpConfirm = () =>{
+      //   topUpGoal(currentGoalId, )
+      // }
+
   const [selectedTerm, setSelectedTerm] = useState(currentGoalType || 'Краткосрочные');
   const [selectedStatus, setSelectedStatus] = useState('Активные');
    const [showSortModal, setShowSortModal] = useState(false);
    const [selectedSort, setSelectedSort] = useState('По %');
+
+   const [showTopUpModal, setShowTopUpModal] = useState(false);
 
 
   const termOptions = ['Краткосрочные', 'Среднесрочные', 'Долгосрочные'];
@@ -57,50 +73,50 @@ const GoalsScreen = () => {
 
 
   // Функция фильтрации по срочности
-const filterGoalsByTerm = (goals: Goal[], term: string) => {
-  return goals.filter(goal => {
-    switch (term) {
-      case 'Краткосрочные':
-        return goal.type === 'short';
-      case 'Среднесрочные':
-        return goal.type === 'medium';
-      case 'Долгосрочные':
-        return goal.type === 'long';
-      default:
-        return true;
-    }
-  });
-};
+  const filterGoalsByTerm = (goals: Goal[], term: string) => {
+    return goals.filter(goal => {
+      switch (term) {
+        case 'Краткосрочные':
+          return goal.type === 'short';
+        case 'Среднесрочные':
+          return goal.type === 'medium';
+        case 'Долгосрочные':
+          return goal.type === 'long';
+        default:
+          return true;
+      }
+    });
+  };
 
 // Функция фильтрации по статусу (активные/завершенные)
-const filterGoalsByStatus = (goals: Goal[], status: string) => {
-  return goals.filter(goal => {
-    if (status === 'Активные') {
-      return Number(goal.progress) < 100;
-    } else if (status === 'Завершенные') {
-      return Number(goal.progress) >= 100;
-    }
-    return true;
-  });
-};
+  const filterGoalsByStatus = (goals: Goal[], status: string) => {
+    return goals.filter(goal => {
+      if (status === 'Активные') {
+        return Number(goal.progress) < 100;
+      } else if (status === 'Завершенные') {
+        return Number(goal.progress) >= 100;
+      }
+      return true;
+    });
+  };
 
 // Функция сортировки
-const sortGoals = (goals: Goal[], sortType: string) => {
-  const sortedGoals = [...goals];
-  
-  switch (sortType) {
-    case 'По %':
-      return sortedGoals.sort((a, b) => b.progress! - a.progress!);
-    case 'По дате':
-      return sortedGoals.sort((a, b) => {
-        const dateA = new Date(Number(a.timeframe.year), Number(a.timeframe.day));
-        const dateB = new Date(Number(b.timeframe.year), Number(b.timeframe.day));
-        return dateA.getTime() - dateB.getTime();
-      });
-    default:
-      return sortedGoals;
-  }
-};
+  const sortGoals = (goals: Goal[], sortType: string) => {
+    const sortedGoals = [...goals];
+    
+    switch (sortType) {
+      case 'По %':
+        return sortedGoals.sort((a, b) => b.progress! - a.progress!);
+      case 'По дате':
+        return sortedGoals.sort((a, b) => {
+          const dateA = new Date(Number(a.timeframe.year), Number(a.timeframe.day));
+          const dateB = new Date(Number(b.timeframe.year), Number(b.timeframe.day));
+          return dateA.getTime() - dateB.getTime();
+        });
+      default:
+        return sortedGoals;
+    }
+  };
 
 // Использование в компоненте с useEffect
 const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
@@ -153,7 +169,7 @@ useEffect(() => {
     </TouchableOpacity>
   );
 
-  const CircularProgress = ({ progress }:any) => {
+  const CircularProgress = ( {progress}:{progress:number}) => {
        const radius = 35;
     const strokeWidth = 6;
     const normalizedRadius = radius - strokeWidth * 2;
@@ -190,7 +206,7 @@ useEffect(() => {
         </svg>
         <View className="absolute inset-0 items-center justify-center">
           <Text className="text-white text-sm font-['SFProDisplayBold']">
-            {progress}%
+            {progress.toFixed(1)}%
           </Text>
         </View>
       </View>
@@ -289,15 +305,15 @@ useEffect(() => {
             
           
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
-            Собрано {goal.collected} из {goal.amount}
+            Собрано {goal.collected ?? 0} из {goal.amount}
           </Text>
         </View>
         
-        <CircularProgress progress={goal.progress} />
+        <CircularProgress progress={goal.progress ?? 0} />
       </View>
       
       <View className="flex-row space-x-3">
-        <TouchableOpacity className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
+        <TouchableOpacity onPress={()=>handleTopUp(goal.id, goal.name)} className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
           <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
             Пополнить
           </Text>
@@ -311,6 +327,16 @@ useEffect(() => {
           <Ionicons name="pencil" size={16} color="white" />
         </TouchableOpacity>
       </View>
+      
+        <TopUpModal
+          visible={showTopUpModal}
+          onClose={() => setShowTopUpModal(false)}
+         
+          goalId={currentGoalChangeId}
+          title={goalTitle}
+          currency="₸"
+        />
+
     </View>
   );
 
@@ -406,6 +432,8 @@ return (
         linkUrl="https://web.telegram.org/a/#-1002352034763_2"
         linkText="Видеоурок на Telegram"
       />
+
+      
     </SafeAreaView>
   );
 };

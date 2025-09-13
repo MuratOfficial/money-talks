@@ -8,7 +8,7 @@ import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 
 import Svg, { Circle } from 'react-native-svg';
-import useFinancialStore from '@/hooks/useStore';
+import useFinancialStore, { Goal } from '@/hooks/useStore';
 
 const PersonalFinancialPlanScreen = () => {
   const router = useRouter();
@@ -46,23 +46,7 @@ const PersonalFinancialPlanScreen = () => {
   const [riskProfile, setRiskProfile] = useState('Агрессивный');
   
   // Goals
-  const [goals, setGoals] = useState([
-    {
-      id: 1,
-      name: 'Купить мебель',
-      deadline: 'Срок достижения цели: 12 марта 2025',
-      amount: 'Собрано 700 $ из 300 $',
-      investment: 'Ежемесячная сумма инвестирования - 5 000 $',
-      progress: 20
-    },
-    {
-      id: 2,
-      name: 'Купить холодильник',
-      deadline: 'Срок достижения цели: 20 марта 2025',
-      amount: 'Собрано 0 $ из 300 000 ₸',
-      progress: 0
-    }
-  ]);
+  const {goals} = useFinancialStore();
 
   const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x=>x.toString());
   const months: string[] = [
@@ -229,28 +213,7 @@ const PersonalFinancialPlanScreen = () => {
             <!-- Финансовые цели -->
             <div class="mb-8 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-6 border border-teal-200">
               <h2 class="text-xl font-semibold text-teal-700 mb-4 border-b-2 border-teal-300 pb-2">Финансовые цели</h2>
-              <div class="space-y-4">
-                ${goals.map(goal => `
-                  <div class="bg-white p-6 rounded-lg border border-teal-200 shadow-sm">
-                    <div class="flex justify-between items-start mb-4">
-                      <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-teal-700 mb-2">${goal.name}</h3>
-                        <p class="text-sm text-gray-600 mb-1">${goal.deadline}</p>
-                        <p class="text-sm text-gray-600 mb-1">${goal.amount}</p>
-                        ${goal.investment ? `<p class="text-sm text-gray-600">${goal.investment}</p>` : ''}
-                      </div>
-                      <div class="ml-4 text-center">
-                        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center border-4 border-${goal.progress > 0 ? 'green' : 'gray'}-300">
-                          <span class="text-sm font-bold text-gray-700">${goal.progress}%</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3">
-                      <div class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-300" style="width: ${goal.progress}%"></div>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
+         
             </div>
 
             <!-- Рекомендации -->
@@ -320,77 +283,74 @@ const PersonalFinancialPlanScreen = () => {
     </TouchableOpacity>
   );
 
-  const CircularProgress = ({ progress, color = '#4CAF50' }:{progress:number; color:string}) => {
-    const size = 70;
+ const CircularProgress = ( {progress}:{progress:number}) => {
+       const radius = 35;
     const strokeWidth = 6;
-    const radius = (size - strokeWidth) / 2;
-    const circumference = radius * Math.PI * 2;
-    const strokeDashoffset = circumference - (circumference * progress) / 100;
+    const normalizedRadius = radius - strokeWidth * 2;
+    const circumference = normalizedRadius * 2 * Math.PI;
+    const strokeDasharray = `${circumference} ${circumference}`;
+    const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-      <View style={{ 
-        width: size, 
-        height: size, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
-      }}>
-        <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
-          {/* Фоновый круг */}
-          <Circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
+      <View className="relative">
+        <svg
+          height={radius * 2}
+          width={radius * 2}
+          className="transform -rotate-90"
+        >
+          <circle
             stroke="#374151"
-            strokeWidth={strokeWidth}
             fill="transparent"
+            strokeWidth={strokeWidth}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
           />
-          
-          {/* Прогресс круг */}
-          <Circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={color}
-            strokeWidth={strokeWidth}
+          <circle
+            stroke="#4CAF50"
             fill="transparent"
-            strokeDasharray={`${circumference} ${circumference}`}
-            strokeDashoffset={strokeDashoffset}
+            strokeWidth={strokeWidth}
+            strokeDasharray={strokeDasharray}
+            style={{ strokeDashoffset }}
             strokeLinecap="round"
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
           />
-        </Svg>
-        
-        {/* Текст с процентами */}
-        <View style={{ position: 'absolute' }}>
-          <Text className="text-white text-xs font-['SFProDisplayBold']">
-            {progress}%
+        </svg>
+        <View className="absolute inset-0 items-center justify-center">
+          <Text className="text-white text-sm font-['SFProDisplayBold']">
+            {progress.toFixed(1)}%
           </Text>
         </View>
       </View>
     );
   };
 
-  const GoalCard = ({ goal }:any) => (
+  const GoalCard = ({ goal }:{goal:Goal}) => (
     <View className="bg-gray-800 rounded-xl p-4 mb-3">
       <View className="flex-row items-start justify-between">
         <View className="flex-1 mr-3">
           <Text className="text-white text-base font-['SFProDisplaySemiBold'] mb-1">
             {goal.name}
           </Text>
-          <Text className="text-gray-400 text-xs font-['SFProDisplayRegular'] mb-1">
-            {goal.deadline}
-          </Text>
+          {goal.timeframe ? 
+                      <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+                        Срок достижения цели {goal.timeframe.day} {goal.timeframe.month} {goal.timeframe.year}
+                      </Text>:<Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+                        Выберите срок
+                        </Text>}
           <Text className="text-gray-400 text-xs font-['SFProDisplayRegular'] mb-1">
             {goal.amount}
           </Text>
-          {goal.investment && (
+          {goal.monthlyInvestment && (
             <Text className="text-gray-400 text-xs font-['SFProDisplayRegular']">
-              {goal.investment}
+              {goal.monthlyInvestment}
             </Text>
           )}
         </View>
         <CircularProgress 
-          progress={goal.progress} 
-          color={goal.progress > 0 ? '#4CAF50' : '#6B7280'} 
+          progress={goal.progress ?? 0} 
         />
       </View>
     </View>
