@@ -6,8 +6,6 @@ import { useRouter } from 'expo-router';
 import Drawer from '@/app/components/Drawer';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-
-import Svg, { Circle } from 'react-native-svg';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
 
 const PersonalFinancialPlanScreen = () => {
@@ -43,6 +41,7 @@ const PersonalFinancialPlanScreen = () => {
   const [medicalInsurance, setMedicalInsurance] = useState('600 000 ₸');
   
   // Risk profile
+  const [showRiskProfile, setShowRiskProfile] = useState(false);
   const [riskProfile, setRiskProfile] = useState('Агрессивный');
   
   // Goals
@@ -53,6 +52,8 @@ const PersonalFinancialPlanScreen = () => {
     'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
   ];
+
+  const risks = ['Агрессивный', "Умеренно-агрессивный", "Умеренный", "Умеренно-консервативный", "Консервативный"]
 
   const currentYear: number = new Date().getFullYear();
   const years: string[] = Array.from({ length: 100 }, (_, i) => currentYear - i).map(x=>x.toString());
@@ -68,6 +69,10 @@ const PersonalFinancialPlanScreen = () => {
     setSelectedSortMonth(value);
     setBirthMonth(value);
   };
+
+   const handleRiskProfile = (value:any) => {
+    setRiskProfile(value);
+  };
   
   const handleSortSelectYear = (value:any) => {
     setSelectedSortYear(value);
@@ -82,191 +87,350 @@ const PersonalFinancialPlanScreen = () => {
   const [selectedSortYear, setSelectedSortYear] = useState('Год');
 
   // Функция генерации PDF с Tailwind CSS
-  const generatePDF = async () => {
-    try {
-      const currentDate = new Date().toLocaleDateString('ru-RU');
-      const birthDate = `${selectedSortDay} ${selectedSortMonth} ${selectedSortYear}`;
-      
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-            body { font-family: 'Inter', sans-serif; }
-            .progress-bar { background: linear-gradient(to right, #10B981 var(--progress, 0%), #E5E7EB var(--progress, 0%)); }
-          </style>
-        </head>
-        <body class="bg-gray-50">
-          <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg">
-            <!-- Header -->
-            <div class="text-center border-b-4 border-blue-500 pb-6 mb-8">
-              <h1 class="text-3xl font-bold text-blue-600 mb-2">Личный Финансовый План</h1>
-              <p class="text-gray-600">Сгенерировано: ${currentDate}</p>
-              <p class="text-gray-600">Период планирования: ${selectedSort}</p>
-            </div>
 
-            <!-- Персональная информация -->
-            <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-              <h2 class="text-xl font-semibold text-blue-700 mb-4 border-b-2 border-blue-300 pb-2">Персональная информация</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">ФИО:</span>
-                  <span class="text-gray-900">${fio || 'Не указано'}</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">Дата рождения:</span>
-                  <span class="text-gray-900">${birthDate !== 'День Месяц Год' ? birthDate : 'Не указано'}</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">Деятельность:</span>
-                  <span class="text-gray-900">${activity || 'Не указано'}</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">Финансово-зависимые:</span>
-                  <span class="text-gray-900">${financialInfo || 'Не указано'}</span>
-                </div>
-              </div>
-            </div>
+interface ExcelCell {
+  value: string | number;
+}
 
-            <!-- Финансовый анализ -->
-            <div class="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
-              <h2 class="text-xl font-semibold text-green-700 mb-4 border-b-2 border-green-300 pb-2">Финансовый анализ</h2>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm">
-                  <div class="text-sm text-gray-600">Доходы</div>
-                  <div class="text-2xl font-bold text-green-600">${income.toLocaleString('ru-RU')} ₸</div>
-                </div>
-                <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm">
-                  <div class="text-sm text-gray-600">Расходы</div>
-                  <div class="text-2xl font-bold text-red-600">${expence.toLocaleString('ru-RU')} ₸</div>
-                </div>
-                <div class="bg-white p-4 rounded-lg border-l-4 border-${delta >= 0 ? 'green' : 'red'}-500 shadow-sm">
-                  <div class="text-sm text-gray-600">Дельта</div>
-                  <div class="text-2xl font-bold text-${delta >= 0 ? 'green' : 'red'}-600">${delta.toLocaleString('ru-RU')} ₸</div>
-                </div>
-              </div>
-            </div>
+interface ExcelRow {
+  [key: number]: ExcelCell;
+}
 
-            <!-- Чистый капитал -->
-            <div class="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
-              <h2 class="text-xl font-semibold text-purple-700 mb-4 border-b-2 border-purple-300 pb-2">Расчет чистого капитала</h2>
-              <div class="space-y-3">
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">Активы:</span>
-                  <span class="text-lg font-semibold text-green-600">79 200 000 ₸</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                  <span class="font-medium text-gray-700">Пассивы:</span>
-                  <span class="text-lg font-semibold text-red-600">5 700 000 ₸</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded border-2 border-blue-300">
-                  <span class="font-bold text-gray-800">Чистый капитал:</span>
-                  <span class="text-xl font-bold text-blue-700">74 500 000 ₸</span>
-                </div>
-              </div>
-            </div>
+interface ExcelSheet {
+  rows?: ExcelRow[];
+}
 
-            <!-- Подушка безопасности -->
-            <div class="mb-8 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg p-6 border border-yellow-200">
-              <h2 class="text-xl font-semibold text-yellow-700 mb-4 border-b-2 border-yellow-300 pb-2">Подушка безопасности</h2>
-              <div class="bg-white p-4 rounded-lg border border-yellow-300">
-                <div class="flex justify-between items-center">
-                  <span class="font-medium text-gray-700">На 3 месяца (по постоянному расходу):</span>
-                  <span class="text-lg font-bold text-yellow-700">${securityPillow}</span>
-                </div>
-              </div>
-            </div>
+interface ExcelData {
+  sheets: {
+    [key: string]: ExcelSheet;
+  };
+}
 
-            <!-- Страховая защита -->
-            <div class="mb-8 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6 border border-indigo-200">
-              <h2 class="text-xl font-semibold text-indigo-700 mb-4 border-b-2 border-indigo-300 pb-2">Страховая защита</h2>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-lg border border-indigo-200">
-                  <div class="text-sm text-gray-600 mb-1">Уход из жизни</div>
-                  <div class="text-lg font-semibold text-indigo-700">${lifeInsurance}</div>
-                </div>
-                <div class="bg-white p-4 rounded-lg border border-indigo-200">
-                  <div class="text-sm text-gray-600 mb-1">Инвалидность</div>
-                  <div class="text-lg font-semibold text-indigo-700">${disability}</div>
-                </div>
-                <div class="bg-white p-4 rounded-lg border border-indigo-200">
-                  <div class="text-sm text-gray-600 mb-1">Болезненный лист</div>
-                  <div class="text-lg font-semibold text-indigo-700">${medicalInsurance}</div>
-                </div>
-              </div>
-            </div>
+interface LiquidAsset {
+  name: string;
+  currency: string;
+  ownership: string;
+  value: number;
+}
 
-            <!-- Риск-профиль -->
-            <div class="mb-8 bg-gradient-to-r from-red-50 to-pink-50 rounded-lg p-6 border border-red-200">
-              <h2 class="text-xl font-semibold text-red-700 mb-4 border-b-2 border-red-300 pb-2">Инвестиционный профиль</h2>
-              <div class="bg-white p-4 rounded-lg border-2 border-red-300">
-                <div class="flex justify-between items-center">
-                  <span class="font-medium text-gray-700">Риск-профиль:</span>
-                  <span class="px-4 py-2 bg-red-100 text-red-700 font-bold rounded-full">${riskProfile}</span>
-                </div>
-              </div>
-            </div>
+// Создаем функцию для преобразования ваших данных в формат ExcelData
+const prepareExcelData = (): ExcelData => {
+  // Примерные данные на основе вашего компонента
+  const portfolioRows: ExcelRow[] = [
+    { 0: { value: 'Название актива' }, 1: { value: 'Валюта' }, 2: { value: 'Доля владения' }, 3: { value: 'Стоимость' } },
+    { 0: { value: 'Депозит в банке' }, 1: { value: 'KZT' }, 2: { value: '100%' }, 3: { value: securityPillow.replace(/[^\d]/g, '') || 1000000 } },
+    { 0: { value: 'Акции' }, 1: { value: 'USD' }, 2: { value: '100%' }, 3: { value: 500000 } },
+    { 0: { value: 'Облигации' }, 1: { value: 'KZT' }, 2: { value: '100%' }, 3: { value: 300000 } },
+    { 0: { value: 'Неликвидные активы' } }, // Маркер окончания ликвидных активов
+    // Дополнительные строки для типов инструментов (строки 18-30)
+    { 18: { value: 'Акции роста' } },
+    { 18: { value: 'Дивидендные акции' } },
+    { 18: { value: 'Государственные облигации' } },
+    { 18: { value: 'Корпоративные облигации' } },
+    { 18: { value: 'Недвижимость' } },
+    { 18: { value: 'Драгоценные металлы' } }
+  ];
 
-            <!-- Финансовые цели -->
-            <div class="mb-8 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-6 border border-teal-200">
-              <h2 class="text-xl font-semibold text-teal-700 mb-4 border-b-2 border-teal-300 pb-2">Финансовые цели</h2>
-         
-            </div>
+  const instrumentsRows: ExcelRow[] = [
+    { 0: { value: 'Год' }, 1: { value: 'Сумма' } },
+    { 0: { value: '1' }, 1: { value: delta > 0 ? delta * 12 : 1200000 } },
+    { 0: { value: '2' }, 1: { value: delta > 0 ? delta * 24 : 2400000 } },
+    { 0: { value: '3' }, 1: { value: delta > 0 ? delta * 36 : 3600000 } },
+    { 0: { value: '4' }, 1: { value: delta > 0 ? delta * 48 : 4800000 } },
+    { 0: { value: '5' }, 1: { value: delta > 0 ? delta * 60 : 6000000 } },
+    // Рентная корзина (столбцы 7-8)
+    { 7: { value: '1' }, 8: { value: 600000 } },
+    { 7: { value: '2' }, 8: { value: 1200000 } },
+    { 7: { value: '3' }, 8: { value: 1800000 } },
+    // Активная корзина (столбцы 14-15)
+    { 14: { value: '1' }, 15: { value: 400000 } },
+    { 14: { value: '2' }, 15: { value: 800000 } },
+    { 14: { value: '3' }, 15: { value: 1200000 } }
+  ];
 
-            <!-- Рекомендации -->
-            <div class="mb-8 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-6 border border-gray-200">
-              <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b-2 border-gray-300 pb-2">Рекомендации</h2>
-              <div class="space-y-3">
-                <div class="p-4 bg-white rounded-lg border-l-4 border-blue-500">
-                  <p class="text-gray-700">• Поддерживайте подушку безопасности на уровне 3-6 месяцев расходов</p>
-                </div>
-                <div class="p-4 bg-white rounded-lg border-l-4 border-green-500">
-                  <p class="text-gray-700">• Инвестируйте свободный денежный поток согласно вашему риск-профилю</p>
-                </div>
-                <div class="p-4 bg-white rounded-lg border-l-4 border-yellow-500">
-                  <p class="text-gray-700">• Регулярно пересматривайте и корректируйте финансовые цели</p>
-                </div>
-                <div class="p-4 bg-white rounded-lg border-l-4 border-purple-500">
-                  <p class="text-gray-700">• Обеспечьте достаточный уровень страховой защиты</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="text-center pt-6 border-t-2 border-blue-500">
-              <p class="text-sm text-gray-500">
-                Данный документ сгенерирован автоматически и носит рекомендательный характер.<br>
-                Для принятия инвестиционных решений рекомендуется консультация с финансовым консультантом.
-              </p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
-
-      // Создаем PDF
-      const { uri } = await Print.printToFileAsync({ 
-        html: htmlContent,
-        base64: false 
-      });
-
-      console.log('PDF создан:', uri);
-
-      // Показываем меню для сохранения/поделиться
-      await shareAsync(uri, { 
-        UTI: '.pdf', 
-        mimeType: 'application/pdf',
-        dialogTitle: 'Сохранить финансовый план'
-      });
-
-    } catch (error) {
-      console.error('Ошибка при создании PDF:', error);
-      Alert.alert('Ошибка', 'Не удалось создать PDF файл');
+  return {
+    sheets: {
+      'DEVИнвест. Портфель': { rows: portfolioRows },
+      'DEV_Инструменты': { rows: instrumentsRows }
     }
   };
+};
+
+const generatePDF = async (): Promise<void> => {
+  try {
+    // Используем подготовленные данные вместо переданных
+    const excelData = prepareExcelData();
+    const currentDate = new Date().toLocaleDateString('ru-RU');
+    
+    // Извлекаем данные из Excel
+    const portfolioData = excelData.sheets['DEVИнвест. Портфель'] || {};
+    const instrumentsData = excelData.sheets['DEV_Инструменты'] || {};
+    
+    // Извлекаем ликвидные активы
+    const liquidAssets: LiquidAsset[] = [];
+    if (portfolioData.rows) {
+      for (let i = 3; i < portfolioData.rows.length; i++) {
+        const row = portfolioData.rows[i];
+        if (row && row[0] && row[0].value && row[0].value !== 'Неликвидные активы') {
+          liquidAssets.push({
+            name: row[0]?.value?.toString() || '',
+            currency: row[1]?.value?.toString() || '',
+            ownership: row[2]?.value?.toString() || '',
+            value: Number(row[3]?.value) || 0
+          });
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Извлекаем инструменты
+    const regularBasket: ExcelRow[] = instrumentsData.rows ? instrumentsData.rows.slice(1, 6) : [];
+    const rentalBasket: ExcelRow[] = instrumentsData.rows ? instrumentsData.rows.slice(6, 9) : [];
+    const activeBasket: ExcelRow[] = instrumentsData.rows ? instrumentsData.rows.slice(9, 12) : [];
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+          body { font-family: 'Inter', sans-serif; }
+          .progress-bar { background: linear-gradient(to right, #10B981 var(--progress, 0%), #E5E7EB var(--progress, 0%)); }
+          .asset-table { border-collapse: collapse; width: 100%; }
+          .asset-table th, .asset-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          .asset-table th { background-color: #f8fafc; }
+        </style>
+      </head>
+      <body class="bg-gray-50">
+        <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg">
+          <!-- Header -->
+          <div class="text-center border-b-4 border-blue-500 pb-6 mb-8">
+            <h1 class="text-3xl font-bold text-blue-600 mb-2">Инвестиционный Портфель</h1>
+            <p class="text-gray-600">Сгенерировано: ${currentDate}</p>
+            <p class="text-gray-600">Клиент: ${fio || 'Не указано'}</p>
+            <p class="text-gray-600">Профиль риска: ${riskProfile}</p>
+          </div>
+
+          <!-- Ликвидные активы -->
+          <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+            <h2 class="text-xl font-semibold text-blue-700 mb-4 border-b-2 border-blue-300 pb-2">Ликвидные активы</h2>
+            <div class="overflow-x-auto">
+              <table class="asset-table">
+                <thead>
+                  <tr>
+                    <th>Название</th>
+                    <th>Валюта</th>
+                    <th>Доля владения</th>
+                    <th>Стоимость</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${liquidAssets.map(asset => `
+                    <tr>
+                      <td>${asset.name}</td>
+                      <td>${asset.currency}</td>
+                      <td>${asset.ownership}</td>
+                      <td>${asset.value.toLocaleString('ru-RU')} ₸</td>
+                    </tr>
+                  `).join('')}
+                  <tr class="bg-blue-50 font-semibold">
+                    <td colspan="3">Общая стоимость ликвидных активов:</td>
+                    <td>${liquidAssets.reduce((sum, asset) => sum + asset.value, 0).toLocaleString('ru-RU')} ₸</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Финансовая подушка и страховки -->
+          <div class="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 border border-yellow-200">
+            <h2 class="text-xl font-semibold text-yellow-700 mb-4 border-b-2 border-yellow-300 pb-2">Финансовая безопасность</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                <h3 class="text-lg font-semibold text-yellow-600 mb-2">Финансовая подушка</h3>
+                <p class="text-2xl font-bold">${securityPillow}</p>
+              </div>
+              <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                <h3 class="text-lg font-semibold text-yellow-600 mb-2">Страхование жизни</h3>
+                <p class="text-xl">${lifeInsurance}</p>
+              </div>
+              <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                <h3 class="text-lg font-semibold text-yellow-600 mb-2">Страхование от нетрудоспособности</h3>
+                <p class="text-xl">${disability}</p>
+              </div>
+              <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                <h3 class="text-lg font-semibold text-yellow-600 mb-2">Медицинское страхование</h3>
+                <p class="text-xl">${medicalInsurance}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Инвестиционные корзины -->
+          <div class="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+            <h2 class="text-xl font-semibold text-green-700 mb-4 border-b-2 border-green-300 pb-2">Инвестиционные стратегии</h2>
+            
+            <!-- Регулярная корзина -->
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-green-600 mb-3">Регулярная корзина</h3>
+              <div class="bg-white p-4 rounded-lg border border-green-200">
+                ${regularBasket.length > 0 ? `
+                  <table class="asset-table">
+                    <thead>
+                      <tr>
+                        <th>Год</th>
+                        <th>Сумма</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${regularBasket.map((row, index) => `
+                        <tr>
+                          <td>${row[0]?.value?.toString() || index + 1}</td>
+                          <td>${row[1]?.value ? Number(row[1].value).toLocaleString('ru-RU') + ' ₸' : '0 ₸'}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                ` : '<p class="text-gray-500">Данные не доступны</p>'}
+              </div>
+            </div>
+
+            <!-- Рентная корзина -->
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-blue-600 mb-3">Рентная корзина</h3>
+              <div class="bg-white p-4 rounded-lg border border-blue-200">
+                ${rentalBasket.length > 0 ? `
+                  <table class="asset-table">
+                    <thead>
+                      <tr>
+                        <th>Год</th>
+                        <th>Сумма</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${rentalBasket.map((row, index) => `
+                        <tr>
+                          <td>${row[7]?.value?.toString() || index + 1}</td>
+                          <td>${row[8]?.value ? Number(row[8].value).toLocaleString('ru-RU') + ' ₸' : '0 ₸'}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                ` : '<p class="text-gray-500">Данные не доступны</p>'}
+              </div>
+            </div>
+
+            <!-- Активная корзина -->
+            <div>
+              <h3 class="text-lg font-semibold text-purple-600 mb-3">Активная корзина</h3>
+              <div class="bg-white p-4 rounded-lg border border-purple-200">
+                ${activeBasket.length > 0 ? `
+                  <table class="asset-table">
+                    <thead>
+                      <tr>
+                        <th>Год</th>
+                        <th>Сумма</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${activeBasket.map((row, index) => `
+                        <tr>
+                          <td>${row[14]?.value?.toString() || index + 1}</td>
+                          <td>${row[15]?.value ? Number(row[15].value).toLocaleString('ru-RU') + ' ₸' : '0 ₸'}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                ` : '<p class="text-gray-500">Данные не доступны</p>'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Типы инструментов -->
+          <div class="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
+            <h2 class="text-xl font-semibold text-purple-700 mb-4 border-b-2 border-purple-300 pb-2">Типы инвестиционных инструментов</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${portfolioData.rows && portfolioData.rows.length > 18 ? 
+                portfolioData.rows.slice(18, 30).filter(row => row[18] && row[18].value).map(row => `
+                  <div class="bg-white p-3 rounded-lg border border-purple-200 flex items-center">
+                    <div class="w-2 h-6 bg-purple-500 rounded mr-3"></div>
+                    <span class="text-gray-700">${row[18].value?.toString()}</span>
+                  </div>
+                `).join('') : 
+                '<p class="text-gray-500 col-span-2">Данные о типах инструментов не доступны</p>'
+              }
+            </div>
+          </div>
+
+          <!-- Финансовые цели -->
+          ${goals && goals.length > 0 ? `
+          <div class="mb-8 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-6 border border-teal-200">
+            <h2 class="text-xl font-semibold text-teal-700 mb-4 border-b-2 border-teal-300 pb-2">Финансовые цели</h2>
+            <div class="space-y-3">
+              ${goals.map((goal: any) => `
+                <div class="p-4 bg-white rounded-lg border-l-4 border-teal-500">
+                  <p class="text-gray-700 font-semibold">${goal.name || 'Цель'}</p>
+                  <p class="text-gray-600">Сумма: ${goal.amount ? Number(goal.amount).toLocaleString('ru-RU') + ' ₸' : 'Не указана'}</p>
+                  <p class="text-gray-600">Срок: ${goal.deadline || 'Не указан'}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Рекомендации -->
+          <div class="mb-8 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg p-6 border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b-2 border-gray-300 pb-2">Инвестиционные рекомендации</h2>
+            <div class="space-y-3">
+              <div class="p-4 bg-white rounded-lg border-l-4 border-blue-500">
+                <p class="text-gray-700">• Диверсифицируйте портфель между различными типами активов</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg border-l-4 border-green-500">
+                <p class="text-gray-700">• Регулярно ребалансируйте портфель в соответствии с инвестиционной стратегией</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg border-l-4 border-yellow-500">
+                <p class="text-gray-700">• Учитывайте валютные риски при инвестировании в иностранные активы</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg border-l-4 border-purple-500">
+                <p class="text-gray-700">• Мониторьте ликвидность активов для обеспечения финансовой гибкости</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="text-center pt-6 border-t-2 border-blue-500">
+            <p class="text-sm text-gray-500">
+              Инвестиционный портфель сгенерирован на основе предоставленных данных.<br>
+              Рекомендуется регулярный мониторинг и корректировка инвестиционной стратегии.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Создаем PDF
+    const { uri } = await (Print as any).printToFileAsync({ 
+      html: htmlContent,
+      base64: false 
+    });
+
+    console.log('PDF создан:', uri);
+
+    // Показываем меню для сохранения/поделиться
+    await (shareAsync as any)(uri, { 
+      UTI: '.pdf', 
+      mimeType: 'application/pdf',
+      dialogTitle: 'Сохранить инвестиционный портфель'
+    });
+
+  } catch (error) {
+    console.error('Ошибка при создании PDF:', error);
+    Alert.alert('Ошибка', 'Не удалось создать PDF файл');
+  }
+};
 
   const DropdownButton = ({ value, onPress, isFirst = false, isLast = false }:any) => (
     <TouchableOpacity
@@ -481,7 +645,7 @@ const PersonalFinancialPlanScreen = () => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Расходы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{expence} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" />
+                <Ionicons name="create-outline" size={16} color="white" onPress={()=>router.push("/main/finance/expences/main")}/>
               </View>
             </View>
             
@@ -489,7 +653,7 @@ const PersonalFinancialPlanScreen = () => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Доходы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{income} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" />
+                <Ionicons name="create-outline" size={16} color="white" onPress={()=>router.push("/main/finance/incomes/main")} />
               </View>
             </View>
             
@@ -511,7 +675,7 @@ const PersonalFinancialPlanScreen = () => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Активы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">79 200 000 ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" />
+                <Ionicons onPress={()=>router.push("/main/finance/actives/main")} name="create-outline" size={16} color="white" />
               </View>
             </View>
             
@@ -519,7 +683,7 @@ const PersonalFinancialPlanScreen = () => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Пассивы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">5 700 000 ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" />
+                <Ionicons onPress={()=>router.push("/main/finance/passives/main")} name="create-outline" size={16} color="white" />
               </View>
             </View>
             
@@ -527,7 +691,7 @@ const PersonalFinancialPlanScreen = () => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Чистый капитал</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">74 500 000 ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" />
+                
               </View>
             </View>
           </View>
@@ -573,12 +737,8 @@ const PersonalFinancialPlanScreen = () => {
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Риск-профиль
           </Text>
-          <TouchableOpacity className="bg-gray-800 rounded-xl px-4 py-3 flex-row items-center justify-between">
-            <Text className="text-white text-base font-['SFProDisplayRegular']">
-              {riskProfile}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color="white" />
-          </TouchableOpacity>
+            <DropdownButton value={riskProfile} onPress={() => setShowRiskProfile(true)} />
+           
         </View>
 
         {/* Goals */}
@@ -609,6 +769,16 @@ const PersonalFinancialPlanScreen = () => {
           onSelect={handleSortSelectMonth}
           selectedValue={selectedSortMonth}
           options={months}
+          animationType='fade'
+        />
+
+         <Drawer 
+          title='Риск-профиль'
+          visible={showRiskProfile}
+          onClose={() => setShowRiskProfile(false)}
+          onSelect={handleRiskProfile}
+          selectedValue={riskProfile}
+          options={risks}
           animationType='fade'
         />
         

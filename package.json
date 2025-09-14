@@ -24,9 +24,11 @@
     "expo": "~52.0.47",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.8",
+    "expo-file-system": "^19.0.14",
     "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
     "expo-image": "~2.0.7",
+    "expo-image-picker": "~16.0.6",
     "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.5",
     "expo-print": "~14.0.3",
@@ -38,6 +40,7 @@
     "expo-system-ui": "~4.0.9",
     "expo-web-browser": "~14.0.2",
     "nativewind": "^4.1.23",
+    "pdf-lib": "^1.17.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-icons": "^5.5.0",
@@ -55,8 +58,7 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "tailwindcss": "^3.4.17",
-    "zustand": "^5.0.6",
-    "expo-image-picker": "~16.0.6"
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
