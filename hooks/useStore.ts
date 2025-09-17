@@ -83,6 +83,28 @@ export interface Asset {
   color?: string;
 }
 
+// Новый интерфейс для ЛФП данных
+export interface PersonalFinancialPlan {
+  id: string;
+  fio: string;
+  birthDate: {
+    day: string;
+    month: string;
+    year: string;
+  };
+  activity: string;
+  financialDependents: string;
+  securityPillow: string;
+  insurance: {
+    life: string;
+    disability: string;
+    medical: string;
+  };
+  riskProfile: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface AppState {
   // Пользователь
   user: User | null;
@@ -107,6 +129,9 @@ export interface AppState {
   totalBalance: string;
   walletBalance: string;
   wallets: Wallet[];
+
+  // ЛФП данные
+  personalFinancialPlan: PersonalFinancialPlan | null;
 
   // Настройки
   theme: 'light' | 'dark';
@@ -164,11 +189,18 @@ export interface AppState {
   // Цели
   setGoalFilter: (type: string) => void;
   pickEditGoal: (id:string) => void;
-  addGoal: (goalData: GoalFormData) => string; // returns new goal id
+  addGoal: (goalData: GoalFormData) => string;
   updateGoal: (id: string, goalData: Partial<GoalFormData>) => boolean;
   deleteGoal: (id: string) => boolean;
   getGoalById: (id: string) => Goal | undefined;
   getGoalsByType: (type: 'short' | 'medium' | 'long') => Goal[];
+
+  // Новые действия с ЛФП
+  initializePersonalFinancialPlan: (userData?: Partial<PersonalFinancialPlan>) => string;
+  updatePersonalFinancialPlan: (updates: Partial<PersonalFinancialPlan>) => boolean;
+  resetPersonalFinancialPlan: () => void;
+  clearPersonalFinancialPlan: () => void;
+  getPersonalFinancialPlan: () => PersonalFinancialPlan | null;
 }
 
 // Начальные данные
@@ -221,12 +253,35 @@ const initialCategories: FinancialCategory[] = [
   },
 ];
 
+// Функция для создания дефолтного ЛФП
+const createDefaultPFP = (generateId: () => string, userData?: Partial<PersonalFinancialPlan>): PersonalFinancialPlan => ({
+  id: generateId(),
+  fio: '',
+  birthDate: {
+    day: 'День',
+    month: 'Месяц',
+    year: 'Год',
+  },
+  activity: '',
+  financialDependents: '',
+  securityPillow: '1 000 000 ₸',
+  insurance: {
+    life: '500 000 ₸',
+    disability: '600 000 ₸',
+    medical: '600 000 ₸',
+  },
+  riskProfile: 'Агрессивный',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ...userData
+});
+
 // Создание Zustand Store с персистентностью
 export const useFinancialStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Начальное состояние
-      user: {name:"Uknown", password:"password", email:"user12@gamil.com", id:"initial"},
+      user: {name:"Unknown", password:"password", email:"user12@gmail.com", id:"initial"},
       isAuthenticated: false,
       currentGoalType:"Краткосрочные",
       isLoading: false,
@@ -243,7 +298,9 @@ export const useFinancialStore = create<AppState>()(
       actives: [],
       passives:[],
       currentAsset:null,
-      goals: [], // Добавлено состояние для целей
+      goals: [],
+      personalFinancialPlan: null, // Добавлено состояние для ЛФП
+      
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
       
@@ -296,9 +353,6 @@ export const useFinancialStore = create<AppState>()(
       },
 
       pickEditGoal: (id:string)=>{
-
-       
-        
         set((prevState) => ({
           currentGoalChangeId: id,
         }));
@@ -352,6 +406,74 @@ export const useFinancialStore = create<AppState>()(
         return goals.filter((goal: Goal) => goal.type === type);
       },
 
+      // Новые функции для работы с ЛФП
+      initializePersonalFinancialPlan: (userData?: Partial<PersonalFinancialPlan>): string => {
+        const state = get();
+        const newPFP = createDefaultPFP(state.generateId, {
+          fio: state.user?.name || '',
+          ...userData
+        });
+
+        set({
+          personalFinancialPlan: newPFP
+        });
+
+        return newPFP.id;
+      },
+
+      updatePersonalFinancialPlan: (updates: Partial<PersonalFinancialPlan>): boolean => {
+        const { personalFinancialPlan, generateId } = get();
+        
+        // Если ЛФП не существует, создаем новый
+        if (!personalFinancialPlan) {
+          const newPFP = createDefaultPFP(generateId, {
+            ...updates,
+            updatedAt: new Date()
+          });
+          
+          set({
+            personalFinancialPlan: newPFP
+          });
+          
+          return true;
+        }
+
+        // Обновляем существующий ЛФП
+        const updatedPFP: PersonalFinancialPlan = {
+          ...personalFinancialPlan,
+          ...updates,
+          updatedAt: new Date(),
+        };
+
+        set({
+          personalFinancialPlan: updatedPFP
+        });
+
+        return true;
+      },
+
+      resetPersonalFinancialPlan: () => {
+        const { generateId, user } = get();
+        const defaultPFP = createDefaultPFP(generateId, {
+          fio: user?.name || '',
+        });
+
+        set({
+          personalFinancialPlan: defaultPFP
+        });
+      },
+
+      clearPersonalFinancialPlan: () => {
+        set({
+          personalFinancialPlan: null
+        });
+      },
+
+      getPersonalFinancialPlan: (): PersonalFinancialPlan | null => {
+        const { personalFinancialPlan } = get();
+        return personalFinancialPlan;
+      },
+
       // Финансы - Категории
       setCategories: (categories) => set({ categories }),
 
@@ -387,7 +509,6 @@ export const useFinancialStore = create<AppState>()(
         const newExpences = [...state.expences, newExpence];
         const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
 
-        // ИСПРАВЛЕНИЕ: Обновляем категорию через прямое изменение state
         const updatedCategories = state.categories.map(category => 
           category.id === 'expence' 
             ? {
@@ -417,7 +538,6 @@ export const useFinancialStore = create<AppState>()(
           ...asset
         };
 
- 
         return {
           currentAsset: changed
         };
@@ -624,7 +744,8 @@ export const useFinancialStore = create<AppState>()(
         incomes: state.incomes,
         actives: state.actives,
         passives: state.passives,
-        goals: state.goals, // Добавлено в persist
+        goals: state.goals,
+        personalFinancialPlan: state.personalFinancialPlan, // Добавлено в persist
         theme: state.theme,
         language: state.language,
         currency: state.currency
@@ -646,7 +767,7 @@ export const useSettings = () => useFinancialStore((state) => ({
   currency: state.currency 
 }));
 
-// Новые селекторы для целей
+// Селекторы для целей
 export const useGoals = () => useFinancialStore((state) => state.goals);
 export const useGoalActions = () => useFinancialStore((state) => ({
   addGoal: state.addGoal,
@@ -654,6 +775,16 @@ export const useGoalActions = () => useFinancialStore((state) => ({
   deleteGoal: state.deleteGoal,
   getGoalById: state.getGoalById,
   getGoalsByType: state.getGoalsByType
+}));
+
+// Новые селекторы для ЛФП
+export const usePersonalFinancialPlan = () => useFinancialStore((state) => state.personalFinancialPlan);
+export const usePFPActions = () => useFinancialStore((state) => ({
+  initializePersonalFinancialPlan: state.initializePersonalFinancialPlan,
+  updatePersonalFinancialPlan: state.updatePersonalFinancialPlan,
+  resetPersonalFinancialPlan: state.resetPersonalFinancialPlan,
+  clearPersonalFinancialPlan: state.clearPersonalFinancialPlan,
+  getPersonalFinancialPlan: state.getPersonalFinancialPlan
 }));
 
 // Хелпер функция для конвертации данных формы

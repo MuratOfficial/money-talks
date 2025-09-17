@@ -14,7 +14,7 @@ const PersonalFinancialPlanScreen = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedSort, setSelectedSort] = useState('1 год');
 
-  const {user, getCategoryBalance} = useFinancialStore();
+  const {user, getCategoryBalance,goals, updatePersonalFinancialPlan, clearPersonalFinancialPlan, resetPersonalFinancialPlan, personalFinancialPlan} = useFinancialStore();
   
   // Form states
   const [fio, setFio] = useState(user?.name || "");
@@ -44,8 +44,6 @@ const PersonalFinancialPlanScreen = () => {
   const [showRiskProfile, setShowRiskProfile] = useState(false);
   const [riskProfile, setRiskProfile] = useState('Агрессивный');
   
-  // Goals
-  const {goals} = useFinancialStore();
 
   const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x=>x.toString());
   const months: string[] = [
@@ -60,24 +58,24 @@ const PersonalFinancialPlanScreen = () => {
   
   const [securityPillow, setSecurityPillow] = useState('1 000 000 ₸');
 
-  const handleSortSelectDay = (value:any) => {
-    setSelectedSortDay(value);
-    setBirthDay(value);
-  };
+  // const handleSortSelectDay = (value:any) => {
+  //   setSelectedSortDay(value);
+  //   setBirthDay(value);
+  // };
   
-  const handleSortSelectMonth = (value:any) => {
-    setSelectedSortMonth(value);
-    setBirthMonth(value);
-  };
+  // const handleSortSelectMonth = (value:any) => {
+  //   setSelectedSortMonth(value);
+  //   setBirthMonth(value);
+  // };
 
-   const handleRiskProfile = (value:any) => {
-    setRiskProfile(value);
-  };
+  //  const handleRiskProfile = (value:any) => {
+  //   setRiskProfile(value);
+  // };
   
-  const handleSortSelectYear = (value:any) => {
-    setSelectedSortYear(value);
-    setBirthYear(value);
-  };
+  // const handleSortSelectYear = (value:any) => {
+  //   setSelectedSortYear(value);
+  //   setBirthYear(value);
+  // };
 
   const [showDrawerDay, setShowDrawerDay] = useState(false);
   const [selectedSortDay, setSelectedSortDay] = useState('День');
@@ -85,6 +83,133 @@ const PersonalFinancialPlanScreen = () => {
   const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
   const [showDrawerYear, setShowDrawerYear] = useState(false);
   const [selectedSortYear, setSelectedSortYear] = useState('Год');
+
+  // ============== ФУНКЦИИ ОБНОВЛЕНИЯ ЛФП ДАННЫХ ==============
+
+// PFP field update functions
+const updateFio = (value: string) => {
+  updatePersonalFinancialPlan({ fio: value });
+};
+
+const updateActivity = (value: string) => {
+  updatePersonalFinancialPlan({ activity: value });
+};
+
+const updateFinancialDependents = (value: string) => {
+  updatePersonalFinancialPlan({ financialDependents: value });
+};
+
+const updateSecurityPillow = (value: string) => {
+  updatePersonalFinancialPlan({ securityPillow: value });
+};
+
+const updateLifeInsurance = (value: string) => {
+  updatePersonalFinancialPlan({ 
+    insurance: { 
+      ...personalFinancialPlan?.insurance, 
+      life: value 
+    } as any 
+  });
+};
+
+const updateDisabilityInsurance = (value: string) => {
+  updatePersonalFinancialPlan({ 
+    insurance: { 
+      ...personalFinancialPlan?.insurance, 
+      disability: value 
+    } as any 
+  });
+};
+
+const updateMedicalInsurance = (value: string) => {
+  updatePersonalFinancialPlan({ 
+    insurance: { 
+      ...personalFinancialPlan?.insurance, 
+      medical: value 
+    } as any 
+  });
+};
+
+const updateRiskProfile = (value: string) => {
+  updatePersonalFinancialPlan({ riskProfile: value });
+};
+
+const updateBirthDate = (day?: string, month?: string, year?: string) => {
+  updatePersonalFinancialPlan({ 
+    birthDate: {
+      day: day || personalFinancialPlan?.birthDate.day || 'День',
+      month: month || personalFinancialPlan?.birthDate.month || 'Месяц',
+      year: year || personalFinancialPlan?.birthDate.year || 'Год',
+    }
+  });
+};
+
+// ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
+
+const handleSortSelectDay = (value: string) => {
+  updateBirthDate(value);
+  setShowDrawerDay(false);
+};
+
+const handleSortSelectMonth = (value: string) => {
+  updateBirthDate(undefined, value);
+  setShowDrawerMonth(false);
+};
+
+const handleSortSelectYear = (value: string) => {
+  updateBirthDate(undefined, undefined, value);
+  setShowDrawerYear(false);
+};
+
+const handleRiskProfile = (value: string) => {
+  updateRiskProfile(value);
+  setShowRiskProfile(false);
+};
+
+// ============== ФУНКЦИИ СБРОСА И ОЧИСТКИ ==============
+
+const handleResetPFP = () => {
+  Alert.alert(
+    'Сброс данных',
+    'Вы уверены, что хотите сбросить все данные ЛФП к значениям по умолчанию?',
+    [
+      {
+        text: 'Отмена',
+        style: 'cancel',
+      },
+      {
+        text: 'Сбросить',
+        style: 'destructive',
+        onPress: () => {
+          resetPersonalFinancialPlan();
+          Alert.alert('Успешно', 'Данные ЛФП сброшены к значениям по умолчанию');
+        },
+      },
+    ]
+  );
+};
+
+const handleClearPFP = () => {
+  Alert.alert(
+    'Очистка данных',
+    'Вы уверены, что хотите полностью очистить все данные ЛФП?',
+    [
+      {
+        text: 'Отмена',
+        style: 'cancel',
+      },
+      {
+        text: 'Очистить',
+        style: 'destructive',
+        onPress: () => {
+          clearPersonalFinancialPlan();
+          Alert.alert('Успешно', 'Данные ЛФП полностью очищены');
+        },
+      },
+    ]
+  );
+};
+
 
   // Функция генерации PDF с Tailwind CSS
 
@@ -534,54 +659,66 @@ const generatePDF = async (): Promise<void> => {
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
-        {/* FIO */}
-        <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-            ФИО
-          </Text>
-          <TextInput
-            value={fio}
-            onChangeText={setFio}
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-            placeholder="Введите ФИО"
-            placeholderTextColor="#666"
-          />
-        </View>
+        {/* ============== ПОЛЕ ФИО ============== */}
+      <View className="mb-4">
+        <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          ФИО
+        </Text>
+        <TextInput
+          value={personalFinancialPlan?.fio || user?.name || ''}
+          onChangeText={updateFio}  
+          className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+          placeholder="Введите ФИО"
+          placeholderTextColor="#666"
+        />
+      </View>
 
-        {/* Birth Date */}
+        {/* ============== ДАТА РОЖДЕНИЯ ============== */}
         <View className="mb-4">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
             Дата рождения
           </Text>
           <View className="flex-row">
-            <DropdownButton value={selectedSortDay} onPress={() => setShowDrawerDay(true)} />
-            <DropdownButton value={selectedSortMonth} onPress={() => setShowDrawerMonth(true)} />
-            <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
+            <DropdownButton 
+              value={personalFinancialPlan?.birthDate.day || 'День'} 
+              onPress={() => setShowDrawerDay(true)} 
+            />
+            
+            <DropdownButton 
+              value={personalFinancialPlan?.birthDate.month || 'Месяц'} 
+              onPress={() => setShowDrawerMonth(true)} 
+            />
+            
+            <DropdownButton 
+              value={personalFinancialPlan?.birthDate.year || 'Год'} 
+              onPress={() => setShowDrawerYear(true)} 
+              isLast 
+            />
           </View>
         </View>
 
-        {/* Activity */}
+        {/* ============== ДЕЯТЕЛЬНОСТЬ ============== */}
         <View className="mb-4">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
             Деятельность
           </Text>
           <TextInput
-            value={activity}
-            onChangeText={setActivity}
+            value={personalFinancialPlan?.activity || ''}
+            onChangeText={updateActivity}
             className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите деятельность"
             placeholderTextColor="#666"
           />
         </View>
 
-        {/* Financial Info */}
+        {/* ============== ФИНАНСОВО-ЗАВИСИМЫЕ ЛЮДИ ============== */}
         <View className="mb-4">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
             Финансово-зависимые люди
           </Text>
           <TextInput
-            value={financialInfo}
-            onChangeText={setFinancialInfo}
+            value={personalFinancialPlan?.financialDependents || ''}
+            onChangeText={updateFinancialDependents} 
             className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите количество"
             keyboardType="number-pad"
@@ -697,48 +834,82 @@ const generatePDF = async (): Promise<void> => {
           </View>
         </View>
 
-        {/* Security Pillow */}
+        {/* ============== ПОДУШКА БЕЗОПАСНОСТИ ============== */}
         <View className="mb-6">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Подушка безопасности на 3 месяца
           </Text>
           <View className="flex-row justify-between items-center p-3 rounded-xl bg-white/10">
             <Text className="text-white text-sm font-['SFProDisplayRegular']">По постоянному расходу</Text>
-            <Text className="text-white text-sm font-['SFProDisplayRegular']">{securityPillow}</Text>
+            <TextInput
+              value={personalFinancialPlan?.securityPillow || ''}
+              onChangeText={updateSecurityPillow}  
+              className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+              placeholder="1 000 000 ₸"
+              placeholderTextColor="#666"
+              keyboardType="numeric"
+            />
           </View>
         </View>
 
-        {/* Insurance Protection */}
+        {/* ============== СТРАХОВАЯ ЗАЩИТА ============== */}
         <View className="mb-6">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Страховая защита
           </Text>
           
           <View className="space-y-3 p-3 rounded-xl bg-white/10">
+            {/* Страхование жизни */}
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Уход из жизни</Text>
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">{lifeInsurance}</Text>
+              <TextInput
+                value={personalFinancialPlan?.insurance.life || ''}
+                onChangeText={updateLifeInsurance}  
+                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                placeholder="500 000 ₸"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
             </View>
             
+            {/* Страхование от инвалидности */}
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Инвалидность</Text>
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">{disability}</Text>
+              <TextInput
+                value={personalFinancialPlan?.insurance.disability || ''}
+                onChangeText={updateDisabilityInsurance} 
+                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                placeholder="600 000 ₸"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
             </View>
             
+            {/* Медицинское страхование */}
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Болезненный лист</Text>
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">{medicalInsurance}</Text>
+              <TextInput
+                value={personalFinancialPlan?.insurance.medical || ''}
+                onChangeText={updateMedicalInsurance}  
+                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                placeholder="600 000 ₸"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
             </View>
           </View>
         </View>
 
-        {/* Risk Profile */}
+        {/* ============== РИСК-ПРОФИЛЬ ============== */}
         <View className="mb-6">
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Риск-профиль
           </Text>
-            <DropdownButton value={riskProfile} onPress={() => setShowRiskProfile(true)} />
-           
+          {/* Вызывает handleRiskProfile через Drawer */}
+          <DropdownButton 
+            value={personalFinancialPlan?.riskProfile || 'Агрессивный'} 
+            onPress={() => setShowRiskProfile(true)} 
+          />
         </View>
 
         {/* Goals */}
@@ -752,46 +923,49 @@ const generatePDF = async (): Promise<void> => {
           ))}
         </View>
 
+        {/* Drawer для выбора дня - onSelect вызывает handleSortSelectDay */}
         <Drawer 
           title='День'
           visible={showDrawerDay}
           onClose={() => setShowDrawerDay(false)}
-          onSelect={handleSortSelectDay}
-          selectedValue={selectedSortDay}
+          onSelect={handleSortSelectDay}  
+          selectedValue={personalFinancialPlan?.birthDate.day || 'День'}
           options={days}
           animationType='fade'
         />
-        
+
+        {/* Drawer для выбора месяца - onSelect вызывает handleSortSelectMonth */}
         <Drawer 
           title='Месяц'
           visible={showDrawerMonth}
           onClose={() => setShowDrawerMonth(false)}
-          onSelect={handleSortSelectMonth}
-          selectedValue={selectedSortMonth}
+          onSelect={handleSortSelectMonth}  
+          selectedValue={personalFinancialPlan?.birthDate.month || 'Месяц'}
           options={months}
           animationType='fade'
         />
 
-         <Drawer 
-          title='Риск-профиль'
-          visible={showRiskProfile}
-          onClose={() => setShowRiskProfile(false)}
-          onSelect={handleRiskProfile}
-          selectedValue={riskProfile}
-          options={risks}
-          animationType='fade'
-        />
-        
+        {/* Drawer для выбора года - onSelect вызывает handleSortSelectYear */}
         <Drawer 
           title='Год'
           visible={showDrawerYear}
           onClose={() => setShowDrawerYear(false)}
-          onSelect={handleSortSelectYear}
-          selectedValue={selectedSortYear}
+          onSelect={handleSortSelectYear} 
+          selectedValue={personalFinancialPlan?.birthDate.year || 'Год'}
           options={years}
           animationType='fade'
         />
 
+        {/* Drawer для выбора риск-профиля - onSelect вызывает handleRiskProfile */}
+        <Drawer 
+          title='Риск-профиль'
+          visible={showRiskProfile}
+          onClose={() => setShowRiskProfile(false)}
+          onSelect={handleRiskProfile}  
+          selectedValue={personalFinancialPlan?.riskProfile || 'Агрессивный'}
+          options={risks}
+          animationType='fade'
+        />
       </ScrollView>
     </SafeAreaView>
   );
