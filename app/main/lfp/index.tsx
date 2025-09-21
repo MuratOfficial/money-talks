@@ -5,11 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Drawer from '@/app/components/Drawer';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
-import  DropdownButton  from './components/DropdownButton';
-import  GoalCard  from './components/GoalCard';
+import DropdownButton from './components/DropdownButton';
+import GoalCard from './components/GoalCard';
 import PDFLoadingModal from './components/PDFLoadingComponent';
 import { useLFPExport } from '@/hooks/useLFPExport';
-import { generateLFPPDFWithProgress } from '@/hooks/usePDFGenerate';
 
 const PersonalFinancialPlanScreen = () => {
   const router = useRouter();
@@ -17,29 +16,56 @@ const PersonalFinancialPlanScreen = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedSort, setSelectedSort] = useState('1 год');
 
-  const {user, getCategoryBalance,goals, currency,language, updatePersonalFinancialPlan, clearPersonalFinancialPlan, resetPersonalFinancialPlan, personalFinancialPlan} = useFinancialStore();
+  // Получаем ВСЕ необходимые данные из store
+  const {
+    user,
+    getCategoryBalance,
+    goals,
+    currency,
+    language,
+    updatePersonalFinancialPlan,
+    clearPersonalFinancialPlan,
+    resetPersonalFinancialPlan,
+    personalFinancialPlan,
+    // ДОБАВЬТЕ ЭТИ ПОЛЯ ИЗ ВАШЕГО STORE:
+    incomes,      // Если есть в store
+    actives,      // Если есть в store  
+    passives,     // Если есть в store
+    expences      // Если есть в store
+  } = useFinancialStore();
   
-  // Form states
-  const [fio, setFio] = useState(user?.name || "");
-
+  // Используем хук с ПОЛНЫМИ данными
+  const {
+    loadingState,
+    isDataAvailable,
+    exportToPDF,        // Используем эту функцию вместо generatePDF
+    printPDF,
+    showExportMenu,
+    closeModal
+  } = useLFPExport({
+    personalFinancialPlan,
+    currency,
+    language,
+    goals: goals || [],
+    incomes: incomes || [],     // Передаем данные из store
+    actives: actives || [],     // Передаем данные из store
+    passives: passives || [],   // Передаем данные из store
+    appCurrency: currency
+  });
 
   const income = getCategoryBalance("income");
   const expence = getCategoryBalance("expence");
-
   const delta = income - expence || 0;
 
-  const handleSortSelect = (value:any) => {
+  const handleSortSelect = (value: any) => {
     setSelectedSort(value);
     console.log('Selected sort:', value);
   };
-  
 
-  
   // Risk profile
   const [showRiskProfile, setShowRiskProfile] = useState(false);
-  
 
-  const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x=>x.toString());
+  const days: string[] = Array.from({ length: 31 }, (_, i) => i + 1).map(x => x.toString());
   const months: string[] = [
     'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
@@ -48,141 +74,116 @@ const PersonalFinancialPlanScreen = () => {
   const risks = ['Агрессивный', "Умеренно-агрессивный", "Умеренный", "Умеренно-консервативный", "Консервативный"]
 
   const currentYear: number = new Date().getFullYear();
-  const years: string[] = Array.from({ length: 100 }, (_, i) => currentYear - i).map(x=>x.toString());
+  const years: string[] = Array.from({ length: 100 }, (_, i) => currentYear - i).map(x => x.toString());
 
   const [showDrawerDay, setShowDrawerDay] = useState(false);
   const [showDrawerMonth, setShowDrawerMonth] = useState(false);
   const [showDrawerYear, setShowDrawerYear] = useState(false);
 
-    const {
-    loadingState,
-    isDataAvailable,
-    exportToPDF,
-    printPDF,
-    showExportMenu,
-    closeModal
-  } = useLFPExport({
-    personalFinancialPlan,
-    currency,
-    language
-  });
-
   // ============== ФУНКЦИИ ОБНОВЛЕНИЯ ЛФП ДАННЫХ ==============
 
-// PFP field update functions
-const updateFio = (value: string) => {
-  updatePersonalFinancialPlan({ fio: value });
-};
+  const updateFio = (value: string) => {
+    updatePersonalFinancialPlan({ fio: value });
+  };
 
-const updateActivity = (value: string) => {
-  updatePersonalFinancialPlan({ activity: value });
-};
+  const updateActivity = (value: string) => {
+    updatePersonalFinancialPlan({ activity: value });
+  };
 
-const updateFinancialDependents = (value: string) => {
-  updatePersonalFinancialPlan({ financialDependents: value });
-};
+  const updateFinancialDependents = (value: string) => {
+    updatePersonalFinancialPlan({ financialDependents: value });
+  };
 
-const updateRiskProfile = (value: string) => {
-  updatePersonalFinancialPlan({ riskProfile: value });
-};
+  const updateRiskProfile = (value: string) => {
+    updatePersonalFinancialPlan({ riskProfile: value });
+  };
 
-const updateBirthDate = (day?: string, month?: string, year?: string) => {
-  updatePersonalFinancialPlan({ 
-    birthDate: {
-      day: day || personalFinancialPlan?.birthDate.day || 'День',
-      month: month || personalFinancialPlan?.birthDate.month || 'Месяц',
-      year: year || personalFinancialPlan?.birthDate.year || 'Год',
-    }
-  });
-};
+  const updateBirthDate = (day?: string, month?: string, year?: string) => {
+    updatePersonalFinancialPlan({ 
+      birthDate: {
+        day: day || personalFinancialPlan?.birthDate.day || 'День',
+        month: month || personalFinancialPlan?.birthDate.month || 'Месяц',
+        year: year || personalFinancialPlan?.birthDate.year || 'Год',
+      }
+    });
+  };
 
-// ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
+  // ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
 
-const handleSortSelectDay = (value: string) => {
-  updateBirthDate(value);
-  setShowDrawerDay(false);
-};
+  const handleSortSelectDay = (value: string) => {
+    updateBirthDate(value);
+    setShowDrawerDay(false);
+  };
 
-const handleSortSelectMonth = (value: string) => {
-  updateBirthDate(undefined, value);
-  setShowDrawerMonth(false);
-};
+  const handleSortSelectMonth = (value: string) => {
+    updateBirthDate(undefined, value);
+    setShowDrawerMonth(false);
+  };
 
-const handleSortSelectYear = (value: string) => {
-  updateBirthDate(undefined, undefined, value);
-  setShowDrawerYear(false);
-};
+  const handleSortSelectYear = (value: string) => {
+    updateBirthDate(undefined, undefined, value);
+    setShowDrawerYear(false);
+  };
 
-const handleRiskProfile = (value: string) => {
-  updateRiskProfile(value);
-  setShowRiskProfile(false);
-};
+  const handleRiskProfile = (value: string) => {
+    updateRiskProfile(value);
+    setShowRiskProfile(false);
+  };
 
-// ============== ФУНКЦИИ СБРОСА И ОЧИСТКИ ==============
+  // ============== ФУНКЦИИ СБРОСА И ОЧИСТКИ ==============
 
-const handleResetPFP = () => {
-  Alert.alert(
-    'Сброс данных',
-    'Вы уверены, что хотите сбросить все данные ЛФП к значениям по умолчанию?',
-    [
-      {
-        text: 'Отмена',
-        style: 'cancel',
-      },
-      {
-        text: 'Сбросить',
-        style: 'destructive',
-        onPress: () => {
-          resetPersonalFinancialPlan();
-          Alert.alert('Успешно', 'Данные ЛФП сброшены к значениям по умолчанию');
+  const handleResetPFP = () => {
+    Alert.alert(
+      'Сброс данных',
+      'Вы уверены, что хотите сбросить все данные ЛФП к значениям по умолчанию?',
+      [
+        {
+          text: 'Отмена',
+          style: 'cancel',
         },
-      },
-    ]
-  );
-};
-
-const handleClearPFP = () => {
-  Alert.alert(
-    'Очистка данных',
-    'Вы уверены, что хотите полностью очистить все данные ЛФП?',
-    [
-      {
-        text: 'Отмена',
-        style: 'cancel',
-      },
-      {
-        text: 'Очистить',
-        style: 'destructive',
-        onPress: () => {
-          clearPersonalFinancialPlan();
-          Alert.alert('Успешно', 'Данные ЛФП полностью очищены');
+        {
+          text: 'Сбросить',
+          style: 'destructive',
+          onPress: () => {
+            resetPersonalFinancialPlan();
+            Alert.alert('Успешно', 'Данные ЛФП сброшены к значениям по умолчанию');
+          },
         },
-      },
-    ]
-  );
-};
+      ]
+    );
+  };
 
+  const handleClearPFP = () => {
+    Alert.alert(
+      'Очистка данных',
+      'Вы уверены, что хотите полностью очистить все данные ЛФП?',
+      [
+        {
+          text: 'Отмена',
+          style: 'cancel',
+        },
+        {
+          text: 'Очистить',
+          style: 'destructive',
+          onPress: () => {
+            clearPersonalFinancialPlan();
+            Alert.alert('Успешно', 'Данные ЛФП полностью очищены');
+          },
+        },
+      ]
+    );
+  };
 
-
-
-
-const generatePDF = async (): Promise<void> => {
-  try {
-    if (personalFinancialPlan) {
-
-      console.log("OK")
-      await generateLFPPDFWithProgress({
-        personalFinancialPlan,
-        currency,
-        language
-      });
+  // ============== ОБРАБОТЧИК ГЕНЕРАЦИИ PDF ==============
+  const handleGeneratePDF = async () => {
+    if (!personalFinancialPlan) {
+      Alert.alert('Ошибка', 'Пожалуйста, заполните данные ЛФП');
+      return;
     }
 
-  } catch (error) {
-    console.error('Ошибка при создании PDF:', error);
-    Alert.alert('Ошибка', 'Не удалось создать PDF файл');
-  }
-};
+    // Используем функцию из хука, которая уже содержит всю логику
+    await exportToPDF();
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-black">
@@ -199,18 +200,18 @@ const generatePDF = async (): Promise<void> => {
         showsVerticalScrollIndicator={false}
       >
         {/* ============== ПОЛЕ ФИО ============== */}
-      <View className="mb-4">
-        <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
-          ФИО
-        </Text>
-        <TextInput
-          value={personalFinancialPlan?.fio || user?.name || ''}
-          onChangeText={updateFio}  
-          className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
-          placeholder="Введите ФИО"
-          placeholderTextColor="#666"
-        />
-      </View>
+        <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            ФИО
+          </Text>
+          <TextInput
+            value={personalFinancialPlan?.fio || user?.name || ''}
+            onChangeText={updateFio}  
+            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            placeholder="Введите ФИО"
+            placeholderTextColor="#666"
+          />
+        </View>
 
         {/* ============== ДАТА РОЖДЕНИЯ ============== */}
         <View className="mb-4">
@@ -273,14 +274,14 @@ const generatePDF = async (): Promise<void> => {
           <View className="flex-row items-center justify-between ">
             <TouchableOpacity
               onPress={() => setShowDrawer(true)}
-              className=" px-3 py-1.5 border border-white w-fit rounded-2xl flex flex-row items-center justify-center gap-2"
+              className="px-3 py-1.5 border border-white w-fit rounded-2xl flex flex-row items-center justify-center gap-2"
             >
               <Text className="text-white text-xs font-['SFProDisplayRegular']">
                 {selectedSort}
               </Text>
-              <View className="w-4 h-4  rounded items-center justify-center">
-                      <Ionicons name="funnel-outline" size={14} color="white" />
-                    </View>
+              <View className="w-4 h-4 rounded items-center justify-center">
+                <Ionicons name="funnel-outline" size={14} color="white" />
+              </View>
             </TouchableOpacity>
             <Drawer 
               title='Сортировка'
@@ -288,20 +289,26 @@ const generatePDF = async (): Promise<void> => {
               onClose={() => setShowDrawer(false)}
               onSelect={handleSortSelect}
               selectedValue={selectedSort}
-              options={ ['1 год', '5 лет', '10  лет', '20 лет', '25 лет']}
+              options={['1 год', '5 лет', '10 лет', '20 лет', '25 лет']}
             />
 
-
+            {/* ИСПРАВЛЕННАЯ КНОПКА */}
             <TouchableOpacity 
-            disabled={!isDataAvailable || loadingState.isVisible}
-              onPress={generatePDF}
-              className="ml-4 px-3 py-2 gap-2 rounded-lg flex-row items-center "
+              disabled={!isDataAvailable || loadingState.isVisible}
+              onPress={handleGeneratePDF}  // Используем исправленную функцию
+              className={`ml-4 px-3 py-2 gap-2 rounded-lg flex-row items-center ${
+                (!isDataAvailable || loadingState.isVisible) ? 'opacity-50' : ''
+              }`}
               activeOpacity={0.8}
             >
               <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
-                {loadingState.isVisible ? 'Создание PDF...' : 'Скачайте файл'}
+                {loadingState.isVisible ? 
+                  (loadingState.status === 'generating' ? 'Создание PDF...' : 
+                   loadingState.status === 'sharing' ? 'Подготовка...' : 
+                   loadingState.status === 'success' ? 'Готово!' : 'Скачайте файл') 
+                  : 'Скачайте файл'}
               </Text>
-              <View className="w-4 h-4  rounded items-center justify-center">
+              <View className="w-4 h-4 rounded items-center justify-center">
                 <Image 
                   source={require('../../../assets/images/pdf.png')}
                   className="w-6 h-6"
@@ -323,7 +330,7 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Расходы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{expence} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" onPress={()=>router.push("/main/finance/expences/main")}/>
+                <Ionicons name="create-outline" size={16} color="white" onPress={() => router.push("/main/finance/expences/main")}/>
               </View>
             </View>
             
@@ -331,7 +338,7 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Доходы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{income} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" onPress={()=>router.push("/main/finance/incomes/main")} />
+                <Ionicons name="create-outline" size={16} color="white" onPress={() => router.push("/main/finance/incomes/main")} />
               </View>
             </View>
             
@@ -353,7 +360,7 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Активы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">79 200 000 ₸</Text>
-                <Ionicons onPress={()=>router.push("/main/finance/actives/main")} name="create-outline" size={16} color="white" />
+                <Ionicons onPress={() => router.push("/main/finance/actives/main")} name="create-outline" size={16} color="white" />
               </View>
             </View>
             
@@ -361,7 +368,7 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Пассивы</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">5 700 000 ₸</Text>
-                <Ionicons onPress={()=>router.push("/main/finance/passives/main")} name="create-outline" size={16} color="white" />
+                <Ionicons onPress={() => router.push("/main/finance/passives/main")} name="create-outline" size={16} color="white" />
               </View>
             </View>
             
@@ -369,7 +376,6 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Чистый капитал</Text>
               <View className="flex-row items-center">
                 <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">74 500 000 ₸</Text>
-                
               </View>
             </View>
           </View>
@@ -384,7 +390,6 @@ const generatePDF = async (): Promise<void> => {
             <Text className="text-white text-sm font-['SFProDisplayRegular']">По постоянному расходу</Text>
             <Text 
               className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
-              
             >{personalFinancialPlan?.securityPillow || ''}</Text>
           </View>
         </View>
@@ -400,9 +405,7 @@ const generatePDF = async (): Promise<void> => {
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Уход из жизни</Text>
               <Text
-           
                 className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
-              
               >{personalFinancialPlan?.insurance.life || ''}</Text>
             </View>
             
@@ -411,7 +414,6 @@ const generatePDF = async (): Promise<void> => {
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Инвалидность</Text>
               <Text
                 className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
-               
               >{personalFinancialPlan?.insurance.disability || ''}</Text>
             </View>
             
@@ -419,9 +421,7 @@ const generatePDF = async (): Promise<void> => {
             <View className="flex-row justify-between items-center">
               <Text className="text-white text-sm font-['SFProDisplayRegular']">Болезненный лист</Text>
               <Text
-               
                 className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
-                
               >{personalFinancialPlan?.insurance.medical || ''}</Text>
             </View>
           </View>
@@ -432,7 +432,6 @@ const generatePDF = async (): Promise<void> => {
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
             Риск-профиль
           </Text>
-          {/* Вызывает handleRiskProfile через Drawer */}
           <DropdownButton 
             value={personalFinancialPlan?.riskProfile || 'Агрессивный'} 
             onPress={() => setShowRiskProfile(true)} 
@@ -450,16 +449,17 @@ const generatePDF = async (): Promise<void> => {
           ))}
         </View>
 
+        {/* PDF LOADING MODAL */}
         <PDFLoadingModal
-        visible={loadingState.isVisible}
-        status={loadingState.status}
-        message={loadingState.message}
-        progress={loadingState.progress}
-        onClose={closeModal}
-        allowClose={loadingState.status === 'error' || loadingState.status === 'success'}
-      />
+          visible={loadingState.isVisible}
+          status={loadingState.status}
+          message={loadingState.message}
+          progress={loadingState.progress}
+          onClose={closeModal}
+          allowClose={loadingState.status === 'error' || loadingState.status === 'success'}
+        />
 
-        {/* Drawer для выбора дня - onSelect вызывает handleSortSelectDay */}
+        {/* Drawer для выбора дня */}
         <Drawer 
           title='День'
           visible={showDrawerDay}
@@ -470,7 +470,7 @@ const generatePDF = async (): Promise<void> => {
           animationType='fade'
         />
 
-        {/* Drawer для выбора месяца - onSelect вызывает handleSortSelectMonth */}
+        {/* Drawer для выбора месяца */}
         <Drawer 
           title='Месяц'
           visible={showDrawerMonth}
@@ -481,7 +481,7 @@ const generatePDF = async (): Promise<void> => {
           animationType='fade'
         />
 
-        {/* Drawer для выбора года - onSelect вызывает handleSortSelectYear */}
+        {/* Drawer для выбора года */}
         <Drawer 
           title='Год'
           visible={showDrawerYear}
@@ -492,7 +492,7 @@ const generatePDF = async (): Promise<void> => {
           animationType='fade'
         />
 
-        {/* Drawer для выбора риск-профиля - onSelect вызывает handleRiskProfile */}
+        {/* Drawer для выбора риск-профиля */}
         <Drawer 
           title='Риск-профиль'
           visible={showRiskProfile}

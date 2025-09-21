@@ -86,7 +86,7 @@ const AddActivesForm = () => {
             className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите сумму"
             placeholderTextColor="#666"
-            keyboardType="default"
+            keyboardType="number-pad"
             autoCapitalize="none"
           />
           
@@ -101,7 +101,7 @@ const AddActivesForm = () => {
             className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите доход"
             placeholderTextColor="#666"
-            keyboardType="default"
+            keyboardType="number-pad"
             autoCapitalize="none"
           />
           

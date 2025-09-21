@@ -1,14 +1,22 @@
 // hooks/useLFPExport.tsx
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { PersonalFinancialPlan } from './useStore';
 import { generateLFPPDFWithProgress, printLFPPDFWithProgress } from './usePDFGenerate';
+import { Asset, Goal, PersonalFinancialPlan } from './useStore';
 
 interface UseLFPExportOptions {
   personalFinancialPlan: PersonalFinancialPlan | null;
   currency?: string;
   language?: 'ru' | 'en' | 'kz';
-}
+  // Добавляем данные из приложения
+  goals?: Goal[];
+  incomes?: Asset[];
+  actives?: Asset[];
+  passives?: Asset[];
+  appCurrency?: "₸" | "$" | "€";}
+
+
+
 
 interface LoadingState {
   isVisible: boolean;

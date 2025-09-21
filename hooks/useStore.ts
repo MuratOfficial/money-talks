@@ -754,6 +754,8 @@ export const useFinancialStore = create<AppState>()(
   )
 );
 
+export const appStore = useFinancialStore;
+
 // Селекторы для удобства
 export const useUser = () => useFinancialStore((state) => state.user);
 export const useAuth = () => useFinancialStore((state) => ({ 

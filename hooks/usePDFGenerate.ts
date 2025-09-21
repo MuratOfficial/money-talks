@@ -2,7 +2,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Alert } from 'react-native';
-import useFinancialStore, { PersonalFinancialPlan } from './useStore';
+import useFinancialStore, { appStore, Asset, Goal, PersonalFinancialPlan } from './useStore';
 
 interface PDFGeneratorOptions {
   personalFinancialPlan: PersonalFinancialPlan;
@@ -82,8 +82,188 @@ const generateLFPHtmlContent = (plan: PersonalFinancialPlan, options: PDFGenerat
     }
   };
 
-  const {incomes, actives, passives, goals, currency} = useFinancialStore();
+  
 
+  const storeState = appStore.getState();
+    const {
+      goals,
+      incomes,
+      actives,
+      passives,
+      currency: appCurrency,
+      user
+    } = storeState;
+
+// TypeScript функции для финансовых калькуляторов
+// Добавить в начало функции generateLFPHtmlContent
+
+interface CalculatorData {
+  requiredReturn: {
+    startCapital: number;
+    targetCapital: number;
+    years: number;
+    result: string;
+  };
+  capitalGrowth: {
+    startCapital: number;
+    annualReturn: number;
+    years: number;
+    result: number;
+  };
+  capitalWithDeposits: Array<{
+    startCapital: number;
+    monthlyDeposit: number;
+    annualReturn: number;
+    years: number;
+    result: number;
+  }>;
+  monthlyInvestmentNeeded: {
+    targetCapital: number;
+    startCapital: number;
+    annualReturn: number;
+    years: number;
+    result: number;
+  };
+}
+
+// 1. Расчет требуемой доходности
+const calculateRequiredReturn = (startCapital: number, targetCapital: number, years: number): string => {
+  if (years === 0 || startCapital === 0) return '0.00';
+  return ((Math.pow(targetCapital / startCapital, 1 / years) - 1) * 100).toFixed(2);
+};
+
+// 2. Расчет роста начального капитала
+const calculateCapitalGrowth = (startCapital: number, annualReturn: number, years: number): number => {
+  return Math.round(startCapital * Math.pow(1 + annualReturn / 100, years));
+};
+
+// 3. Расчет роста капитала с ежемесячными пополнениями
+const calculateCapitalWithDeposits = (
+  startCapital: number, 
+  monthlyDeposit: number, 
+  annualReturn: number, 
+  years: number
+): number => {
+  const monthlyRate = annualReturn / 100 / 12;
+  const months = years * 12;
+  
+  // Рост начального капитала
+  const futureValueStart = startCapital * Math.pow(1 + monthlyRate, months);
+  
+  // Рост ежемесячных пополнений (аннуитет)
+  if (monthlyRate === 0) {
+    // Если доходность 0%, то просто сумма
+    return Math.round(futureValueStart + monthlyDeposit * months);
+  }
+  
+  const futureValueDeposits = monthlyDeposit * 
+    ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+  
+  return Math.round(futureValueStart + futureValueDeposits);
+};
+
+// 4. Расчет требуемого ежемесячного инвестирования
+const calculateMonthlyInvestment = (
+  targetCapital: number, 
+  startCapital: number, 
+  annualReturn: number, 
+  years: number
+): number => {
+  const monthlyRate = annualReturn / 100 / 12;
+  const months = years * 12;
+  
+  // Будущая стоимость начального капитала
+  const futureValueStart = startCapital * Math.pow(1 + monthlyRate, months);
+  
+  // Оставшаяся сумма, которую нужно набрать ежемесячными взносами
+  const remainingAmount = targetCapital - futureValueStart;
+  
+  if (remainingAmount <= 0) return 0;
+  
+  if (monthlyRate === 0) {
+    // Если доходность 0%, то просто делим на количество месяцев
+    return Math.round(remainingAmount / months);
+  }
+  
+  // Требуемый ежемесячный взнос
+  const monthlyPayment = remainingAmount / 
+    ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+  
+  return Math.round(monthlyPayment);
+};
+
+// Вспомогательные функции для работы с целями
+const calculateYearsLeft = (timeframe: { day: string; month: string; year: string }): number => {
+  const targetDate = new Date(parseInt(timeframe.year), parseInt(timeframe.month) - 1);
+  const currentDate = new Date();
+  return Math.max(1, targetDate.getFullYear() - currentDate.getFullYear());
+};
+
+const getCurrencySymbol = (currency: string): string => {
+  if (currency === 'USD' || currency === '$') return '$';
+  return '₸';
+};
+
+// Генерация данных для калькуляторов на основе целей пользователя
+const generateCalculatorData = (
+  goals: Goal[], 
+  actives: Asset[], 
+  totalActives: number
+): CalculatorData => {
+  const longTermGoals = goals.filter(g => g.type === 'long');
+  const mediumTermGoals = goals.filter(g => g.type === 'medium');
+  
+  // Пример расчета для первой долгосрочной цели
+  const firstLongTermGoal = longTermGoals[0];
+  const targetCapital = firstLongTermGoal ? parseFloat(firstLongTermGoal.amount) || 100000 : 100000;
+  const startCapital = totalActives > 0 ? totalActives * 0.1 : 10000;
+  const years = firstLongTermGoal ? calculateYearsLeft(firstLongTermGoal.timeframe) : 10;
+  
+  return {
+    requiredReturn: {
+      startCapital,
+      targetCapital,
+      years,
+      result: calculateRequiredReturn(startCapital, targetCapital, years)
+    },
+    
+    capitalGrowth: {
+      startCapital: totalActives > 0 ? totalActives * 0.3 : 100000,
+      annualReturn: 10,
+      years: 10,
+      result: calculateCapitalGrowth(totalActives > 0 ? totalActives * 0.3 : 100000, 10, 10)
+    },
+    
+    capitalWithDeposits: [...mediumTermGoals, ...longTermGoals].slice(0, 3).map(goal => {
+      const yearsLeft = calculateYearsLeft(goal.timeframe);
+      const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 500;
+      const startCapital = (goal.collected && parseFloat(goal.collected)) || 6000;
+      const annualReturn = parseFloat(goal.returnRate) || 10;
+      
+      return {
+        startCapital,
+        monthlyDeposit: monthlyInvestment,
+        annualReturn,
+        years: yearsLeft,
+        result: calculateCapitalWithDeposits(startCapital, monthlyInvestment, annualReturn, yearsLeft)
+      };
+    }),
+    
+    monthlyInvestmentNeeded: {
+      targetCapital: mediumTermGoals[0] ? parseFloat(mediumTermGoals[0].amount) || 35000 : 35000,
+      startCapital: 500,
+      annualReturn: 10,
+      years: mediumTermGoals[0] ? calculateYearsLeft(mediumTermGoals[0].timeframe) : 5,
+      result: calculateMonthlyInvestment(
+        mediumTermGoals[0] ? parseFloat(mediumTermGoals[0].amount) || 35000 : 35000,
+        500,
+        10,
+        mediumTermGoals[0] ? calculateYearsLeft(mediumTermGoals[0].timeframe) : 5
+      )
+    }
+  };
+};
+    
 
   // Функция для получения процентного соотношения валют
 const getCurrencyRatio = (goalCurrency:string) => {
@@ -93,7 +273,7 @@ const getCurrencyRatio = (goalCurrency:string) => {
 };
 
 // Функция для форматирования суммы
-const formatAmount = (amount:number, curr = currency) => {
+const formatAmount = (amount:number, curr = appCurrency) => {
   return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ' + curr;
 };
 
@@ -107,16 +287,7 @@ const totalIncomes = incomes?.reduce((sum, income) => sum + income.amount, 0) ||
 const totalActives = actives?.reduce((sum, active) => sum + active.amount, 0) || 0;
 const totalPassives = passives?.reduce((sum, passive) => sum + passive.amount, 0) || 0;
 
-// Функция для расчета оставшихся лет до цели
-const calculateYearsLeft = (timeframe:{
-    day: string;
-    month: string;
-    year: string;
-  }) => {
-  const targetDate = new Date(parseInt(timeframe.year), parseInt(timeframe.month) - 1);
-  const currentDate = new Date();
-  return Math.max(0, targetDate.getFullYear() - currentDate.getFullYear());
-};
+
 
   const t = translations[language];
 
@@ -293,7 +464,7 @@ const calculateYearsLeft = (timeframe:{
                         <table class="info-table">
                             <tr>
                                 <th>${t.client}</th>
-                                <td>Женщина</td>
+                                <td>Не указано</td>
                             </tr>
                             <tr>
                                 <th>${t.birthDate}</th>
@@ -301,7 +472,7 @@ const calculateYearsLeft = (timeframe:{
                             </tr>
                             <tr>
                                 <th>${t.fullName}</th>
-                                <td class="highlight">${plan.fio}</td>
+                                <td class="highlight">${plan.fio || user?.name}</td>
                             </tr>
                             <tr>
                                 <th>${t.city}</th>
@@ -553,7 +724,6 @@ const calculateYearsLeft = (timeframe:{
                 </div>
             </div>
         </div>
-        // ЗАМЕНИТЬ СТАТИЧЕСКИЕ ТАБЛИЦЫ НА ДИНАМИЧЕСКИЕ С ЭТИМИ БЛОКАМИ:
 
 // Блок для долгосрочных целей (показывается только если есть долгосрочные цели)
 ${longTermGoals.length > 0 ? `
@@ -604,10 +774,508 @@ ${longTermGoals.length > 0 ? `
 </div>
 ` : ''}
 
-// Аналогично для среднесрочных целей
 ${mediumTermGoals.length > 0 ? `
-<!-- аналогичный блок для среднесрочных целей с оранжевым дизайном -->
+<div style="margin-bottom: 40px;">
+    <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 12px 20px; margin-bottom: 15px; border-radius: 8px; font-weight: bold;">
+        БЛОК 2 - ДОЛГОСРОЧНЫЕ ЦЕЛИ (БОЛЕЕ 5 ЛЕТ)
+    </div>
+    
+    <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 10px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+            </thead>
+            <tbody>
+                ${mediumTermGoals.map((goal, index) => {
+                    const yearsLeft = calculateYearsLeft(goal.timeframe);
+                    const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                    const ratios = getCurrencyRatio(goal.currency);
+                    
+                    return `
+                    <tr style="background: ${index % 2 === 0 ? '#f0fdf4' : '#dcfce7'};">
+                        <td style="padding: 12px 8px; text-align: center; font-weight: bold;">${index + 1}</td>
+                        <td style="padding: 12px; font-weight: 600; color: #166534;">${goal.name}</td>
+                        <td style="padding: 12px; text-align: center;">${formatAmount(parseFloat(goal.amount))}</td>
+                        <td style="padding: 12px; text-align: center;">${goal.currency === 'USD' ? '$' : '₸'}</td>
+                        <td style="padding: 12px; text-align: center; font-size: 11px;">${goal.timeframe.day}.${goal.timeframe.month}.${goal.timeframe.year}</td>
+                        <td style="padding: 12px; text-align: center;">${goal.returnRate}%</td>
+                        <td style="padding: 12px; text-align: center;">${goal.inflationRate}%</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold;">${yearsLeft}</td>
+                        <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                        <td style="padding: 12px; text-align: center;">${formatAmount(monthlyInvestment * ratios.kzt, '₸')}</td>
+                        <td style="padding: 12px; text-align: center;">${formatAmount(monthlyInvestment * ratios.usd, '$')}</td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>
+        
+        <div style="background: #fbbf24; padding: 12px; text-align: center; font-weight: bold; color: #92400e;">
+            ИТОГО: ${formatAmount(mediumTermGoals.reduce((sum, goal) => {
+                const ratios = getCurrencyRatio(goal.currency);
+                return sum + (parseFloat(goal.monthlyInvestment) || 0) * ratios.kzt;
+            }, 0), '₸')} | ${formatAmount(mediumTermGoals.reduce((sum, goal) => {
+                const ratios = getCurrencyRatio(goal.currency);
+                return sum + (parseFloat(goal.monthlyInvestment) || 0) * ratios.usd;
+            }, 0), '$')}
+        </div>
+    </div>
+</div>
 ` : ''}
+
+<!-- ДИНАМИЧЕСКАЯ СЕКЦИЯ КАЛЬКУЛЯТОРОВ - ЗАМЕНИТЬ СТАТИЧЕСКУЮ ВЕРСИЮ -->
+
+${goals.length > 0 || actives.length > 0 ? `
+<div style="page-break-before: always; margin-top: 60px;">
+    <div class="section-title" style="background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); color: white; padding: 15px 25px; margin: 0 -40px 30px -40px; text-align: center; font-size: 22px;">
+        КАЛЬКУЛЯТОРЫ
+    </div>
+
+    <!-- РАСЧЕТ ТРЕБУЕМОЙ ДОХОДНОСТИ -->
+    ${longTermGoals.length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ ТРЕБУЕМОЙ ДОХОДНОСТИ
+        </div>
+        
+        <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 8px; overflow: hidden;">
+             <table style="width: 100%; border-collapse: collapse;">    
+            <thead>
+                    <tr style="background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%); color: white; font-size: 11px;">
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Смартовое вложение и ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Целевой капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 6px; text-align: center;">Ежемесячная инвестиция</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${mediumTermGoals.map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const targetAmount = parseFloat(goal.amount) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || 500;
+                        const annualReturn = parseFloat(goal.returnRate) || 10;
+                        const monthlyInvestmentNeeded = calculateMonthlyInvestment(targetAmount, startCapital, annualReturn, yearsLeft);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#fef2f2' : '#fee2e2'};">
+                            <td style="padding: 10px; text-align: center; color: #991b1b; font-weight: 600; font-size: 12px;">${goal.name}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(targetAmount, goal.currency === 'USD' ? '$':'₸')}
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Целевой капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Требуемая доходность, %</th>
+                    </tr>
+                </thead>
+                <tbody>`})}
+                    ${longTermGoals.map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const targetAmount = parseFloat(goal.amount) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || (totalActives * 0.1) || 10000;
+                        const requiredReturn = calculateRequiredReturn(startCapital, targetAmount, yearsLeft);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f0fdf4' : '#dcfce7'};">
+                            <td style="padding: 12px; text-align: center; color: #166534; font-weight: 600;">${goal.name}</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(targetAmount)}</td>
+                            <td style="padding: 12px; text-align: center;">${yearsLeft}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${requiredReturn}%</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>`:''}
+    
+
+    ${totalActives > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА
+        </div>
+        
+        <div style="background: #fefce8; border: 2px solid #fed7aa; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[5, 10, 15, 20].map((years, index) => {
+                        const startCapital = totalActives * 0.3;
+                        const annualReturn = 10; // Можно взять из настроек пользователя
+                        const finalAmount = calculateCapitalGrowth(startCapital, annualReturn, years);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#fefce8' : '#fef3c7'};">
+                            <td style="padding: 12px; text-align: center; color: #c2410c; font-weight: 600;">Основной сценарий (${years} лет)</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${annualReturn}%</td>
+                            <td style="padding: 12px; text-align: center;">${years}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(finalAmount)}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+    <!-- РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ -->
+    ${[...mediumTermGoals, ...longTermGoals].length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ
+        </div>
+        
+        <div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%); color: white; font-size: 11px;">
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Смартовое вложение и ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 6px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[...mediumTermGoals, ...longTermGoals].slice(0, 3).map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || 6000;
+                        const annualReturn = parseFloat(goal.returnRate) || 10;
+                        const finalAmount = calculateCapitalWithDeposits(startCapital, monthlyInvestment, annualReturn, yearsLeft);
+                        const ratios = getCurrencyRatio(goal.currency);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f9fafb' : '#f3f4f6'};">
+                            <td style="padding: 10px; text-align: center; color: #6b21a8; font-weight: 600; font-size: 12px;">${goal.name}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(startCapital, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${annualReturn}%</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${yearsLeft}</td>
+                            <td style="padding: 10px; text-align: center; background: #fef3c7; font-weight: bold; font-size: 12px;">${formatAmount(finalAmount, goal.currency === 'USD' ? '$' : '₸')}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+
+
+    <!-- РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА -->
+    ${totalActives > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА
+        </div>
+        
+        <div style="background: #fefce8; border: 2px solid #fed7aa; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[5, 10, 15, 20].map((years, index) => {
+                        const startCapital = totalActives * 0.3;
+                        const annualReturn = 10; // Можно взять из настроек пользователя
+                        const finalAmount = calculateCapitalGrowth(startCapital, annualReturn, years);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#fefce8' : '#fef3c7'};">
+                            <td style="padding: 12px; text-align: center; color: #c2410c; font-weight: 600;">Основной сценарий (${years} лет)</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${annualReturn}%</td>
+                            <td style="padding: 12px; text-align: center;">${years}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(finalAmount)}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+    <!-- РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ -->
+    ${[...mediumTermGoals, ...longTermGoals].length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ
+        </div>
+        
+        <div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%); color: white; font-size: 11px;">
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Смартовое вложение и ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 6px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[...mediumTermGoals, ...longTermGoals].slice(0, 3).map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || 6000;
+                        const annualReturn = parseFloat(goal.returnRate) || 10;
+                        const finalAmount = calculateCapitalWithDeposits(startCapital, monthlyInvestment, annualReturn, yearsLeft);
+                        
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f9fafb' : '#f3f4f6'};">
+                            <td style="padding: 10px; text-align: center; color: #6b21a8; font-weight: 600; font-size: 12px;">${goal.name}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(startCapital, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${annualReturn}%</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${yearsLeft}</td>
+                            <td style="padding: 10px; text-align: center; background: #fef3c7; font-weight: bold; font-size: 12px;">${formatAmount(finalAmount, goal.currency === 'USD' ? '$' : '₸')}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+
+
+    <!-- РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА -->
+    ${totalActives > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА
+        </div>
+        
+        <div style="background: #fefce8; border: 2px solid #fed7aa; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[5, 10, 15, 20].map((years, index) => {
+                        const startCapital = totalActives * 0.3;
+                        const annualReturn = 10; // Можно взять из настроек пользователя
+                        const finalAmount = calculateCapitalGrowth(startCapital, annualReturn, years);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#fefce8' : '#fef3c7'};">
+                            <td style="padding: 12px; text-align: center; color: #c2410c; font-weight: 600;">Основной сценарий (${years} лет)</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${annualReturn}%</td>
+                            <td style="padding: 12px; text-align: center;">${years}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(finalAmount)}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+    <!-- РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ -->
+    ${[...mediumTermGoals, ...longTermGoals].length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ
+        </div>
+        
+        <div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%); color: white; font-size: 11px;">
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Смартовое вложение и ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 6px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[...mediumTermGoals, ...longTermGoals].slice(0, 3).map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || 6000;
+                        const annualReturn = parseFloat(goal.returnRate) || 10;
+                        const finalAmount = calculateCapitalWithDeposits(startCapital, monthlyInvestment, annualReturn, yearsLeft);
+                        const ratios = getCurrencyRatio(goal.currency);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f9fafb' : '#f3f4f6'};">
+                            <td style="padding: 10px; text-align: center; color: #6b21a8; font-weight: 600; font-size: 12px;">${goal.name}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(startCapital, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${annualReturn}%</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${yearsLeft}</td>
+                            <td style="padding: 10px; text-align: center; background: #fef3c7; font-weight: bold; font-size: 12px;">${formatAmount(finalAmount, goal.currency === 'USD' ? '$' : '₸')}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+    <!-- РАСЧЕТ ЕЖЕМЕСЯЧНОГО ИНВЕСТИРОВАНИЯ ДЛЯ ДОСТИЖЕНИЯ КАПИТАЛА -->
+    ${mediumTermGoals.length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ ЕЖЕМЕСЯЧНОГО ИНВЕСТИРОВАНИЯ ДЛЯ ДОСТИЖЕНИЯ КАПИТАЛА
+        </div>
+        
+        <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;"> : '₸')}</td>
+                        </tr>
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+</div>
+` : ''}
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Целевой капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Требуемая доходность, %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${longTermGoals.map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const targetAmount = parseFloat(goal.amount) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || (totalActives * 0.1) || 10000;
+                        const requiredReturn = calculateRequiredReturn(startCapital, targetAmount, yearsLeft);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f0fdf4' : '#dcfce7'};">
+                            <td style="padding: 12px; text-align: center; color: #166534; font-weight: 600;">${goal.name}</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(targetAmount)}</td>
+                            <td style="padding: 12px; text-align: center;">${yearsLeft}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${requiredReturn}%</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+   
+
+    <!-- РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА -->
+    ${totalActives > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА НАЧАЛЬНОГО КАПИТАЛА
+        </div>
+        
+        <div style="background: #fefce8; border: 2px solid #fed7aa; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%); color: white; font-size: 12px;">
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 8px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[5, 10, 15, 20].map((years, index) => {
+                        const startCapital = totalActives * 0.3;
+                        const annualReturn = 10; // Можно взять из настроек пользователя
+                        const finalAmount = calculateCapitalGrowth(startCapital, annualReturn, years);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#fefce8' : '#fef3c7'};">
+                            <td style="padding: 12px; text-align: center; color: #c2410c; font-weight: 600;">Основной сценарий (${years} лет)</td>
+                            <td style="padding: 12px; text-align: center;">${formatAmount(startCapital)}</td>
+                            <td style="padding: 12px; text-align: center;">${annualReturn}%</td>
+                            <td style="padding: 12px; text-align: center;">${years}</td>
+                            <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(finalAmount)}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+    <!-- РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ -->
+    ${[...mediumTermGoals, ...longTermGoals].length > 0 ? `
+    <div style="margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 8px 15px; margin-bottom: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            РАСЧЕТ РОСТА КАПИТАЛА С УЧЕТОМ ПОПОЛНЕНИЙ
+        </div>
+        
+        <div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%); color: white; font-size: 11px;">
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Смартовое вложение и ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Ежемесячное пополнение</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Доходность</th>
+                        <th style="padding: 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                        <th style="padding: 6px; text-align: center;">Итоговая сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${[...mediumTermGoals, ...longTermGoals].slice(0, 3).map((goal, index) => {
+                        const yearsLeft = calculateYearsLeft(goal.timeframe);
+                        const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                        const startCapital = (goal.collected && parseFloat(goal.collected)) || 6000;
+                        const annualReturn = parseFloat(goal.returnRate) || 10;
+                        const finalAmount = calculateCapitalWithDeposits(startCapital, monthlyInvestment, annualReturn, yearsLeft);
+                        const ratios = getCurrencyRatio(goal.currency);
+                        
+                        return `
+                        <tr style="background: ${index % 2 === 0 ? '#f9fafb' : '#f3f4f6'};">
+                            <td style="padding: 10px; text-align: center; color: #6b21a8; font-weight: 600; font-size: 12px;">${goal.name}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(startCapital, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${annualReturn}%</td>
+                            <td style="padding: 10px; text-align: center; font-size: 12px;">${yearsLeft}</td>
+                            <td style="padding: 10px; text-align: center; background: #fef3c7; font-weight: bold; font-size: 12px;">${formatAmount(finalAmount, goal.currency === 'USD' ? '$' : '₸')}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    ` : ''}
+
+   
     </body>
     </html>
   `;

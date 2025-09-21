@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   SafeAreaView,
   StatusBar,
   TextInput,
   ScrollView,
   Alert,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
@@ -130,9 +130,9 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
     }
   };
 
-  // const isFormValid = title.trim() && amount.trim() && selectedCategory;
+  const isFormValid = title.trim() && amount.trim() && selectedCategory;
 
-    const isFormValid = title.trim() && amount.trim();
+    // const isFormValid = title.trim() && amount.trim();
 
   return (
     <SafeAreaView className="flex-1 bg-black">
@@ -196,12 +196,23 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
             {categories.map((category) => (
               <TouchableOpacity
                 key={category.id}
-                className={`w-16 h-16 rounded-full justify-center items-center mb-4 ${
-                  selectedCategory === category.id ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''
-                }`}
-                style={{ backgroundColor: category.color }}
-                // onPress={() => handleCategorySelect(category.id)}
-                activeOpacity={0.8}
+                onPress={() => handleCategorySelect(category.id)}
+                activeOpacity={0.7}
+                style={[
+                  {
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 16,
+                    backgroundColor: category.color,
+                  },
+                  selectedCategory === category.id && {
+                    borderWidth: 2,
+                    borderColor: 'white',
+                  }
+                ]}
               >
                 {renderIcon(category)}
               </TouchableOpacity>

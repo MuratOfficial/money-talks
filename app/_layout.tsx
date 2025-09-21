@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Inter_900Black, useFonts } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import "../global.css"
 
 import { useColorScheme } from '@/hooks/useColorScheme';

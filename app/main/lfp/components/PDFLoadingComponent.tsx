@@ -191,7 +191,7 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
       >
         {/* Blur overlay effect */}
         <View 
-          className="absolute bg-gray-900/60" 
+          className="absolute bg-gray-900/90" 
           style={{
             top: 0,
             left: 0,
