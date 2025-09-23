@@ -1,106 +1,150 @@
+// app/(auth)/forgotten.tsx
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
+import useFinancialStore from '@/hooks/useStore';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('user12@gmail.com');
+export default function ForgottenScreen() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const router = useRouter();
+  const { resetPassword } = useFinancialStore();
 
-  const handleLogin = () => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-    router.replace('/(auth)/confirm');
+  const handleResetPassword = async () => {
+    if (!email.trim()) {
+      setError('Введите email');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError('Введите корректный email');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await resetPassword(email.trim());
+
+      if (result.success) {
+        Alert.alert(
+          'Письмо отправлено',
+          `Инструкции по восстановлению пароля отправлены на ${email}. Проверьте вашу почту, включая папку "Спам".`,
+          [
+            {
+              text: 'OK',
+              onPress: () => router.push({
+                pathname: '/(auth)/confirm',
+                params: { email }
+              })
+            }
+          ]
+        );
+      } else {
+        throw new Error(result.error || 'Ошибка отправки письма');
+      }
+    } catch (error: any) {
+      console.error('Ошибка восстановления пароля:', error);
+      
+      switch (error.message) {
+        case 'User not found':
+          setError('Пользователь с таким email не найден');
+          break;
+        case 'Email rate limit exceeded':
+          setError('Слишком много попыток. Попробуйте позже');
+          break;
+        default:
+          setError('Произошла ошибка. Попробуйте еще раз');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View className='flex-1 bg-black px-4'>
-      <View className="flex-row items-center  pt-12 pb-8">
-        <TouchableOpacity className="mr-4" onPress={()=>router.replace('/(auth)/login')}>
+    <View className="flex-1 bg-black px-6">
+      {/* Header */}
+      <View className="flex-row items-center pt-12 pb-8">
+        <TouchableOpacity 
+          className="mr-4" 
+          onPress={() => router.replace('/(auth)/login')}
+          disabled={loading}
+        >
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.header} className="font-['SFProDisplayRegular'] ">Забыли пароль?</Text>
       
-      <View style={styles.inputContainer} className=''>
-        <Text className="font-['SFProDisplayRegular']" style={styles.label}>Email</Text>
+      {/* Title */}
+      <Text className="font-['SFProDisplayRegular'] text-white text-2xl font-bold mb-4 text-left">
+        Забыли пароль?
+      </Text>
+      
+      {/* Description */}
+      <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-8">
+        Введите email, связанный с вашим аккаунтом, и мы отправим инструкции для восстановления пароля
+      </Text>
+      
+      {/* Email Input */}
+      <View className="mb-6">
+        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
+          Email
+        </Text>
         <TextInput
-          style={styles.input}
+          className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 text-base bg-[#333333] text-white"
           value={email}
-          className="font-['SFProDisplayRegular']"
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            if (error) setError('');
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder='Введите почту '
+          placeholder="Введите ваш email"
+          placeholderTextColor="#666"
+          editable={!loading}
         />
+        {error ? (
+          <Text className="font-['SFProDisplayRegular'] text-red-500 text-sm mt-2">
+            {error}
+          </Text>
+        ) : null}
       </View>
       
-
-      
+      {/* Submit Button */}
       <TouchableOpacity 
-        style={styles.loginButton} 
-        onPress={handleLogin}
-        className=''
+        className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
+          loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
+        }`}
+        onPress={handleResetPassword}
+        disabled={loading || !email.trim()}
       >
-        <Text className="font-['SFProDisplayRegular']" style={styles.loginButtonText}>Далее</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text className="font-['SFProDisplayRegular'] text-white text-base font-medium">
+            Отправить инструкции
+          </Text>
+        )}
       </TouchableOpacity>
-      
+
+      {/* Back to Login */}
+      <TouchableOpacity 
+        className="items-center mt-6"
+        onPress={() => router.replace('/(auth)/login')}
+        disabled={loading}
+      >
+        <Text className="font-['SFProDisplayRegular'] text-green-500 text-base">
+          Вернуться к входу
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-    backgroundColor: '#000',
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 32,
-    textAlign: 'left',
-    color: '#FFFFFF',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 8,
-    color: '#BDBDBD',
-  },
-  input: {
-    height: 50,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    backgroundColor: '#333333',
-    color:"#BDBDBD"
-  },
-  errorText: {
-    color: '#FF6F71',
-    marginTop: 8,
-    fontSize: 14,
-  },
-  loginButton: {
-    backgroundColor: '#4CAF50',
-    height: 50,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'medium',
-  },
-  forgotPassword: {
-    color: '#4CAF50',
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 14,
-  },
-});

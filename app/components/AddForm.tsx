@@ -68,7 +68,7 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
       }
     } catch (error) {
       console.error('Navigation error:', error);
-      // Fallback на замену маршрута
+     
       router.replace('/main/finance');
     }
   };
@@ -100,7 +100,6 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
         });
       }
 
-      // Для Android используем больший timeout
       const timeout = Platform.OS === 'android' ? 300 : 100;
       
       setTimeout(() => {
@@ -132,7 +131,6 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
 
   const isFormValid = title.trim() && amount.trim() && selectedCategory;
 
-    // const isFormValid = title.trim() && amount.trim();
 
   return (
     <SafeAreaView className="flex-1 bg-black">

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '@/lib/supabase';
+import { Platform } from 'react-native';
 
 // Типы данных
 export interface Goal {
@@ -105,6 +107,8 @@ export interface PersonalFinancialPlan {
   updatedAt: Date;
 }
 
+const redirectUrl = Platform.OS === "web" ? "http://localhost:8081/new-password" : "money-talks:/new-password"
+
 export interface AppState {
   // Пользователь
   user: User | null;
@@ -143,12 +147,20 @@ export interface AppState {
   logout: () => void;
   setLoading: (loading: boolean) => void;
   updateUserProfile: (updates: Partial<User>) => void;
+
+  signUp: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
+  verifyResetCode: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
+  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   
   // Действия с финансами
   setCategories: (categories: FinancialCategory[]) => void;
   addCategory: (category: Omit<FinancialCategory, 'id'>) => void;
   updateCategory: (categoryId: string, updates: Partial<FinancialCategory>) => void;
   deleteCategory: (categoryId: string) => void;
+  resetCategory: () => void;
 
   // Действия с кошелком
   setWallets: (wallets: Wallet[]) => void;
@@ -281,7 +293,7 @@ export const useFinancialStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Начальное состояние
-      user: {name:"Unknown", password:"password", email:"user12@gmail.com", id:"initial"},
+      user: {name:"Unknown", password:"password", email:"", id:"initial"},
       isAuthenticated: false,
       currentGoalType:"Краткосрочные",
       isLoading: false,
@@ -323,9 +335,161 @@ export const useFinancialStore = create<AppState>()(
 
       setLoading: (isLoading) => set({ isLoading }),
 
-      updateUserProfile: (updates) => set((state) => ({
-        user: state.user ? { ...state.user, ...updates } : null
-      })),
+      signUp: async (email: string, password: string, name: string) => {
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name,
+              },
+            },
+          });
+
+          if (error) throw error;
+
+          if (data.user) {
+            const user: User = {
+              id: data.user.id,
+              email: data.user.email!,
+              name: name,
+              password: '', 
+              avatar: null,
+            };
+
+            set({ user, isAuthenticated: true });
+            return { success: true };
+          }
+
+          return { success: false, error: 'Не удалось создать пользователя' };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+
+      signIn: async (email: string, password: string) => {
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) throw error;
+
+          if (data.user) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            const user: User = {
+              id: data.user.id,
+              email: data.user.email!,
+              name: profile?.name || data.user.email!,
+              password: '',
+              avatar: profile?.avatar || null,
+              riskProfile: profile?.risk_profile,
+            };
+
+            set({ user, isAuthenticated: true });
+            return { success: true };
+          }
+
+          return { success: false, error: 'Не удалось войти' };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+
+      signOut: async () => {
+        try {
+          await supabase.auth.signOut();
+          set({ 
+            user: null, 
+            isAuthenticated: false,
+            goals: [],
+            categories: [],
+            wallets: [],
+            personalFinancialPlan: null
+          });
+        } catch (error) {
+          console.error('Ошибка при выходе:', error);
+        }
+      },
+
+      resetPassword: async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Ошибка восстановления пароля:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  verifyResetCode: async (email: string, code: string) => {
+    try {
+      // Для Supabase код верификации приходит по email
+      // Обычно проверка происходит при переходе по ссылке
+      // Если нужна проверка кода, можно использовать кастомную логику
+      // или дождаться, когда пользователь перейдет по ссылке
+      
+      // Временная заглушка - всегда возвращаем успех для демонстрации
+      // В реальном приложении здесь будет логика проверки кода
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  updatePassword: async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Ошибка обновления пароля:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+      updateUserProfile: async (updates: Partial<User>) => {
+        const { user } = get();
+        if (!user) return;
+
+        try {
+          // Обновляем в Supabase
+          const { error } = await supabase
+            .from('profiles')
+            .update({
+              name: updates.name,
+              avatar: updates.avatar,
+              risk_profile: updates.riskProfile,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id);
+
+          if (error) throw error;
+
+          // Обновляем локальное состояние
+          set((state) => ({
+            user: state.user ? { ...state.user, ...updates } : null,
+          }));
+        } catch (error) {
+          console.error('Ошибка при обновлении профиля:', error);
+        }
+      },
 
       // Цели
       setGoalFilter:(type) => set((state)=> { 
@@ -499,6 +663,10 @@ export const useFinancialStore = create<AppState>()(
         categories: state.categories.filter(category => category.id !== categoryId)
       })),
 
+      resetCategory:()=>set((state)=>({
+        categories: initialCategories
+      })),
+
       // Расходы
       addExpences: (expence) => set((state) => {
         const newExpence: Asset = {
@@ -532,7 +700,6 @@ export const useFinancialStore = create<AppState>()(
         };
       }),
 
-      // Редактирование текущего ассета
       setCurrentAsset:(asset)=>set((state) => {
         const changed: Asset = {
           ...asset
@@ -542,6 +709,8 @@ export const useFinancialStore = create<AppState>()(
           currentAsset: changed
         };
       }),
+
+
 
       // Активы
       addActives: (active) => set((state) => {

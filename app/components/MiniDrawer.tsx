@@ -48,7 +48,7 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
     >
       {/* Backdrop */}
       <TouchableOpacity 
-        className="flex-1 bg-white/10 justify-end backdrop-blur-md"
+        className="flex-1 bg-black/50 justify-end backdrop-blur-md"
         activeOpacity={1}
         onPress={handleBackdropPress}
       >
@@ -104,62 +104,5 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
     </Modal>
   );
 };
-
-// Пример использования компонента
-// const ExampleUsage: React.FC = () => {
-//   const [showDeleteDrawer, setShowDeleteDrawer] = React.useState(false);
-//   const [showLogoutDrawer, setShowLogoutDrawer] = React.useState(false);
-
-//   const handleDeleteAccount = () => {
-//     console.log('Аккаунт удален');
-//     // Логика удаления аккаунта
-//   };
-
-//   const handleLogout = () => {
-//     console.log('Выход из аккаунта');
-//     // Логика выхода
-//   };
-
-//   return (
-//     <View className="flex-1 bg-gray-900 justify-center items-center">
-//       {/* Trigger Buttons */}
-//       <TouchableOpacity
-//         onPress={() => setShowDeleteDrawer(true)}
-//         className="bg-red-600 px-6 py-3 rounded-lg mb-4"
-//       >
-//         <Text className="text-white font-medium">Удалить аккаунт</Text>
-//       </TouchableOpacity>
-
-//       <TouchableOpacity
-//         onPress={() => setShowLogoutDrawer(true)}
-//         className="bg-blue-600 px-6 py-3 rounded-lg"
-//       >
-//         <Text className="text-white font-medium">Выйти</Text>
-//       </TouchableOpacity>
-
-//       {/* Confirmation Drawers */}
-//       <ConfirmationDrawer
-//         visible={showDeleteDrawer}
-//         title="Удалить аккаунт?"
-//         onClose={() => setShowDeleteDrawer(false)}
-//         onConfirm={handleDeleteAccount}
-//         onCancel={() => console.log('Отменено')}
-//         confirmText="Да"
-//         cancelText="Нет"
-//         confirmButtonColor="#DC2626" // red-600
-//       />
-
-//       <ConfirmationDrawer
-//         visible={showLogoutDrawer}
-//         title="Выйти из аккаунта?"
-//         onClose={() => setShowLogoutDrawer(false)}
-//         onConfirm={handleLogout}
-//         onCancel={() => console.log('Отменено')}
-//         confirmText="Выйти"
-//         cancelText="Отмена"
-//       />
-//     </View>
-//   );
-// };
 
 export default ConfirmationDrawer;

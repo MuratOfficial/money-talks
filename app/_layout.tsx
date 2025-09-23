@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import "../global.css"
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { AuthGuard } from '@/components/AuthGuard';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,12 +28,19 @@ export default function RootLayout() {
   }
 
   return (
+  
+    <AuthGuard>
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="(auth)" />
+      {/* <Stack.Screen name="(auth)" /> */}
       <Stack.Screen name="main" />
-      <Stack.Screen name="test" />
+      {/* <Stack.Screen name="test" /> */}
       <Stack.Screen name="+not-found" />
     </Stack>
+
+    </AuthGuard>
+
+
+    
   );
 }

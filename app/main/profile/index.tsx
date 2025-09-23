@@ -13,6 +13,22 @@ const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
+    const { signOut, user } = useFinancialStore();
+  const router = useRouter();
+
+
+  const performLogout = async () => {
+    try {
+      await signOut();
+      
+      router.replace("/(auth)/login");
+      
+    } catch (error) {
+      console.error('Ошибка при выходе:', error);
+      Alert.alert('Ошибка', 'Не удалось выйти из аккаунта');
+    } 
+  };
+
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
@@ -60,7 +76,6 @@ const ProfileScreen = () => {
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
   const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
 
-  const {user} = useFinancialStore();
 
   const profileName = user?.name || "Unknown";
 
@@ -80,14 +95,28 @@ const ProfileScreen = () => {
   };
 
     const [showLogoutDrawer, setShowLogoutDrawer] = useState(false);
-  const router = useRouter();
 
 
-
-  const handleLogout = () => {
-    console.log('Выход из аккаунта');
-    // Логика выхода
-  };
+  // const handleLogout = () => {
+  //   Alert.alert(
+  //     'Выход из аккаунта',
+  //     'Вы уверены, что хотите выйти?',
+  //     [
+  //       {
+  //         text: 'Отмена',
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'Выйти',
+  //         style: 'destructive',
+  //         onPress: async () => {
+  //           await signOut();
+  //           router.push("/(auth)/login")
+  //         },
+  //       },
+  //     ]
+  //   );
+  // };
 
   const menuItems = [
     {
@@ -262,7 +291,7 @@ const ProfileScreen = () => {
           visible={showLogoutDrawer}
           title="Выйти из аккаунта?"
           onClose={() => setShowLogoutDrawer(false)}
-          onConfirm={handleLogout}
+          onConfirm={performLogout}
           onCancel={() => console.log('Отменено')}
           confirmText="Выйти"
           cancelText="Отмена"
