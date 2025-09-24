@@ -86,7 +86,7 @@ export default function OnboardingScreen() {
     return (
       <Animated.View style={[styles.slide, { opacity }]}>
         <View style={styles.content}>
-          <Text style={styles.title} className="font-['SFProDisplayRegular']">{item.title}</Text>
+          <Text style={styles.title} className="font-['SFProDisplaySemiBold']">{item.title}</Text>
           <Text style={styles.description} className="font-['SFProDisplayRegular']">{item.description}</Text>
 
           {item.showBulletPoints && item.bulletPoints && (
@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
     marginBottom: 24,
     color: '#fff',
     textAlign: 'center'
@@ -264,6 +263,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600'
   }
 });

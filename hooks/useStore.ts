@@ -25,6 +25,23 @@ export interface Goal {
   updatedAt: Date;
 }
 
+export interface AuthResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
+export interface VerifyOtpParams {
+  email: string;
+  token: string;
+  type: 'recovery' | 'signup' | 'email_change';
+}
+
+export interface UpdatePasswordParams {
+
+  newPassword: string;
+}
+
 export interface GoalFormData {
   name: string;
   type: 'short' | 'medium' | 'long';
@@ -107,7 +124,6 @@ export interface PersonalFinancialPlan {
   updatedAt: Date;
 }
 
-const redirectUrl = Platform.OS === "web" ? "http://localhost:8081/new-password" : "money-talks:/new-password"
 
 export interface AppState {
   // Пользователь
@@ -151,9 +167,11 @@ export interface AppState {
   signUp: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
-    resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   verifyResetCode: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
-  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
+ 
+  resetPassword: (email: string) => Promise<AuthResponse>;
+  verifyOtp: (params: VerifyOtpParams) => Promise<AuthResponse>;
+  updatePassword: (params: UpdatePasswordParams) => Promise<AuthResponse>;
   
   // Действия с финансами
   setCategories: (categories: FinancialCategory[]) => void;
@@ -387,7 +405,7 @@ export const useFinancialStore = create<AppState>()(
             const user: User = {
               id: data.user.id,
               email: data.user.email!,
-              name: profile?.name || data.user.email!,
+              name: data.user.user_metadata?.full_name || data.user.email!,
               password: '',
               avatar: profile?.avatar || null,
               riskProfile: profile?.risk_profile,
@@ -419,57 +437,107 @@ export const useFinancialStore = create<AppState>()(
         }
       },
 
-      resetPassword: async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
-      });
+  resetPassword: async (email: string): Promise<AuthResponse> => {
+  try {
+    // Отправляем код восстановления без redirect_to
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
 
-      if (error) throw error;
-
-      return { success: true };
-    } catch (error: any) {
-      console.error('Ошибка восстановления пароля:', error);
-      return { success: false, error: error.message };
+    if (error) {
+      console.error('Ошибка отправки кода:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
     }
-  },
+
+    return { 
+      success: true, 
+      data 
+    };
+  } catch (error: any) {
+    console.error('Ошибка resetPassword:', error);
+    return { 
+      success: false, 
+      error: error.message || 'Произошла неизвестная ошибка' 
+    };
+  }
+},
+
+verifyOtp: async ({ email, token, type }: VerifyOtpParams): Promise<AuthResponse> => {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type
+    });
+
+    if (error) {
+      console.error('Ошибка проверки OTP:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+
+    return { 
+      success: true, 
+      data 
+    };
+  } catch (error: any) {
+    console.error('Ошибка verifyOtp:', error);
+    return { 
+      success: false, 
+      error: error.message || 'Произошла неизвестная ошибка' 
+    };
+  }
+},
+
+updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResponse> => {
+  try {
+
+
+    // Если верификация прошла успешно, обновляем пароль
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) {
+      console.error('Ошибка обновления пароля:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+
+    return { 
+      success: true, 
+      data 
+    };
+  } catch (error: any) {
+    console.error('Ошибка updatePassword:', error);
+    return { 
+      success: false, 
+      error: error.message || 'Произошла неизвестная ошибка' 
+    };
+  }
+},
 
   verifyResetCode: async (email: string, code: string) => {
     try {
-      // Для Supabase код верификации приходит по email
-      // Обычно проверка происходит при переходе по ссылке
-      // Если нужна проверка кода, можно использовать кастомную логику
-      // или дождаться, когда пользователь перейдет по ссылке
-      
-      // Временная заглушка - всегда возвращаем успех для демонстрации
-      // В реальном приложении здесь будет логика проверки кода
+ 
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   },
 
-  updatePassword: async (newPassword: string) => {
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
 
-      if (error) throw error;
-
-      return { success: true };
-    } catch (error: any) {
-      console.error('Ошибка обновления пароля:', error);
-      return { success: false, error: error.message };
-    }
-  },
 
       updateUserProfile: async (updates: Partial<User>) => {
         const { user } = get();
         if (!user) return;
 
         try {
-          // Обновляем в Supabase
           const { error } = await supabase
             .from('profiles')
             .update({

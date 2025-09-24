@@ -1,4 +1,3 @@
-// app/(auth)/forgotten.tsx
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -9,6 +8,7 @@ export default function ForgottenScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   const router = useRouter();
   const { resetPassword } = useFinancialStore();
@@ -36,19 +36,12 @@ export default function ForgottenScreen() {
       const result = await resetPassword(email.trim());
 
       if (result.success) {
-        Alert.alert(
-          'Письмо отправлено',
-          `Инструкции по восстановлению пароля отправлены на ${email}. Проверьте вашу почту, включая папку "Спам".`,
-          [
-            {
-              text: 'OK',
-              onPress: () => router.push({
-                pathname: '/(auth)/confirm',
-                params: { email }
-              })
-            }
-          ]
-        );
+        setEmailSent(true);
+        // Переход на экран ввода OTP с передачей email
+        router.push({
+          pathname: '/(auth)/reset-password-otp',
+          params: { email: email.trim() }
+        });
       } else {
         throw new Error(result.error || 'Ошибка отправки письма');
       }
@@ -65,6 +58,24 @@ export default function ForgottenScreen() {
         default:
           setError('Произошла ошибка. Попробуйте еще раз');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!emailSent) return;
+    
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await resetPassword(email.trim());
+      if (result.success) {
+        Alert.alert('Успешно', 'Код восстановления повторно отправлен на ваш email');
+      }
+    } catch (error) {
+      setError('Ошибка при повторной отправке кода');
     } finally {
       setLoading(false);
     }
@@ -90,50 +101,97 @@ export default function ForgottenScreen() {
       
       {/* Description */}
       <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-8">
-        Введите email, связанный с вашим аккаунтом, и мы отправим инструкции для восстановления пароля
+        {emailSent 
+          ? `Код восстановления отправлен на ${email}. Проверьте вашу почту, включая папку "Спам".`
+          : 'Введите email, связанный с вашим аккаунтом, и мы отправим код для восстановления пароля'
+        }
       </Text>
       
-      {/* Email Input */}
-      <View className="mb-6">
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
-          Email
-        </Text>
-        <TextInput
-          className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 text-base bg-[#333333] text-white"
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            if (error) setError('');
-          }}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          placeholder="Введите ваш email"
-          placeholderTextColor="#666"
-          editable={!loading}
-        />
-        {error ? (
-          <Text className="font-['SFProDisplayRegular'] text-red-500 text-sm mt-2">
-            {error}
-          </Text>
-        ) : null}
-      </View>
-      
-      {/* Submit Button */}
-      <TouchableOpacity 
-        className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
-          loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
-        }`}
-        onPress={handleResetPassword}
-        disabled={loading || !email.trim()}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text className="font-['SFProDisplayRegular'] text-white text-base font-medium">
-            Отправить инструкции
-          </Text>
-        )}
-      </TouchableOpacity>
+      {!emailSent ? (
+        <>
+          {/* Email Input */}
+          <View className="mb-6">
+            <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
+              Email
+            </Text>
+            <TextInput
+              className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 text-base bg-[#333333] text-white"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (error) setError('');
+              }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholder="Введите ваш email"
+              placeholderTextColor="#666"
+              editable={!loading}
+            />
+            {error ? (
+              <Text className="font-['SFProDisplayRegular'] text-red-500 text-sm mt-2">
+                {error}
+              </Text>
+            ) : null}
+          </View>
+          
+          {/* Submit Button */}
+          <TouchableOpacity 
+            className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
+              loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
+            }`}
+            onPress={handleResetPassword}
+            disabled={loading || !email.trim()}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text className="font-['SFProDisplayRegular'] text-white text-base font-medium">
+                Отправить код
+              </Text>
+            )}
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          {/* Success State - показываем после отправки */}
+          <View className="items-center mb-8">
+            <MaterialIcons name="mail-outline" size={64} color="#4CAF50" />
+            <Text className="font-['SFProDisplayRegular'] text-white text-lg font-medium mt-4 text-center">
+              Код отправлен!
+            </Text>
+          </View>
+
+          {/* Resend Button */}
+          <TouchableOpacity 
+            className={`h-[50px] rounded-[16px] justify-center items-center mt-4 border border-[#4CAF50] ${
+              loading ? 'opacity-50' : ''
+            }`}
+            onPress={handleResendCode}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#4CAF50" />
+            ) : (
+              <Text className="font-['SFProDisplayRegular'] text-[#4CAF50] text-base font-medium">
+                Отправить код повторно
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Continue Button */}
+          <TouchableOpacity 
+            className="h-[50px] rounded-[16px] justify-center items-center mt-4 bg-[#4CAF50]"
+            onPress={() => router.push({
+              pathname: '/(auth)/reset-password-otp',
+              params: { email: email.trim() }
+            })}
+          >
+            <Text className="font-['SFProDisplayRegular'] text-white text-base font-medium">
+              Ввести код
+            </Text>
+          </TouchableOpacity>
+        </>
+      )}
 
       {/* Back to Login */}
       <TouchableOpacity 

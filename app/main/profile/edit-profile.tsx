@@ -113,7 +113,7 @@ const EditProfilePage: React.FC = () => {
         <TouchableOpacity className="mr-4" onPress={()=>router.replace('/main/profile')}>
            <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text className="text-white text-lg font-semibold font-['SFProDisplayRegular']">
+        <Text className="text-white text-lg font-['SFProDisplayRegular']">
           Редактировать профиль
         </Text>
       </View>
@@ -179,26 +179,16 @@ const EditProfilePage: React.FC = () => {
 
           {/* Password Field */}
           <View className="mb-4">
-            <Text className="text-gray-400 text-sm mb-2 font-['SFProDisplayRegular']">Повторите пароль</Text>
-            <View className="bg-[#333333] rounded-2xl flex-row items-center">
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                className="text-white p-3.5 text-sm flex-1 font-['SFProDisplayRegular']"
-                secureTextEntry={!showPassword}
-                placeholderTextColor="#9CA3AF"
-              />
-              <TouchableOpacity 
-                onPress={() => setShowPassword(!showPassword)}
-                className="px-4"
-              >
-                <MaterialIcons 
-                  name={showPassword ? "visibility" : "visibility-off"} 
-                  size={24} 
-                  color="#9CA3AF" 
-                />
-              </TouchableOpacity>
-            </View>
+            <Text className="text-gray-400 text-sm mb-2 font-['SFProDisplayRegular']">Изменить пароль</Text>
+            <TouchableOpacity 
+              onPress={()=>router.push("/(auth)/new-password")}
+              className="bg-red-800 rounded-2xl py-3 items-center mb-2"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white text-base  font-['SFProDisplayRegular']">
+                Новый пароль
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         
@@ -223,7 +213,7 @@ const EditProfilePage: React.FC = () => {
           className="bg-green-600 rounded-2xl py-3 items-center mb-2"
           activeOpacity={0.8}
         >
-          <Text className="text-white text-base font-semibold font-['SFProDisplayRegular']">
+          <Text className="text-white text-base  font-['SFProDisplayRegular']">
             Сохранить
           </Text>
         </TouchableOpacity>
