@@ -44,7 +44,24 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
     }
   };
 
-  const categories: CategoryItem[] = [
+  const categories: CategoryItem[] = type==="income"?[
+    { id: 'wallet', name: 'Кошелек', icon: 'wallet', iconLibrary: 'material', color: '#10B981' },
+    { id: 'books', name: 'Книги', icon: 'library-books', iconLibrary: 'material', color: '#8110B9' },
+    
+     { id: 'bank', name: 'Банк', icon: 'account-balance', iconLibrary: 'material', color: '#10B981' },
+    
+     { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#3B82F6' },
+   { id: 'attach-money', name: 'Деньги', icon: 'attach-money', iconLibrary: 'material', color: '#8B5CF6' },
+    { id: 'bitcoin', name: 'Криpto', icon: 'logo-bitcoin', iconLibrary: 'ionicons', color: '#F59E0B' },
+    { id: 'card-giftcard', name: 'Экспорт', icon: 'card-giftcard', iconLibrary: 'material', color: '#06B6D4' },
+    { id: 'play', name: 'Развлечения', icon: 'play', iconLibrary: 'ionicons', color: '#EC4899' },
+    { id: 'restaurant', name: 'Еда', icon: 'restaurant', iconLibrary: 'ionicons', color: '#F97316' },
+    { id: 'shopping', name: 'Покупки', icon: 'bag-handle', iconLibrary: 'ionicons', color: '#06B6D4' },
+    { id: 'fitness', name: 'Спорт', icon: 'fitness', iconLibrary: 'ionicons', color: '#84CC16' },
+    { id: 'warning', name: 'Предупреждение', icon: 'warning', iconLibrary: 'ionicons', color: '#3B82F6' },
+    { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#F59E0B' },
+  
+  ]: [
     { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#3B82F6' },
     { id: 'bank', name: 'Банк', icon: 'account-balance', iconLibrary: 'material', color: '#10B981' },
     { id: 'phone', name: 'Телефон', icon: 'phone-portrait', iconLibrary: 'ionicons', color: '#8B5CF6' },

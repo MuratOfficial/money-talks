@@ -9,6 +9,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -31,6 +32,10 @@ interface AdviceAccordionModalProps {
   title: string;
   items: AccordionItem[];
 }
+
+const { height: screenHeight } = Dimensions.get('window');
+
+const  height  = screenHeight * 0.8;
 
 const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
   visible,
@@ -88,11 +93,11 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="none"
-      statusBarTranslucent
+      animationType="slide"
+      onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-end">
-        <View className="bg-[#121212] rounded-t-3xl max-h-[100%]">
+        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
           {/* Header */}
           <View className="flex-row items-center justify-between p-4 border-b border-gray-700">
             <TouchableOpacity onPress={onClose}>
@@ -106,7 +111,8 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
 
           {/* Accordion Content */}
           <ScrollView 
-            className="flex-1" 
+            className="mb-4"
+            style={{ maxHeight: height}}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ padding: 16 }}
           >

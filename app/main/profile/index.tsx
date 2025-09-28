@@ -96,28 +96,6 @@ const ProfileScreen = () => {
 
     const [showLogoutDrawer, setShowLogoutDrawer] = useState(false);
 
-
-  // const handleLogout = () => {
-  //   Alert.alert(
-  //     'Выход из аккаунта',
-  //     'Вы уверены, что хотите выйти?',
-  //     [
-  //       {
-  //         text: 'Отмена',
-  //         style: 'cancel',
-  //       },
-  //       {
-  //         text: 'Выйти',
-  //         style: 'destructive',
-  //         onPress: async () => {
-  //           await signOut();
-  //           router.push("/(auth)/login")
-  //         },
-  //       },
-  //     ]
-  //   );
-  // };
-
   const menuItems = [
     {
       id: 'tips',

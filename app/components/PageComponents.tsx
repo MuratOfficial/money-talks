@@ -126,17 +126,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
     setSelectedCategory(term);
   }
 
-
-  const handleInfo = () => {
-    console.log('Информация');
-    // Логика показа информации
-  };
-
-  const handleAddAsset = () => {
-    console.log('Добавить актив');
-    // Логика добавления актива
-  };
-
   const handleAssetInfo = (assetId: string) => {
     console.log('Информация об активе:', assetId);
     // Логика показа информации об активе
@@ -144,7 +133,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const handleEditAsset = (assetId: string) => {
     console.log('Редактировать актив:', assetId);
-    // Логика редактирования актива
+    
   };
 
 
@@ -295,7 +284,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           
         </View>
 
-        {/* Assets List */}
         <View className="bg-white/10 rounded-xl px-3 mb-2">
           {currentAssets.map((asset, index) => ( 
             <View key={asset.id}>
@@ -338,10 +326,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         </View>
         
       </ScrollView> : currentAnalyzeList.length > 0 ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-        {/* Total Assets */}
-        
-
-        {/* Assets List */}
         
           {currentAnalyzeList.map((asset, index) => ( 
             <View key={index}>

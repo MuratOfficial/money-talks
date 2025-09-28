@@ -73,7 +73,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   ];
 
   const currentYear: number = new Date().getFullYear();
-  const years: string[] = Array.from({ length: 100 }, (_, i) => (currentYear + 50 - i).toString());
+  const years: string[] = Array.from({ length: 50 }, (_, i) => (currentYear + i).toString());
 
   useEffect(() => {
     if (editGoalId) {
@@ -131,7 +131,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
 
     } catch (error) {
       console.error('Ошибка при сохранении цели:', error);
-      // добавить показ ошибки пользователю
+      
     }
   };
 
@@ -306,7 +306,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
               Средняя инфляция в валюте
             </Text>
             <TextInput
-              value={formData.inflationRate}
+              value={formData.currency==="USD"?'3':formData.inflationRate}
               onChangeText={(text) => setFormData({ ...formData, inflationRate: text })}
               placeholder="3,00%"
               placeholderTextColor="#6B7280"

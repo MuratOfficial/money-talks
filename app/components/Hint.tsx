@@ -54,7 +54,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 onPress={onClose}
               />
 
-              <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
+        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
 
 
      
