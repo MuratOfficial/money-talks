@@ -11,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
 import InfoModal from './Hint';
+import useFinancialStore from '@/hooks/useStore';
+import PaymentModal from './PaymentModal';
 
 interface PageComponentProps {
   title: string;
@@ -50,11 +52,16 @@ interface AnalyzeList {
 }
 
 const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
+  
+  const{setCurrentAsset} = useFinancialStore();
+  
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
   const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
   const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+
+  const [paymentModalShow, setPaymentModalShow] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   
@@ -126,20 +133,27 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
     setSelectedCategory(term);
   }
 
-  const handleAssetInfo = (assetId: string) => {
-    console.log('Информация об активе:', assetId);
-    // Логика показа информации об активе
+  const handleAssetInfo = (asset:Asset) => {
+    console.log('Информация об активе:', asset);
+    setCurrentAsset(asset);
+    setPaymentModalShow(true);
+  
   };
 
-  const handleEditAsset = (assetId: string) => {
-    console.log('Редактировать актив:', assetId);
+  const handleEditAsset = (asset:Asset) => {
+
+    console.log('Редактировать актив:', asset);
+    setCurrentAsset(asset);
+
     
+    router.replace(addLink || "/main/finance")
   };
 
 
 
 
   const handleAddExpense = () => {
+    setCurrentAsset(null)
     router.replace(addLink || "/main/finance")
   };
 
@@ -305,14 +319,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                   </Text>
                   
                   <TouchableOpacity 
-                    onPress={() => handleAssetInfo(asset.id)}
+                    onPress={() => handleAssetInfo(asset)}
                     className=" mr-2"
                   >
                     <Ionicons name="add-circle-outline" size={20} color="#FFF" />
                   </TouchableOpacity>
                   
                   <TouchableOpacity 
-                    onPress={() => handleEditAsset(asset.id)}
+                    onPress={() => handleEditAsset(asset)}
                     className=""
                   >
                     <Ionicons name="create-outline" size={20} color="#FFF" />
@@ -415,13 +429,21 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           />
 
           <InfoModal 
-        visible={modalVisible} 
-        onClose={closeModal}
-        title="Подсказки про доходы"
-        content={markdownContent}
-        linkUrl="https://web.telegram.org/a/#-1002352034763_2"
-        linkText="Видеоурок на Telegram"
-      />
+            visible={modalVisible} 
+            onClose={closeModal}
+            title="Подсказки про доходы"
+            content={markdownContent}
+            linkUrl="https://web.telegram.org/a/#-1002352034763_2"
+            linkText="Видеоурок на Telegram"
+          />
+
+          <PaymentModal
+          onClose={()=>setPaymentModalShow(false)}
+          
+          visible={paymentModalShow}
+          
+          
+          />
       
     </SafeAreaView>
   );

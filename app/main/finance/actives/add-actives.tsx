@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,13 +13,23 @@ import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 
 const AddActivesForm = () => {
+
+
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [inc, setInc] = useState('');
 
-  const {addActives} = useFinancialStore();
+  const {addActives, currentAsset} = useFinancialStore();
 
   const router = useRouter();
+
+  useEffect(()=>{
+    if(currentAsset){
+      setTitle(currentAsset.name);
+      setAmount(currentAsset.amount.toString());
+      setInc(currentAsset.yield?.toString() || "")
+    }
+  }, [currentAsset])
 
 
   const handleBack = () => {

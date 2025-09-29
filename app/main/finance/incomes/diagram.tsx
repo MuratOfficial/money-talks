@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
 import ChartScreen from '@/app/components/Diagram';
+import useFinancialStore from '@/hooks/useStore';
 
 const DiagramIncomeScreen: React.FC = () => {
+
+  const {incomes} = useFinancialStore();
 
 
 
   return (
-      <ChartScreen backLink={'/main/finance/incomes/main'}/>
+      <ChartScreen assets={incomes} backLink={'/main/finance/incomes/main'}/>
   );
 };
 

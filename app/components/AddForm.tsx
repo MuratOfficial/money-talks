@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
-import useFinancialStore from '@/hooks/useStore';
+import useFinancialStore, { Asset } from '@/hooks/useStore';
 
 interface CategoryItem {
   id: string;
@@ -26,14 +26,23 @@ interface AddFormProps{
   backLink?: Href;
   name?: string;
   type?: "income" | "expence";
+  formItem: Asset | null
 }
 
-const AddForm = ({backLink, name, type}:AddFormProps) => {
+const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-  const {addIncomes, addExpences} = useFinancialStore();
+  useEffect(()=>{
+    if(formItem){
+      setTitle(formItem.name);
+      setAmount(formItem.amount.toString());
+      setSelectedCategory(formItem.icon || '')
+    }
+  }, [formItem])
+
+  const {addIncomes, addExpences, updateIncomes, updateExpences} = useFinancialStore();
 
   const handleCategorySelect = (categoryId: string) => {
     try {
@@ -98,8 +107,27 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
 
     try {
       const selectedCat = categories.find(x => x.id === selectedCategory);
-      
-      if(type === "income"){
+
+      if(formItem){
+        if(type === "income"){
+        updateIncomes(formItem.id, {
+          name: title,
+          amount: parseFloat(amount),
+          icon: selectedCat?.icon,
+          color: selectedCat?.color,
+        });
+      }
+
+      if(type === "expence"){
+        updateExpences(formItem.id,{
+          name: title,
+          amount: parseFloat(amount),
+          icon: selectedCat?.icon,
+          color: selectedCat?.color,
+        });
+      }
+      }else{
+        if(type === "income"){
         addIncomes({
           name: title,
           amount: parseFloat(amount),
@@ -116,6 +144,9 @@ const AddForm = ({backLink, name, type}:AddFormProps) => {
           color: selectedCat?.color,
         });
       }
+      }
+      
+      
 
       const timeout = Platform.OS === 'android' ? 300 : 100;
       

@@ -198,11 +198,19 @@ export interface AppState {
   addExpences: (expence: Omit<Asset, 'id'>) => void;
   addIncomes: (income: Omit<Asset, 'id'>) => void;
 
+
   // Активы
   addActives: (active: Omit<Asset, 'id'>) => void;
+  
 
   // Пассивы
   addPassives: (active: Omit<Asset, 'id'>) => void;
+
+  // Функции для обновления
+    updateExpences: (id: string, expence: Partial<Omit<Asset, 'id'>>) => void;
+  updateIncomes: (id: string, income: Partial<Omit<Asset, 'id'>>) => void;
+  updateActives: (id: string, active: Partial<Omit<Asset, 'id'>>) => void;
+  updatePassives: (id: string, passive: Partial<Omit<Asset, 'id'>>) => void;
 
   // Действия с настройками
   setTheme: (theme: 'light' | 'dark') => void;
@@ -210,7 +218,7 @@ export interface AppState {
   setCurrency: (currency: '₸' | '$' | '€') => void;
 
   // Редактирование ассета
-  setCurrentAsset: (asset: Asset) => void;
+  setCurrentAsset: (asset: Asset | null) => void;
   
   // Утилиты
   formatAmount: (amount: number) => string;
@@ -437,99 +445,99 @@ export const useFinancialStore = create<AppState>()(
         }
       },
 
-  resetPassword: async (email: string): Promise<AuthResponse> => {
-  try {
-    // Отправляем код восстановления без redirect_to
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+        resetPassword: async (email: string): Promise<AuthResponse> => {
+        try {
+          // Отправляем код восстановления без redirect_to
+          const { data, error } = await supabase.auth.resetPasswordForEmail(email);
 
-    if (error) {
-      console.error('Ошибка отправки кода:', error);
-      return { 
-        success: false, 
-        error: error.message 
-      };
-    }
+          if (error) {
+            console.error('Ошибка отправки кода:', error);
+            return { 
+              success: false, 
+              error: error.message 
+            };
+          }
 
-    return { 
-      success: true, 
-      data 
-    };
-  } catch (error: any) {
-    console.error('Ошибка resetPassword:', error);
-    return { 
-      success: false, 
-      error: error.message || 'Произошла неизвестная ошибка' 
-    };
-  }
-},
+          return { 
+            success: true, 
+            data 
+          };
+        } catch (error: any) {
+          console.error('Ошибка resetPassword:', error);
+          return { 
+            success: false, 
+            error: error.message || 'Произошла неизвестная ошибка' 
+          };
+        }
+      },
 
-verifyOtp: async ({ email, token, type }: VerifyOtpParams): Promise<AuthResponse> => {
-  try {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type
-    });
+      verifyOtp: async ({ email, token, type }: VerifyOtpParams): Promise<AuthResponse> => {
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type
+          });
 
-    if (error) {
-      console.error('Ошибка проверки OTP:', error);
-      return { 
-        success: false, 
-        error: error.message 
-      };
-    }
+          if (error) {
+            console.error('Ошибка проверки OTP:', error);
+            return { 
+              success: false, 
+              error: error.message 
+            };
+          }
 
-    return { 
-      success: true, 
-      data 
-    };
-  } catch (error: any) {
-    console.error('Ошибка verifyOtp:', error);
-    return { 
-      success: false, 
-      error: error.message || 'Произошла неизвестная ошибка' 
-    };
-  }
-},
+          return { 
+            success: true, 
+            data 
+          };
+        } catch (error: any) {
+          console.error('Ошибка verifyOtp:', error);
+          return { 
+            success: false, 
+            error: error.message || 'Произошла неизвестная ошибка' 
+          };
+        }
+      },
 
-updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResponse> => {
-  try {
+      updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResponse> => {
+        try {
 
 
-    // Если верификация прошла успешно, обновляем пароль
-    const { data, error } = await supabase.auth.updateUser({
-      password: newPassword
-    });
+          // Если верификация прошла успешно, обновляем пароль
+          const { data, error } = await supabase.auth.updateUser({
+            password: newPassword
+          });
 
-    if (error) {
-      console.error('Ошибка обновления пароля:', error);
-      return { 
-        success: false, 
-        error: error.message 
-      };
-    }
+          if (error) {
+            console.error('Ошибка обновления пароля:', error);
+            return { 
+              success: false, 
+              error: error.message 
+            };
+          }
 
-    return { 
-      success: true, 
-      data 
-    };
-  } catch (error: any) {
-    console.error('Ошибка updatePassword:', error);
-    return { 
-      success: false, 
-      error: error.message || 'Произошла неизвестная ошибка' 
-    };
-  }
-},
+          return { 
+            success: true, 
+            data 
+          };
+        } catch (error: any) {
+          console.error('Ошибка updatePassword:', error);
+          return { 
+            success: false, 
+            error: error.message || 'Произошла неизвестная ошибка' 
+          };
+        }
+      },
 
-  verifyResetCode: async (email: string, code: string) => {
-    try {
- 
-      return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  },
+      verifyResetCode: async (email: string, code: string) => {
+        try {
+    
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
 
 
 
@@ -638,7 +646,6 @@ updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResp
         return goals.filter((goal: Goal) => goal.type === type);
       },
 
-      // Новые функции для работы с ЛФП
       initializePersonalFinancialPlan: (userData?: Partial<PersonalFinancialPlan>): string => {
         const state = get();
         const newPFP = createDefaultPFP(state.generateId, {
@@ -769,9 +776,15 @@ updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResp
       }),
 
       setCurrentAsset:(asset)=>set((state) => {
-        const changed: Asset = {
+        let changed:Asset | null
+        if(asset!==null){
+          changed = {
           ...asset
         };
+        }else{
+          changed = null
+        }
+        
 
         return {
           currentAsset: changed
@@ -837,6 +850,87 @@ updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResp
         return {
           incomes: newIncomes,
           categories: updatedCategories
+        };
+      }),
+
+      // Обновление
+      updateExpences: (id, expence) => set((state) => {
+        const updatedExpences = state.expences.map(item =>
+          item.id === id ? { ...item, ...expence } : item
+        );
+        
+        const totalAmount = updatedExpences.reduce((sum, asset) => sum + asset.amount, 0);
+        
+        const updatedCategories = state.categories.map(category =>
+          category.id === 'expense'
+            ? {
+                ...category,
+                title: 'Расходы',
+                balance: `${totalAmount} ₸`,
+                items: updatedExpences.map(x => ({
+                  id: x.id,
+                  icon: x.icon || "bag",
+                  name: x.name,
+                  amount: `${x.amount} ₸`,
+                  color: x?.color || "#F44336"
+                }))
+              }
+            : category
+        );
+        
+        return {
+          expences: updatedExpences,
+          categories: updatedCategories
+        };
+      }),
+
+      updateIncomes: (id, income) => set((state) => {
+        const updatedIncomes = state.incomes.map(item =>
+          item.id === id ? { ...item, ...income } : item
+        );
+        
+        const totalAmount = updatedIncomes.reduce((sum, asset) => sum + asset.amount, 0);
+        
+        const updatedCategories = state.categories.map(category =>
+          category.id === 'income'
+            ? {
+                ...category,
+                title: 'Доходы',
+                balance: `${totalAmount} ₸`,
+                items: updatedIncomes.map(x => ({
+                  id: x.id,
+                  icon: x.icon || "bag",
+                  name: x.name,
+                  amount: `${x.amount} ₸`,
+                  color: x?.color || "#E91E63"
+                }))
+              }
+            : category
+        );
+        
+        return {
+          incomes: updatedIncomes,
+          categories: updatedCategories
+        };
+      }),
+
+      updateActives: (id, active) => set((state) => {
+        const updatedActives = state.actives.map(item =>
+          item.id === id ? { ...item, ...active } : item
+        );
+        
+        return {
+          actives: updatedActives
+        };
+      }),
+
+      updatePassives: (id, passive) => set((state) => {
+        const updatedPassives = state.passives.map(item =>
+          item.id === id ? { ...item, ...passive } : item
+        );
+        
+        return {
+          passives: updatedPassives
         };
       }),
 

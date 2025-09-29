@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,16 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
 
   const router = useRouter();
 
-  const {addPassives} = useFinancialStore();
+  const {addPassives, currentAsset} = useFinancialStore();
+
+  
+    useEffect(()=>{
+      if(currentAsset){
+        setTitle(currentAsset.name);
+        setAmount(currentAsset.amount.toString());
+        setPlanningHorizon(currentAsset.yield?.toString() || "")
+      }
+    }, [currentAsset])
 
 
   const handleBack = () => {

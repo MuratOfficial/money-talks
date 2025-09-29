@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomPieChart from './CustomChart';
 import { Href, useRouter } from 'expo-router';
+import { Asset } from '@/hooks/useStore';
 
 interface ExpenseCategory {
   id: string;
@@ -26,27 +27,49 @@ interface PieSegment {
 }
 
 interface ChartScreenProps {
-    backLink?:Href
+    backLink?:Href;
+    assets: Asset[] | null
 }
 
-const ChartScreen = ({backLink}:ChartScreenProps) => {
+const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
+
+
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
     const router = useRouter();
 
+    const [expenseData, setExpenseData] = useState<ExpenseCategory[]|null>(null)
 
-  // Используем один источник данных для синхронизации
-  const expenseData: ExpenseCategory[] = [
-    { id: '1', name: 'Продукты', amount: 200000, color: '#FF9500', percentage: 20 },
-    { id: '2', name: 'Образование', amount: 100000, color: '#FF6B6B', percentage: 20 },
-    { id: '3', name: 'Транспорт', amount: 100000, color: '#4ECDC4', percentage: 20 },
-    { id: '4', name: 'Отдых и развлечения', amount: 100000, color: '#45B7D1', percentage: 20 },
-    { id: '5', name: 'Кафе и рестораны', amount: 100000, color: '#96CEB4', percentage: 20 },
-  ];
+    const [totalAmount, setTotalAmount] = useState(0)
 
-  const totalAmount = expenseData.reduce((sum, item) => sum + item.amount, 0);
+    function getPercentage(total:number, curr:number){
 
-  // Создаем данные для диаграммы из того же источника
-  const chartData: PieSegment[] = expenseData.map(item => ({
+      if(curr>total){
+        return 0
+      }
+
+      return ( curr / total)*100
+    }
+
+    useEffect(()=>{
+      if(assets){
+
+        setTotalAmount(assets.reduce((sum, item) => sum + item.amount, 0))
+
+        setExpenseData(
+          assets.map(x=>(
+            {
+              id:x.id|| "",
+              name:x.name || "",
+              amount:x.amount || 0,
+              color:x.color || "",
+              percentage:getPercentage(totalAmount, x.amount)|| 0
+            }
+          ))
+        )
+      }
+    }, [assets])
+
+  const chartData: PieSegment[]|undefined = expenseData?.map(item => ({
     value: item.amount,
     color: item.color,
     label: item.name,
@@ -84,7 +107,7 @@ const ChartScreen = ({backLink}:ChartScreenProps) => {
         {/* Pie Chart */}
         <View className="items-center mt-4 mb-6 px-4">
           <CustomPieChart 
-            data={chartData}
+            data={chartData || []}
             totalAmount={totalAmount}
             size={280}
             strokeWidth={30}
@@ -133,7 +156,7 @@ const ChartScreen = ({backLink}:ChartScreenProps) => {
         {/* Expense Categories */}
         <View className="px-4 pb-6">
           <View className="bg-white/10 rounded-xl px-3">
-            {expenseData.map((item, index) => (
+            {expenseData?.map((item, index) => (
               <View key={item.id}>
                 <View className="flex-row items-center justify-between py-3">
                   <View className="flex-row items-center flex-1">
@@ -147,7 +170,7 @@ const ChartScreen = ({backLink}:ChartScreenProps) => {
                       </Text>
                     </View>
                     <Text className="text-gray-400 text-sm mr-3 font-['SFProDisplayRegular']">
-                      {item.percentage}%
+                      {item.percentage.toFixed(1)}%
                     </Text>
                   </View>
                   
