@@ -54,6 +54,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
       if(assets){
 
         setTotalAmount(assets.reduce((sum, item) => sum + item.amount, 0))
+        console.log(totalAmount)
 
         setExpenseData(
           assets.map(x=>(

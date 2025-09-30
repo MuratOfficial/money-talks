@@ -96,6 +96,8 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const currentAnalyzeList = analyzeList || [];
 
+  
+
 
    const handleSortSelectFilter = (value:any) => {
     setSelectedSortFilter(value);
@@ -128,6 +130,17 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
     
   };
+
+
+  const inc = analyzeList?.find(x=>x.id==="income")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const exp = analyzeList?.find(x=>x.id==="expences")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  
+  const delta = new Intl.NumberFormat('ru-RU').format(inc - exp) + ' ₸';
+
+  const act = analyzeList?.find(x=>x.id==="actives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const pass = analyzeList?.find(x=>x.id==="passives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  
+  const defActPass = new Intl.NumberFormat('ru-RU').format(act - pass) + ' ₸';
 
   const handleCategory = (term:string) => {
     setSelectedCategory(term);
@@ -187,7 +200,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         </View>
       </View>
 
-      {/* Tab Switcher */}
       {tab1 && <View className="mx-4 mb-2">
         <View className="bg-[#7676803D] rounded-lg p-0.5 flex-row">
           <TouchableOpacity
@@ -215,7 +227,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
       </View>}
       
 
-      {/* Category and Period Filters */}
       <View className="mx-4 mb-2">
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row space-x-3">
@@ -254,7 +265,6 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         </ScrollView>
       </View>
 
-      {/* Analyze block */}
 
       {isAnalyze && <View className="mx-4 mb-2">
         <ScrollView  className="flex-1 " showsVerticalScrollIndicator={false}>
@@ -344,43 +354,119 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           {currentAnalyzeList.map((asset, index) => ( 
             <View key={index}>
               <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
-            {asset.name}
-          </Text>
-          <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
-            {getTotal(asset.item)}
-          </Text>
-        </View>
-          <View className="bg-white/10 rounded-xl px-3 mb-3">
-            {asset.item.map((el, index) => ( 
-            <View key={el.id} >
-              <View className="flex-row items-center justify-between py-3">
-                <View className="flex-1">
-                  <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
-                    {el.name}
-                  </Text>
-
-                 
-                 
-                </View>
-                
-                <View className="flex-row items-center">
-                  <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
-                    {formatAmount(el.amount)}
-                  </Text>
-                  
-                
-                </View>
+                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                  {asset.name}
+                </Text>
+                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                  {getTotal(asset.item)}
+                </Text>
               </View>
-              
-              
-            </View>
-          ))}
-             </View>
+                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                  {asset.item.map((el, index) => ( 
+                  <View key={el.id} >
+                    <View className="flex-row items-center justify-between py-3">
+                      <View className="flex-1">
+                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                          {el.name}
+                        </Text>
+
+                      
+                      
+                      </View>
+                      
+                      <View className="flex-row items-center">
+                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                          {formatAmount(el.amount)}
+                        </Text>
+                        
+                      
+                      </View>
+                    </View>
+                    
+                    
+                  </View>
+                ))}
+                  </View>
 
             </View>
             
           ))}
+
+           <View >
+              <View className="mb-3 flex-row items-center justify-between">
+                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                  Дельта
+                </Text>
+                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                  {delta}
+                </Text>
+              </View>
+                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                 
+                  <View  >
+                    <View className="flex-row items-center justify-between py-3">
+                      <View className="flex-1">
+                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                          Доход-расходы
+                        </Text>
+
+                      
+                      
+                      </View>
+                      
+                      <View className="flex-row items-center">
+                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                        {delta}
+                        </Text>
+                        
+                      
+                      </View>
+                    </View>
+                    
+                    
+                  </View>
+          
+                  </View>
+
+            </View>
+
+            <View >
+              <View className="mb-3 flex-row items-center justify-between">
+                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                  Расчет чистого капитала
+                </Text>
+                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                  {defActPass}
+                </Text>
+              </View>
+                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                 
+                  <View  >
+                    <View className="flex-row items-center justify-between py-3">
+                      <View className="flex-1">
+                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                          Активы-пассивы
+                        </Text>
+
+                      
+                      
+                      </View>
+                      
+                      <View className="flex-row items-center">
+                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                        {defActPass}
+                        </Text>
+                        
+                      
+                      </View>
+                    </View>
+                    
+                    
+                  </View>
+          
+                  </View>
+
+            </View>
        
         
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">

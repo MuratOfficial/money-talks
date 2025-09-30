@@ -98,6 +98,7 @@ export interface Asset {
   name: string;
   amount: number;
   yield?: number;
+  additional?:number;
   icon?: string;
   color?: string;
 }

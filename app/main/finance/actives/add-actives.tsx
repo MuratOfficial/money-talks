@@ -14,12 +14,13 @@ import useFinancialStore from '@/hooks/useStore';
 
 const AddActivesForm = () => {
 
-
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
+  const [additional, setAdditional] = useState<string>('');
+
   const [inc, setInc] = useState('');
 
-  const {addActives, currentAsset} = useFinancialStore();
+  const {addActives, currentAsset, updateActives} = useFinancialStore();
 
   const router = useRouter();
 
@@ -27,9 +28,18 @@ const AddActivesForm = () => {
     if(currentAsset){
       setTitle(currentAsset.name);
       setAmount(currentAsset.amount.toString());
+      setAdditional(currentAsset.additional?.toString() || "")
       setInc(currentAsset.yield?.toString() || "")
     }
-  }, [currentAsset])
+  }, [currentAsset]);
+
+  useEffect(()=>{
+    if(amount && additional && parseFloat(amount) > 0 && parseFloat(additional) >0){
+      const perc = (parseFloat(additional)/parseFloat(amount)) *100;
+
+      setInc(perc.toFixed(2))
+    }
+  },[amount, additional])
 
 
   const handleBack = () => {
@@ -38,12 +48,22 @@ const AddActivesForm = () => {
 
   const handleAddExpense = () => {
     
-    
-    addActives({
+    if(currentAsset){
+      updateActives(currentAsset.id, {
+        name: title,
+      amount: parseFloat(amount),
+      additional: parseFloat(additional),
+      yield: parseFloat(inc)
+      })
+    }else{
+      addActives({
       name: title,
       amount: parseFloat(amount),
+      additional: parseFloat(additional),
       yield: parseFloat(inc)
     })
+    }
+    
 
     router.replace("/main/finance/actives/main")
 
@@ -106,8 +126,8 @@ const AddActivesForm = () => {
             Доход в год
           </Text>
           <TextInput
-            value={inc}
-            onChangeText={setInc}
+            value={additional}
+            onChangeText={setAdditional}
             className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
             placeholder="Введите доход"
             placeholderTextColor="#666"
@@ -116,6 +136,20 @@ const AddActivesForm = () => {
           />
           
         </View>
+
+        {inc && <View className="mb-4">
+          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+            Расчет доходности
+          </Text>
+
+          
+          <Text className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']">
+            {inc}
+          </Text>
+          
+          
+        </View>}
+        
         
       
         

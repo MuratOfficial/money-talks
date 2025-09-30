@@ -65,13 +65,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         className="flex-1 bg-black/50 justify-end backdrop-blur-md"
         activeOpacity={1}
       >
-        {/* Drawer Content */}
         <TouchableOpacity 
           activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
         >
           <View className="bg-[#1C1C1E] rounded-t-2xl px-4 py-6">
-            {/* Header with Close Button */}
+           
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-white text-lg font-['SFProDisplayRegular'] font-medium flex-1">
                 {currentAsset?.name || ""}
@@ -90,7 +89,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 className="bg-white/10 mb-2 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
                 placeholder="Введите сумму"
                 placeholderTextColor="#666"
-                keyboardType="default"
+                keyboardType="numeric"
                 autoCapitalize="none"
                 />
 

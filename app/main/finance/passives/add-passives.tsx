@@ -26,7 +26,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
 
   const router = useRouter();
 
-  const {addPassives, currentAsset} = useFinancialStore();
+  const {addPassives, currentAsset, updatePassives} = useFinancialStore();
 
   
     useEffect(()=>{
@@ -48,11 +48,21 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       return;
     }
 
-    addPassives({
+    if(currentAsset){
+      updatePassives(currentAsset.id, {
+        name: title,
+        amount: parseFloat(amount),
+        yield: parseFloat(planningHorizon)
+      })
+    }else{
+       addPassives({
       name: title,
       amount: parseFloat(amount),
       yield: parseFloat(planningHorizon)
     })
+    }
+
+   
     
    router.replace("/main/finance/passives/main")
     
