@@ -94,8 +94,7 @@ const generateLFPHtmlContent = (plan: PersonalFinancialPlan, options: PDFGenerat
       user
     } = storeState;
 
-// TypeScript функции для финансовых калькуляторов
-// Добавить в начало функции generateLFPHtmlContent
+
 
 interface CalculatorData {
   requiredReturn: {

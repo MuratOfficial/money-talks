@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -53,45 +53,48 @@ interface AnalyzeList {
 
 const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   
-  const{setCurrentAsset} = useFinancialStore();
+  const{setCurrentAsset, setCategoryOption, currentCategoryOption} = useFinancialStore();
   
   const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
-  const [selectedCategory, setSelectedCategory] = useState<string>('obligatory');
-  const router = useRouter();
+ const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
 
   const [paymentModalShow, setPaymentModalShow] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(()=>{
+    setCategoryOption(categories&& categories[0].id || "")
+  }, [])
   
-    const openModal = () => setModalVisible(true);
-    const closeModal = () => setModalVisible(false);
-  
-    const markdownContent = `
-  ## Доходы 💰
-  
-  ### Активный доход
-  **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
-  
-  ### Пассивный доход  
-  **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
-  
-  ### Источники дохода
-  **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
-  
-  #### 1. Регулярные доходы:
-  - Зарплата, пенсия, аренда или плата
-  - *Стоит стремиться увеличить источники регулярных доходов*
-  
-  #### 2. Нерегулярные доходы:
-  - Подарки, подработка  
-  - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
-  
-  ---
-  
-  > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
-  `;
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
+
+  const markdownContent = `
+    ## Доходы 💰
+    
+    ### Активный доход
+    **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
+    
+    ### Пассивный доход  
+    **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
+    
+    ### Источники дохода
+    **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
+    
+    #### 1. Регулярные доходы:
+    - Зарплата, пенсия, аренда или плата
+    - *Стоит стремиться увеличить источники регулярных доходов*
+    
+    #### 2. Нерегулярные доходы:
+    - Подарки, подработка  
+    - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
+    
+    ---
+    
+    > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
+    `;
   
 
   const currentAnalyzeList = analyzeList || [];
@@ -122,7 +125,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const formatAmount = (amount: number, amount2?:number): string => {
 
-    if(selectedCategory==="effect"){
+    if(currentCategoryOption==="effect"){
       return new Intl.NumberFormat('ru-RU').format(amount2 || 0) + ' %';
     } else{
       return new Intl.NumberFormat('ru-RU').format(amount) + ' ₸';
@@ -143,7 +146,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const defActPass = new Intl.NumberFormat('ru-RU').format(act - pass) + ' ₸';
 
   const handleCategory = (term:string) => {
-    setSelectedCategory(term);
+    setCategoryOption(term);
   }
 
   const handleAssetInfo = (asset:Asset) => {
@@ -234,7 +237,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
               <TouchableOpacity
                 key={category.id}
                 className={`px-2 py-1 rounded-full border ${
-                  selectedCategory === category.id
+                  currentCategoryOption === category.id
                     ? 'bg-[#2AA651] border-[#2AA651]'
                     : 'border-gray-600 bg-transparent'
                 }`}
@@ -302,7 +305,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
             {assetName}
           </Text>
-          {selectedCategory !== "effect" && <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+          {currentCategoryOption !== "effect" && <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
             {formatAmount(totalAmount)}
           </Text>}
           

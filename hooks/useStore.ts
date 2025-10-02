@@ -101,6 +101,9 @@ export interface Asset {
   additional?:number;
   icon?: string;
   color?: string;
+  regularity?:'regular' | 'irregular';
+  categoryTab?:string;
+
 }
 
 // Новый интерфейс для ЛФП данных
@@ -158,6 +161,11 @@ export interface AppState {
   theme: 'light' | 'dark';
   language: 'ru' | 'en' | 'kz';
   currency: '₸' | '$' | '€';
+
+  // Выборы в фильтрах
+  currentCategoryOption: string;
+
+  setCategoryOption: (opt:string)=>void;
   
   // Действия с пользователем
   setUser: (user: User) => void;
@@ -323,6 +331,7 @@ export const useFinancialStore = create<AppState>()(
       user: {name:"Unknown", password:"password", email:"", id:"initial"},
       isAuthenticated: false,
       currentGoalType:"Краткосрочные",
+      currentCategoryOption:"",
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
@@ -346,6 +355,14 @@ export const useFinancialStore = create<AppState>()(
       formatAmount: (amount: number) => {
         const { currency } = get();
         return new Intl.NumberFormat('ru-RU').format(amount) + ' ' + currency;
+      },
+
+      // Фильтры
+      setCategoryOption:(opt)=>{
+        set((prevState) => ({
+          currentCategoryOption: opt,
+        }));
+
       },
 
       // Пользователь
