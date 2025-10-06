@@ -13,7 +13,6 @@ const AddWalletScreen = () => {
   const [selectedCurrency, setSelectedCurrency] = useState('Доллар $');
 
   const { 
-    wallets, 
     addWallet,
     getWalletBalance
   } = useFinancialStore();
@@ -26,7 +25,8 @@ const AddWalletScreen = () => {
     summ: Number(amount),
     currency: selectedCurrency[selectedCurrency.length - 1],
     icon: selectedType.icon,
-    color:selectedType.color
+    color:selectedType.color,
+    
 
     });
     getWalletBalance();

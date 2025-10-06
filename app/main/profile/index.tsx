@@ -114,7 +114,7 @@ const ProfileScreen = () => {
     {
       id: 'currency',
       title: 'Выбор валюты',
-      icon: 'camera-outline',
+      icon: 'cash-outline',
       hasArrow: true,
       onPress: () => setShowDrawerCurrency(true)
     },

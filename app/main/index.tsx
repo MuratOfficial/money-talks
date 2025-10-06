@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -8,90 +8,83 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
+  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD } = useFinancialStore();
+  
 
-  const {setGoalFilter} = useFinancialStore();
+  const [showDrawerFilter, setShowDrawerFilter] = useState(false);
+  const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+  const router = useRouter();
 
-    const handleGoal = (title:string, type?:string) => {
-      if (title === "Цели") {
-        if(type==="Краткосрочные"){
-          setGoalFilter("Краткосрочные")
-        }
-        if(type==="Среднесрочные"){
-          setGoalFilter("Среднесрочные")
-        }
-        if(type==="Долгосрочные"){
-          setGoalFilter("Долгосрочные")
-        }
-        router.replace('/main/goals/main');
+  // Используем useCallback для стабильной ссылки на функцию
+  const handleGoal = useCallback((title: string, type?: string) => {
+    if (title === "Цели") {
+      if (type === "Краткосрочные") {
+        setGoalFilter("Краткосрочные");
       }
-      if(title === "Доходы") {
-        router.replace('/main/finance/incomes/main');
+      if (type === "Среднесрочные") {
+        setGoalFilter("Среднесрочные");
       }
-      if(title === "Расходы") {
-        router.replace('/main/finance/expences/main');
+      if (type === "Долгосрочные") {
+        setGoalFilter("Долгосрочные");
       }
+      router.replace('/main/goals/main');
+    }
+    if (title === "Доходы") {
+      router.replace('/main/finance/incomes/main');
+    }
+    if (title === "Расходы") {
+      router.replace('/main/finance/expences/main');
+    }
+  }, [setGoalFilter, router]);
 
-      
-    };
-
-   
-     const [showDrawerFilter, setShowDrawerFilter] = useState(false);
-     const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
-
-  const handleSortSelectFilter = (value:any) => {
+  const handleSortSelectFilter = useCallback((value: string) => {
     setSelectedSortFilter(value);
     console.log('Selected sort:', value);
-  };
-  
-  
+  }, []);
 
-    const router = useRouter();
-  
-
-    const { 
-      categories, 
-      wallets,
-      walletBalance
-    } = useFinancialStore();
-
-
-  const categoriesWith = [
+  // Используем useMemo для мемоизации categoriesWith
+  const categoriesWith = useMemo(() => [
     {
       id: 'wallet',
       title: 'Кошелек',
       balance: walletBalance,
-      items: wallets.map(x=>(
-        {id:x.id, name: x.name, amount: `${x.summ.toString()} ${x.currency}`, color: x.color, icon: x.icon || 'card'}
-      ))
+      balanceUSD: walletBalanceUSD,
+      balanceEUR: walletBalanceEUR,
+      items: wallets.map(x => ({
+        id: x.id,
+        name: x.name,
+        amount: `${x.summ.toString()} ${x.currency}`,
+        color: x.color,
+        icon: x.icon || 'card',
+        iconType: "ionicons"
+      }))
     },
     ...categories,
     {
       title: 'Цели',
       items: [
-        { name: 'Краткосрочные', color: '#29B6F6', icon: 'nuclear-outline' },
-        { name: 'Среднесрочные', color: '#66BB6A', icon: 'earth-outline' },
-        { name: 'Долгосрочные', color: '#7986CB', icon: 'golf-outline' }
+        { name: 'Краткосрочные', color: '#29B6F6', icon: 'nuclear-outline', iconType: "ionicons" },
+        { name: 'Среднесрочные', color: '#66BB6A', icon: 'earth-outline', iconType: "ionicons" },
+        { name: 'Долгосрочные', color: '#7986CB', icon: 'golf-outline', iconType: "ionicons" }
       ]
     }
-  ];
+  ], [walletBalance, walletBalanceUSD, walletBalanceEUR, wallets, categories]);
 
-  const CategoryCard = ({ item, title }:any) => (
+  // Выносим компоненты за пределы основного компонента или используем useCallback
+  const CategoryCard = useCallback(({ item, title }: any) => (
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
       activeOpacity={0.8}
-      onPress={
-        ()=>{
-          handleGoal(title, item.name)
-        }
-      }
+      onPress={() => handleGoal(title, item.name)}
     >
       <View 
         className="w-14 h-14 rounded-full items-center justify-center mb-2"
         style={{ backgroundColor: item.color }}
       >
-        {item.iconType === "ionicons" ?<Ionicons name={item.icon} size={24} color="white" />:<MaterialIcons name={item.icon} size={24} color="white"/> }
-        
-        
+        {item.iconType === "ionicons" ? 
+          <Ionicons name={item.icon} size={24} color="white" /> : 
+          <MaterialIcons name={item.icon} size={24} color="white" />
+        }
       </View>
       
       <Text className="text-white text-xs font-['SFProDisplayRegular'] text-center mb-1">
@@ -104,9 +97,9 @@ const MainScreen = () => {
         </Text>
       )}
     </TouchableOpacity>
-  );
+  ), [handleGoal]);
 
-  const CategorySection = ({ category }:any) => (
+  const CategorySection = useCallback(({ category }: any) => (
     <View className="mb-6">
       <View className="flex-row items-center justify-between mb-4">
         <View>
@@ -114,21 +107,27 @@ const MainScreen = () => {
             {category.title}
           </Text>
           {category.balance && (
-            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
-              {category.balance}
+            <Text className="text-gray-400 text-sm w-52 font-['SFProDisplayRegular']">
+              {category.balance} {category?.balanceUSD && `- ${category?.balanceUSD}`} {category?.balanceEUR && `- ${category?.balanceEUR}`}
             </Text>
           )}
         </View>
         
         {category.title === 'Кошелек' ? (
-          <TouchableOpacity onPress={()=>router.replace('/main/wallet/add-wallet')} className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
+          <TouchableOpacity 
+            onPress={() => router.replace('/main/wallet/add-wallet')} 
+            className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
+          >
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
               Добавить
             </Text>
             <Ionicons name="add" size={16} color="#FFF" />
           </TouchableOpacity>
         ) : category.title !== 'Цели' ? (
-          <TouchableOpacity onPress={()=>setShowDrawerFilter(true)} className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50">
+          <TouchableOpacity 
+            onPress={() => setShowDrawerFilter(true)} 
+            className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
+          >
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
               {selectedSortFilter}
             </Text>
@@ -138,16 +137,22 @@ const MainScreen = () => {
       </View>
       
       <View className="flex-row flex-wrap justify-between">
-      {category.items.length === 0 ?
-        <Text className='w-full text-center text-white/60 text-sm'>
-          Нету данных в данной категорий
-        </Text> : category.items.map((item:any, index:number) => (
-          <CategoryCard key={index} item={item} title={category.title}/>
-        ))
-      }
+        {category.items.length === 0 ?
+          <Text className='w-full text-center text-white/60 text-sm'>
+            Нету данных в данной категорий
+          </Text> : 
+          category.items.map((item: any, index: number) => (
+            <CategoryCard key={`${category.title}-${index}`} item={item} title={category.title}/>
+          ))
+        }
       </View>
     </View>
-  );
+  ), [router, selectedSortFilter, CategoryCard]);
+
+  // Если нужно загрузить баланс при монтировании, используем useEffect
+  // useEffect(() => {
+  //   getWalletBalance();
+  // }, [getWalletBalance]);
 
   return (
     <LinearGradient
@@ -160,29 +165,25 @@ const MainScreen = () => {
           <Text className="text-white text-xl font-['SFProDisplayBold']">
             Главная
           </Text>
-          
-   
         </View>
 
-                 <Drawer 
-                      title='Период'
-                      visible={showDrawerFilter}
-                      onClose={() => setShowDrawerFilter(false)}
-                      onSelect={handleSortSelectFilter}
-                      selectedValue={selectedSortFilter}
-                      options={ ['Сегодня', 'Неделя', 'Месяц', 'Год', 'Все']}
-                      animationType='fade'
-                      
-                      />
+        <Drawer 
+          title='Период'
+          visible={showDrawerFilter}
+          onClose={() => setShowDrawerFilter(false)}
+          onSelect={handleSortSelectFilter}
+          selectedValue={selectedSortFilter}
+          options={['Сегодня', 'Неделя', 'Месяц', 'Год', 'Все']}
+          animationType='fade'
+        />
 
         <ScrollView 
           className="flex-1 px-4"
           showsVerticalScrollIndicator={false}
         >
           {categoriesWith.map((category, index) => (
-            <CategorySection key={index} category={category} />
+            <CategorySection key={`category-${index}`} category={category} />
           ))}
-
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>

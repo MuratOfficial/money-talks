@@ -71,6 +71,8 @@ export interface FinancialCategory {
   id: string;
   title: string;
   balance: string;
+  balanceUSD?:string;
+  balanceEUR?:string;
   items: FinancialItem[];
 }
 
@@ -88,6 +90,8 @@ export interface Wallet {
   name: string;
   type: string;
   summ: number;
+  summUSD?: number;
+  summEUR?:number;
   currency: string;
   icon?: string;
   color?: string;
@@ -153,6 +157,8 @@ export interface AppState {
  
   totalBalance: string;
   walletBalance: string;
+  walletBalanceUSD: string;
+  walletBalanceEUR: string;
   wallets: Wallet[];
 
   // ЛФП данные
@@ -341,6 +347,8 @@ export const useFinancialStore = create<AppState>()(
       totalBalance: '1 990 000 ₸',
       currentGoalChangeId:"",
       walletBalance: '0 ₸',
+      walletBalanceEUR:'0 $',
+      walletBalanceUSD:'0 €',
       theme: 'dark',
       language: 'ru',
       currency: '₸',
@@ -1051,17 +1059,26 @@ export const useFinancialStore = create<AppState>()(
       getWalletBalance: () => {
         const { wallets } = get();
         const filtered = wallets.filter(x => x.currency.includes('₸'));
+        const filteredUSD = wallets.filter(x => x.currency.includes('$'));
+        const filteredEUR = wallets.filter(x => x.currency.includes('€'));
         
-        if (!filtered || filtered.length === 0) {
+        if (!filtered || filtered.length === 0 ) {
           set({ walletBalance: "0 ₸" });
           return;
         }
         
-        const allSumm = wallets.reduce((sum, item) => {
+        const allSumm = filtered.reduce((sum, item) => {
           return sum + item.summ;
         }, 0);
 
-        set({ walletBalance: `${allSumm} ₸` });
+        const allSummUSD = filteredUSD?.reduce((sum, item) => {
+          return sum + item.summ;
+        }, 0);
+        const allSummEUR = filteredEUR?.reduce((sum, item) => {
+          return sum + item.summ;
+        }, 0);
+
+        set({ walletBalance: `${allSumm} ₸`, walletBalanceUSD: `${allSummUSD} $`, walletBalanceEUR: `${allSummEUR} €` });
       },
 
       // Настройки
