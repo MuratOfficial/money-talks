@@ -34,6 +34,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
+
   useEffect(()=>{
     if(formItem){
       setTitle(formItem.name);
@@ -42,7 +43,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
     }
   }, [formItem])
 
-  const {addIncomes, addExpences, updateIncomes, updateExpences} = useFinancialStore();
+  const {addIncomes, addExpences, updateIncomes, updateExpences, currentCategoryOption, currentRegOption} = useFinancialStore();
 
   const handleCategorySelect = (categoryId: string) => {
     try {
@@ -114,7 +115,10 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           name: title,
           amount: parseFloat(amount),
           icon: selectedCat?.icon,
+          iconType: selectedCat?.iconLibrary,
           color: selectedCat?.color,
+          categoryTab: currentCategoryOption || "",
+          regularity: currentRegOption || "regular"
         });
       }
 
@@ -123,7 +127,10 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           name: title,
           amount: parseFloat(amount),
           icon: selectedCat?.icon,
+          iconType:selectedCat?.iconLibrary,
           color: selectedCat?.color,
+          categoryTab: currentCategoryOption || "",
+          regularity: currentRegOption || "regular"
         });
       }
       }else{
@@ -133,6 +140,8 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           amount: parseFloat(amount),
           icon: selectedCat?.icon,
           color: selectedCat?.color,
+          categoryTab: currentCategoryOption || "",
+          regularity: currentRegOption || "regular"
         });
       }
 
@@ -142,6 +151,8 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           amount: parseFloat(amount),
           icon: selectedCat?.icon,
           color: selectedCat?.color,
+          categoryTab: currentCategoryOption || "",
+          regularity: currentRegOption || "regular"
         });
       }
       }

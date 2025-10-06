@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
 import InfoModal from './Hint';
-import useFinancialStore from '@/hooks/useStore';
+import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
 
 interface PageComponentProps {
@@ -37,13 +37,7 @@ interface PageComponentProps {
   isPassive?:boolean;
 }
 
-interface Asset {
-  id: string;
-  name: string;
-  amount: number;
-  yield?: number;
-  icon?:string
-}
+
 
 interface AnalyzeList {
    name: string;
@@ -53,9 +47,9 @@ interface AnalyzeList {
 
 const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   
-  const{setCurrentAsset, setCategoryOption, currentCategoryOption} = useFinancialStore();
+  const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption} = useFinancialStore();
   
-  const [activeTab, setActiveTab] = useState<'regular' | 'irregular'>('regular');
+
  const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
@@ -72,28 +66,28 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const closeModal = () => setModalVisible(false);
 
   const markdownContent = `
-    ## Доходы 💰
-    
-    ### Активный доход
-    **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
-    
-    ### Пассивный доход  
-    **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
-    
-    ### Источники дохода
-    **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
-    
-    #### 1. Регулярные доходы:
-    - Зарплата, пенсия, аренда или плата
-    - *Стоит стремиться увеличить источники регулярных доходов*
-    
-    #### 2. Нерегулярные доходы:
-    - Подарки, подработка  
-    - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
-    
-    ---
-    
-    > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
+## Доходы 💰
+
+### Активный доход
+**Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
+
+### Пассивный доход  
+**Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
+
+### Источники дохода
+**Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
+
+#### 1. Регулярные доходы:
+- Зарплата, пенсия, аренда или плата
+- *Стоит стремиться увеличить источники регулярных доходов*
+
+#### 2. Нерегулярные доходы:
+- Подарки, подработка  
+- *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
+
+---
+
+> 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
     `;
   
 
@@ -108,14 +102,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   };
   
 
-   const liquidAssets: Asset[] = assets || []
+   const liquidAssets: Asset[] = assets?.filter(x=>x.regularity==="regular") || [];
 
-  const illiquidAssets: Asset[] = [
-    // Можно добавить неликвидные активы
-  ];
+  const illiquidAssets: Asset[] = assets?.filter(x=>x.regularity==="irregular") || [];
 
-  const currentAssets = activeTab === 'regular' ? liquidAssets : illiquidAssets;
-  const totalAmount = currentAssets.reduce((sum, asset) => sum + asset.amount, 0);
+  const filteredAssets = currentRegOption === 'regular' ? liquidAssets : currentRegOption === 'irregular' ? illiquidAssets : (assets || []);
+  const currentAssets = (categories && categories[0].id !== "effect") ? filteredAssets.filter(x=>x.categoryTab===currentCategoryOption) :filteredAssets
+
+  const totalAmount = currentAssets?.reduce((sum, asset) => sum + asset.amount, 0);
 
   const getTotal = (assets:Asset[]): string => {
     const sum = assets.reduce((sum, asset) => sum + asset.amount, 0) || 0;
@@ -207,9 +201,9 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         <View className="bg-[#7676803D] rounded-lg p-0.5 flex-row">
           <TouchableOpacity
             className={`flex-1 py-1 px-4 rounded-lg ${
-              activeTab === 'regular' ? 'bg-[#636366]' : ''
+              currentRegOption === 'regular' ? 'bg-[#636366]' : ''
             }`}
-            onPress={() => setActiveTab('regular')}
+            onPress={() => setRegOption('regular')}
           >
             <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
               {tab1}
@@ -218,9 +212,9 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           
           <TouchableOpacity
             className={`flex-1 py-1 px-4 rounded-lg ${
-              activeTab === 'irregular' ? 'bg-[#636366]' : ''
+              currentRegOption === 'irregular' ? 'bg-[#636366]' : ''
             }`}
-            onPress={() => setActiveTab('irregular')}
+            onPress={() => setRegOption('irregular')}
           >
             <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
               {tab2}

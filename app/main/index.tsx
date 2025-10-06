@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import Drawer from '../components/Drawer';
@@ -89,7 +89,9 @@ const MainScreen = () => {
         className="w-14 h-14 rounded-full items-center justify-center mb-2"
         style={{ backgroundColor: item.color }}
       >
-        <Ionicons name={item.icon} size={24} color="white" />
+        {item.iconType === "ionicons" ?<Ionicons name={item.icon} size={24} color="white" />:<MaterialIcons name={item.icon} size={24} color="white"/> }
+        
+        
       </View>
       
       <Text className="text-white text-xs font-['SFProDisplayRegular'] text-center mb-1">

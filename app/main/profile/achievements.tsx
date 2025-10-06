@@ -70,7 +70,7 @@ const AchievementsScreen = () => {
       <View className="flex aspect-square flex-row justify-center items-center w-full rounded-full">
         <Image 
             source={item.image}
-            className="w-12 h-12"
+            className="w-full h-fit"
             resizeMode="contain"
         />
       </View>

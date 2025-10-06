@@ -20,7 +20,7 @@ const AddActivesForm = () => {
 
   const [inc, setInc] = useState('');
 
-  const {addActives, currentAsset, updateActives} = useFinancialStore();
+  const {addActives, currentAsset, updateActives, currentRegOption} = useFinancialStore();
 
   const router = useRouter();
 
@@ -53,14 +53,16 @@ const AddActivesForm = () => {
         name: title,
       amount: parseFloat(amount),
       additional: parseFloat(additional),
-      yield: parseFloat(inc)
+      yield: parseFloat(inc),
+        regularity: currentRegOption || "regular"
       })
     }else{
       addActives({
       name: title,
       amount: parseFloat(amount),
       additional: parseFloat(additional),
-      yield: parseFloat(inc)
+      yield: parseFloat(inc),
+      regularity: currentRegOption || "regular"
     })
     }
     
@@ -68,9 +70,6 @@ const AddActivesForm = () => {
     router.replace("/main/finance/actives/main")
 
   };
-
-
-
 
   const isFormValid = title.trim() && amount.trim();
 

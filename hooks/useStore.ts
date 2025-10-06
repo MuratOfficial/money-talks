@@ -100,8 +100,9 @@ export interface Asset {
   yield?: number;
   additional?:number;
   icon?: string;
+  iconType?:string;
   color?: string;
-  regularity?:'regular' | 'irregular';
+  regularity?:string;
   categoryTab?:string;
 
 }
@@ -164,6 +165,8 @@ export interface AppState {
 
   // Выборы в фильтрах
   currentCategoryOption: string;
+  currentRegOption: string;
+  setRegOption:(opt:string)=>void;
 
   setCategoryOption: (opt:string)=>void;
   
@@ -332,6 +335,7 @@ export const useFinancialStore = create<AppState>()(
       isAuthenticated: false,
       currentGoalType:"Краткосрочные",
       currentCategoryOption:"",
+      currentRegOption:"regular",
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
@@ -361,6 +365,13 @@ export const useFinancialStore = create<AppState>()(
       setCategoryOption:(opt)=>{
         set((prevState) => ({
           currentCategoryOption: opt,
+        }));
+
+      },
+
+      setRegOption:(opt)=>{
+        set((prevState) => ({
+          currentRegOption: opt,
         }));
 
       },
