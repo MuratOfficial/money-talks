@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useRouter, useSegments, useRootNavigationState, Href } from 'expo-router';
 import { supabase } from '../lib/supabase';
+import useFinancialStore from '@/hooks/useStore';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -11,6 +12,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const navigationState = useRootNavigationState();
+  const {setUser, user} = useFinancialStore();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -22,7 +24,23 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         } else if (!session && segments[0] !== '(auth)') {
           setShouldRedirect({ to: '/(auth)/login', replace: true });
         } else if (session?.user && segments[0] === 'login') {
+          setUser({
+            id: session.user.id,
+              email: session.user.email!,
+              name: session.user.user_metadata?.full_name, 
+              password: '',
+          })
           setShouldRedirect({ to: '/main', replace: true });
+        }
+
+   
+        if(session?.user && !user){
+          setUser({
+            id: session.user.id,
+              email: session.user.email!,
+              name: session.user.user_metadata?.full_name, 
+              password: '',
+          })
         }
       } catch (error) {
         console.error('Auth guard error:', error);

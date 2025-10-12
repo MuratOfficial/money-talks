@@ -65,6 +65,7 @@ export interface FinancialItem {
   amount: string;
   color: string;
   icon: string;
+  iconType?:string;
 }
 
 export interface FinancialCategory {
@@ -337,7 +338,7 @@ export const useFinancialStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Начальное состояние
-      user: {name:"Unknown", password:"password", email:"", id:"initial"},
+      user: null,
       isAuthenticated: false,
       currentGoalType:"Краткосрочные",
       currentCategoryOption:"",
@@ -359,7 +360,7 @@ export const useFinancialStore = create<AppState>()(
       passives:[],
       currentAsset:null,
       goals: [],
-      personalFinancialPlan: null, // Добавлено состояние для ЛФП
+      personalFinancialPlan: null, 
       
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),

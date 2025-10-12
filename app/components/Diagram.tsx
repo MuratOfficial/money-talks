@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomPieChart from './CustomChart';
 import { Href, useRouter } from 'expo-router';
-import { Asset } from '@/hooks/useStore';
+import useFinancialStore, { Asset } from '@/hooks/useStore';
 
 interface ExpenseCategory {
   id: string;
@@ -35,7 +35,8 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
 
 
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
-    const router = useRouter();
+  const {currency} = useFinancialStore();  
+  const router = useRouter();
 
     const [expenseData, setExpenseData] = useState<ExpenseCategory[]|null>(null)
 
@@ -77,7 +78,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
   }));
 
   const formatAmount = (amount: number): string => {
-    return new Intl.NumberFormat('ru-RU').format(amount) + ' ₸';
+    return new Intl.NumberFormat('ru-RU').format(amount) + ` ${currency}`;
   };
 
   const handleBack = () => {

@@ -6,13 +6,11 @@ import { useRouter } from 'expo-router';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
 import InfoModal from '@/app/components/Hint';
 import TopUpModal from '@/app/components/TopUpModal';
-
-import Svg, { Circle } from 'react-native-svg';
 import CircularProgress from '../lfp/components/CircularProgress';
 
 const GoalsScreen = () => {
   const router = useRouter();
-  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId} = useFinancialStore();
+  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId, currency} = useFinancialStore();
 
   const [goalTitle, setTitle] = useState("");
 
@@ -295,7 +293,7 @@ useEffect(() => {
          
           goalId={currentGoalChangeId}
           title={goalTitle}
-          currency="₸"
+          currency={currency}
         />
 
     </View>

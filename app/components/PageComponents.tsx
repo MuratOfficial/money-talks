@@ -47,7 +47,7 @@ interface AnalyzeList {
 
 const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   
-  const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption} = useFinancialStore();
+  const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption, currency} = useFinancialStore();
   
 
  const router = useRouter();
@@ -114,7 +114,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const getTotal = (assets:Asset[]): string => {
     const sum = assets.reduce((sum, asset) => sum + asset.amount, 0) || 0;
 
-    return new Intl.NumberFormat('ru-RU').format(sum) + ' ₸';
+    return new Intl.NumberFormat('ru-RU').format(sum) + ` ${currency}`;
   }
 
   const formatAmount = (amount: number, amount2?:number): string => {
@@ -122,7 +122,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
     if(currentCategoryOption==="effect"){
       return new Intl.NumberFormat('ru-RU').format(amount2 || 0) + ' %';
     } else{
-      return new Intl.NumberFormat('ru-RU').format(amount) + ' ₸';
+      return new Intl.NumberFormat('ru-RU').format(amount) + ` ${currency}`;
     }
 
     
@@ -132,12 +132,12 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const inc = analyzeList?.find(x=>x.id==="income")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   const exp = analyzeList?.find(x=>x.id==="expences")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   
-  const delta = new Intl.NumberFormat('ru-RU').format(inc - exp) + ' ₸';
+  const delta = new Intl.NumberFormat('ru-RU').format(inc - exp) + ` ${currency}`;
 
   const act = analyzeList?.find(x=>x.id==="actives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   const pass = analyzeList?.find(x=>x.id==="passives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   
-  const defActPass = new Intl.NumberFormat('ru-RU').format(act - pass) + ' ₸';
+  const defActPass = new Intl.NumberFormat('ru-RU').format(act - pass) + ` ${currency}`;
 
   const handleCategory = (term:string) => {
     setCategoryOption(term);

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -8,7 +8,7 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
-  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD } = useFinancialStore();
+  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance } = useFinancialStore();
   
 
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
@@ -70,7 +70,6 @@ const MainScreen = () => {
     }
   ], [walletBalance, walletBalanceUSD, walletBalanceEUR, wallets, categories]);
 
-  // Выносим компоненты за пределы основного компонента или используем useCallback
   const CategoryCard = useCallback(({ item, title }: any) => (
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
@@ -149,10 +148,9 @@ const MainScreen = () => {
     </View>
   ), [router, selectedSortFilter, CategoryCard]);
 
-  // Если нужно загрузить баланс при монтировании, используем useEffect
-  // useEffect(() => {
-  //   getWalletBalance();
-  // }, [getWalletBalance]);
+  useEffect(() => {
+    getWalletBalance();
+  }, [getWalletBalance]);
 
   return (
     <LinearGradient
