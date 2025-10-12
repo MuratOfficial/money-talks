@@ -7,6 +7,7 @@ import useFinancialStore, { Goal } from '@/hooks/useStore';
 import InfoModal from '@/app/components/Hint';
 import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
+import { fetchTips, Tip } from '@/services/api';
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -17,30 +18,23 @@ const GoalsScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
 
 
-        const markdownContent = `
-            ## Доходы 💰
-            
-            ### Активный доход
-            **Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
-            
-            ### Пассивный доход  
-            **Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
-            
-            ### Источники дохода
-            **Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
-            
-            #### 1. Регулярные доходы:
-            - Зарплата, пенсия, аренда или плата
-            - *Стоит стремиться увеличить источники регулярных доходов*
-            
-            #### 2. Нерегулярные доходы:
-            - Подарки, подработка  
-            - *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
-            
-            ---
-            
-            > 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
-            `;
+      const [tips, setTips] = useState<Tip[]>([]);
+      const [loading, setLoading] = useState(true);
+    
+      useEffect(() => {
+        loadTips();
+      }, []);
+    
+      const loadTips = async () => {
+        try {
+          const data = await fetchTips('incomes'); 
+          setTips(data);
+        } catch (error) {
+          console.error('Failed to load tips:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
     
       const openModal = () => setModalVisible(true);
       const closeModal = () => setModalVisible(false);
@@ -56,9 +50,7 @@ const GoalsScreen = () => {
         setShowTopUpModal(true);
       }
 
-      // const handleTopUpConfirm = () =>{
-      //   topUpGoal(currentGoalId, )
-      // }
+
 
   const [selectedTerm, setSelectedTerm] = useState(currentGoalType || 'Краткосрочные');
   const [selectedStatus, setSelectedStatus] = useState('Активные');
@@ -387,7 +379,7 @@ return (
         visible={modalVisible} 
         onClose={closeModal}
         title="Подсказки про доходы"
-        content={markdownContent}
+        content={tips[0]?.content}
         linkUrl="https://web.telegram.org/a/#-1002352034763_2"
         linkText="Видеоурок на Telegram"
       />

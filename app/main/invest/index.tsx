@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import InfoModal from '@/app/components/Hint';
 import TestComponent from '@/app/components/TestComponent';
+import { fetchQuestions, fetchTips, Question, Tip } from '@/services/api';
 
 interface AccordionItem {
   id: string;
@@ -14,45 +15,32 @@ interface AccordionItem {
 const InvestmentsPage: React.FC = () => {
 
     const [showTest, setShowTest] = useState(false);
+    useEffect(() => {
+      loadQuestions();
+    }, []);
 
-  const sampleQuestions = [
-    {
-      id: 1,
-      question: "Каков ваш текущий возраст (годы)?",
-      options: ["А: 18-29", "В: 30-39", "С: 40-49", "D: 50-59", "E: 60 и старше"],
-      correctAnswer: 0
-    },
-    {
-      id: 2,
-      question: "Какой у вас опыт инвестирования?",
-      options: ["Новичок", "1-3 года", "3-5 лет", "5-10 лет", "Более 10 лет"],
-      correctAnswer: 2
-    },
-    {
-      id: 3,
-      question: "Какую сумму вы готовы инвестировать?",
-      options: ["До 100 000₽", "100 000 - 500 000₽", "500 000 - 1 000 000₽", "Более 1 000 000₽"],
-      correctAnswer: 1
-    },
-    {
-      id: 4,
-      question: "Как долго вы планируете инвестировать?",
-      options: ["До 1 года", "1-3 года", "3-5 лет", "5-10 лет", "Более 10 лет"],
-      correctAnswer: 3
-    },
-    {
-      id: 5,
-      question: "Как вы отреагируете на падение портфеля на 20%?",
-      options: [
-        "Немедленно продам все активы",
-        "Буду беспокоиться, но не продам",
-        "Подожду восстановления",
-        "Докуплю еще активов",
-        "Это нормальная ситуация"
-      ],
-      correctAnswer: 2
-    }
-  ];
+      const [questions, setQuestions] = useState<Question[]>([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
+
+      const loadQuestions = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const data = await fetchQuestions();
+          
+          if (data.length === 0) {
+            setError('Вопросы не найдены. Добавьте вопросы в админ-панели.');
+          } else {
+            setQuestions(data);
+          }
+        } catch (err) {
+          console.error('Failed to load questions:', err);
+          setError('Не удалось загрузить вопросы. Проверьте соединение.');
+        } finally {
+          setLoading(false);
+        }
+      };
 
   const handleTestComplete = (result: any) => {
     console.log('Test completed:', result);
@@ -69,30 +57,23 @@ const InvestmentsPage: React.FC = () => {
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
-  const markdownContent = `
-## Доходы 💰
+    const [tips, setTips] = useState<Tip[]>([]);
+  
+    useEffect(() => {
+      loadTips();
+    }, []);
+  
+    const loadTips = async () => {
+      try {
+        const data = await fetchTips('incomes'); 
+        setTips(data);
+      } catch (error) {
+        console.error('Failed to load tips:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-### Активный доход
-**Активный доход** - деньги которые ты получаешь за свою работу (зарплата, фриланс, бизнес). Без твоего участия доходов нет.
-
-### Пассивный доход  
-**Пассивный доход** - деньги которые приходят без твоего активного труда (дивиденды, аренда, проценты по вкладам). Чем больше пассивного дохода, тем ближе финансовая свобода.
-
-### Источники дохода
-**Доход** - это не только зарплата. Есть много способов получать деньги: инвестиции в акции, доходы от недвижимости, партнерские программы:
-
-#### 1. Регулярные доходы:
-- Зарплата, пенсия, аренда или плата
-- *Стоит стремиться увеличить источники регулярных доходов*
-
-#### 2. Нерегулярные доходы:
-- Подарки, подработка  
-- *Подсказка: рассматривать возможность сделать нерегулярные доходы в регулярные для увеличения доходности*
-
----
-
-> 💡 **Совет**: Диверсифицируйте источники дохода для финансовой стабильности
-`;
 
   const accordionData: AccordionItem[] = [
     {
@@ -125,7 +106,7 @@ const InvestmentsPage: React.FC = () => {
     if (showTest) {
     return (
       <TestComponent
-        questions={sampleQuestions}
+        questions={questions}
         testTitle="Тест"
         onClose={() => setShowTest(false)}
         onComplete={handleTestComplete}
@@ -195,7 +176,7 @@ const InvestmentsPage: React.FC = () => {
         visible={modalVisible} 
         onClose={closeModal}
         title="Подсказки про доходы"
-        content={markdownContent}
+        content={tips[0]?.content}
         linkUrl="https://web.telegram.org/a/#-1002352034763_2"
         linkText="Видеоурок на Telegram"
       />
