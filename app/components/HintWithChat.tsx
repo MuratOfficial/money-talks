@@ -47,7 +47,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
   };
 
   const handleChatPress = () => {
-    // Add a subtle animation when chat button is pressed
+    // Анимация кнопки
     Animated.sequence([
       Animated.timing(chatButtonAnim, {
         toValue: 0.95,
@@ -64,7 +64,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
     setShowChat(true);
   };
 
-  // ИСПРАВЛЕНИЕ: Проверяем наличие контента
+  // Проверка наличия контента
   const safeContent = content || '';
 
   return (
@@ -120,7 +120,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             contentContainerStyle={{ paddingBottom: 10 }}
           >
             <View className="p-4">
-              {/* ИСПРАВЛЕНИЕ: Показываем Markdown только если есть контент */}
+              {/* Показываем Markdown только если есть контент */}
               {safeContent ? (
                 <Markdown
                   style={{
@@ -227,12 +227,13 @@ const InfoModal: React.FC<InfoModalProps> = ({
         </View>
       </View>
       
-      {/* ChatGPT Feature Modal */}
+      {/* ChatGPT Feature Modal - передаем контент как контекст */}
       {enableChatGPT && (
         <ChatGPTFeature
           visible={showChat}
           onClose={() => setShowChat(false)}
           title={title}
+          context={safeContent}
         />
       )}
     </Modal>

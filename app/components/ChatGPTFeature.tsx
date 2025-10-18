@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -10,8 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ChatGPTMessage, sendChatGPTMessage } from '@/services/api';
 
 interface ChatMessage {
   id: string;
@@ -24,41 +26,35 @@ interface ChatGPTFeatureProps {
   visible: boolean;
   onClose: () => void;
   title: string;
+  context?: string; // Контекст из текущего урока
 }
 
 const { height: screenHeight } = Dimensions.get('window');
 
-// ChatGPT API Integration
-const callChatGPT = async (message: string): Promise<string> => {
-  try {
-    // For client-side implementation, we'll use a mock response
-    // In a real implementation, you would call OpenAI API here
-    // You can replace this with actual OpenAI API call
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock responses based on common financial questions
-    const mockResponses = [
-      "I'd be happy to help you with your financial question! Based on the context, here are some insights...",
-      "That's a great question about personal finance. Let me provide you with some guidance...",
-      "I understand you're looking for financial advice. Here's what I recommend...",
-      "Based on your question, here are some strategies that might help improve your financial situation..."
-    ];
-    
-    return mockResponses[Math.floor(Math.random() * mockResponses.length)];
-  } catch (error) {
-    console.error('ChatGPT API Error:', error);
-    return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
-  }
-};
-
-const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title }) => {
+const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ 
+  visible, 
+  onClose, 
+  title, 
+  context 
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<ChatGPTMessage[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  // Инициализация контекста при открытии
+  useEffect(() => {
+    if (visible && context) {
+      setConversationHistory([
+        {
+          role: 'system',
+          content: `Ты полезный помощник по финансовой грамотности. Контекст текущего урока: ${title}. ${context}. Отвечай кратко, понятно и по-дружески на русском языке.`
+        }
+      ]);
+    }
+  }, [visible, context, title]);
 
   const startPulseAnimation = () => {
     Animated.loop(
@@ -101,25 +97,50 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
     setIsLoading(true);
     startPulseAnimation();
 
+    // Обновляем историю разговора
+    const newHistory: ChatGPTMessage[] = [
+      ...conversationHistory,
+      { role: 'user', content: userMessage.text }
+    ];
+
     try {
-      const response = await callChatGPT(userMessage.text);
+      const response = await sendChatGPTMessage({
+        message: userMessage.text,
+        context: context,
+        conversationHistory: newHistory
+      });
       
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: response,
+        text: response.response,
         isUser: false,
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, botMessage]);
+      
+      // Обновляем историю с ответом ассистента
+      setConversationHistory([
+        ...newHistory,
+        { role: 'assistant', content: response.response }
+      ]);
+
     } catch (error) {
+      console.error('ChatGPT Error:', error);
+      
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, something went wrong. Please try again.",
+        text: "Извини, не могу подключиться к серверу. Проверь интернет и попробуй еще раз.",
         isUser: false,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
+      
+      Alert.alert(
+        'Ошибка подключения',
+        'Не удалось связаться с AI ассистентом. Попробуй позже.',
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsLoading(false);
       stopPulseAnimation();
@@ -127,7 +148,15 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleClose = () => {
+    // Очищаем состояние при закрытии
+    setMessages([]);
+    setConversationHistory([]);
+    setInputText('');
+    onClose();
   };
 
   return (
@@ -135,7 +164,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -144,22 +173,45 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
         <TouchableOpacity 
           className="flex-1" 
           activeOpacity={1} 
-          onPress={onClose}
+          onPress={handleClose}
         />
         
         <View className="bg-[#1C1C1E] rounded-t-3xl h-[85%]">
           {/* Header */}
           <View className="flex-row items-center justify-between p-4 border-b border-gray-700">
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={handleClose}>
               <Ionicons name="close" size={24} color="white" />
             </TouchableOpacity>
-            <View className="flex-row items-center">
+            <View className="flex-row items-center flex-1 justify-center">
               <Ionicons name="chatbubble" size={20} color="#F97316" />
-              <Text className="text-white text-lg font-semibold font-['SFProDisplaySemiBold'] ml-2">
-                {title} - AI Assistant
+              <Text 
+                className="text-white text-base font-semibold font-['SFProDisplaySemiBold'] ml-2"
+                numberOfLines={1}
+              >
+                AI Помощник
               </Text>
             </View>
-            <View className="w-6" />
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  'Очистить чат?',
+                  'Вся история разговора будет удалена.',
+                  [
+                    { text: 'Отмена', style: 'cancel' },
+                    {
+                      text: 'Очистить',
+                      style: 'destructive',
+                      onPress: () => {
+                        setMessages([]);
+                        setConversationHistory(conversationHistory.filter(m => m.role === 'system'));
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <Ionicons name="trash-outline" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
           </View>
 
           {/* Messages */}
@@ -167,15 +219,21 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             ref={scrollViewRef}
             className="flex-1 p-4"
             onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+            showsVerticalScrollIndicator={false}
           >
             {messages.length === 0 && (
               <View className="items-center justify-center py-8">
-                <Ionicons name="chatbubbles-outline" size={48} color="#6B7280" />
-                <Text className="text-gray-400 text-center mt-4 text-base font-['SFProDisplayRegular']">
-                  Спрашивай все об {title.toLowerCase()}!
+                <View className="bg-[#F97316]/10 p-6 rounded-full mb-4">
+                  <Ionicons name="chatbubbles" size={48} color="#F97316" />
+                </View>
+                <Text className="text-white text-center text-xl font-semibold font-['SFProDisplaySemiBold'] mb-2">
+                  Привет! 👋
                 </Text>
-                <Text className="text-gray-500 text-center mt-2 text-sm font-['SFProDisplayRegular']">
-                  Я тут чтобы тебе помочь
+                <Text className="text-gray-400 text-center mt-2 text-base font-['SFProDisplayRegular'] px-8">
+                  Спрашивай все о теме "{title}"
+                </Text>
+                <Text className="text-gray-500 text-center mt-2 text-sm font-['SFProDisplayRegular'] px-8">
+                  Я помогу разобраться в любых вопросах
                 </Text>
               </View>
             )}
@@ -215,10 +273,10 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                         transform: [{ scale: pulseAnim }],
                       }}
                     >
-                      <Ionicons name="ellipsis-horizontal" size={16} color="#9CA3AF" />
+                      <Ionicons name="ellipsis-horizontal" size={16} color="#F97316" />
                     </Animated.View>
-                    <Text className="text-gray-400 text-sm ml-2 font-['SFProDisplayRegular']">
-                      ИИ думает...
+                    <Text className="text-gray-300 text-sm ml-2 font-['SFProDisplayRegular']">
+                      AI думает...
                     </Text>
                   </View>
                 </View>
@@ -227,8 +285,8 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           </ScrollView>
 
           {/* Input */}
-          <View className="p-4 border-t border-gray-700">
-            <View className="flex-row items-center bg-gray-800 rounded-2xl px-4 py-2">
+          <View className="p-4 border-t border-gray-700 bg-[#1C1C1E]">
+            <View className="flex-row items-center bg-gray-800 rounded-2xl px-4 py-3">
               <TextInput
                 value={inputText}
                 onChangeText={setInputText}
@@ -239,6 +297,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                 maxLength={500}
                 onSubmitEditing={sendMessage}
                 returnKeyType="send"
+                editable={!isLoading}
               />
               <TouchableOpacity
                 onPress={sendMessage}
@@ -253,10 +312,13 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                 <Ionicons 
                   name="send" 
                   size={20} 
-                  color={inputText.trim() && !isLoading ? "white" : "#6B7280"} 
+                  color={inputText.trim() && !isLoading ? "white" : "#4B5563"} 
                 />
               </TouchableOpacity>
             </View>
+            <Text className="text-gray-500 text-xs text-center mt-2 font-['SFProDisplayRegular']">
+              AI может ошибаться. Проверяй важную информацию.
+            </Text>
           </View>
         </View>
       </KeyboardAvoidingView>

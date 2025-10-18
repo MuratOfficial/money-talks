@@ -6,7 +6,7 @@ const API_BASE_URL = __DEV__
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, 
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,7 +32,31 @@ export interface TestResult {
   }>;
 }
 
-// Получить все вопросы
+export interface Tip {
+  id: string;
+  title: string;
+  content: string; 
+  page: string;
+  order: number;
+  isActive: boolean;
+}
+
+export interface ChatGPTMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+export interface ChatGPTRequest {
+  message: string;
+  context?: string; // Контекст из текущего урока
+  conversationHistory?: ChatGPTMessage[];
+}
+
+export interface ChatGPTResponse {
+  response: string;
+  conversationId?: string;
+}
+
 export const fetchQuestions = async (): Promise<Question[]> => {
   try {
     const response = await api.get('/questions');
@@ -53,15 +77,7 @@ export const saveTestResult = async (result: TestResult): Promise<void> => {
   }
 };
 
-export interface Tip {
-  id: string;
-  title: string;
-  content: string; 
-  page: string;
-  order: number;
-  isActive: boolean;
-}
-
+// Получить советы
 export const fetchTips = async (page?: string): Promise<Tip[]> => {
   try {
     const url = page ? `/tips?page=${encodeURIComponent(page)}` : '/tips';
@@ -73,5 +89,17 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
   }
 };
 
+// ChatGPT интеграция
+export const sendChatGPTMessage = async (
+  request: ChatGPTRequest
+): Promise<ChatGPTResponse> => {
+  try {
+    const response = await api.post('/chatgpt', request);
+    return response.data;
+  } catch (error) {
+    console.error('Error calling ChatGPT:', error);
+    throw error;
+  }
+};
 
 export default api;
