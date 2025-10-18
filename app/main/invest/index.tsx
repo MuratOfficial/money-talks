@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import InfoModal from '@/app/components/Hint';
 import TestComponent from '@/app/components/TestComponent';
 import { fetchQuestions, fetchTips, Question, Tip } from '@/services/api';
+import InfoModal from '@/app/components/HintWithChat';
 
 interface AccordionItem {
   id: string;
@@ -172,13 +172,14 @@ const InvestmentsPage: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <InfoModal 
+      <InfoModal
         visible={modalVisible} 
         onClose={closeModal}
         title="Подсказки про доходы"
         content={tips[0]?.content}
         linkUrl="https://web.telegram.org/a/#-1002352034763_2"
         linkText="Видеоурок на Telegram"
+        enableChatGPT={true}
       />
     </View>
   );

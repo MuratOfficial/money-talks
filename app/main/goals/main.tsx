@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
-import InfoModal from '@/app/components/Hint';
 import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
 import { fetchTips, Tip } from '@/services/api';
+import InfoModal from '@/app/components/HintWithChat';
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -375,13 +375,14 @@ return (
       {/* Sort Modal */}
       <SortModal />
 
-      <InfoModal 
+      <InfoModal
         visible={modalVisible} 
         onClose={closeModal}
         title="Подсказки про доходы"
         content={tips[0]?.content}
         linkUrl="https://web.telegram.org/a/#-1002352034763_2"
         linkText="Видеоурок на Telegram"
+        enableChatGPT={true}
       />
 
       

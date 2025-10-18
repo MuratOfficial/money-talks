@@ -11,10 +11,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
-import InfoModal from './Hint';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
 import { fetchTips, Tip } from '@/services/api';
+import InfoModal from './HintWithChat';
 
 interface PageComponentProps {
   title: string;
@@ -513,6 +513,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
             content={tips[0]?.content}
             linkUrl="https://web.telegram.org/a/#-1002352034763_2"
             linkText="Видеоурок на Telegram"
+            enableChatGPT={true}
           />
 
           <PaymentModal
