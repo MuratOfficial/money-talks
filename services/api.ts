@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api/public' 
-  : 'https://your-domain.com/api/public'; 
+const API_BASE_URL = 'https://moneytalks-admin.netlify.app/api/public'; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
