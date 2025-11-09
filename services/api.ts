@@ -1,3 +1,4 @@
+import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 
 const API_BASE_URL = 'https://moneytalks-admin.netlify.app/api/public'; 
@@ -46,7 +47,7 @@ export interface ChatGPTMessage {
 
 export interface ChatGPTRequest {
   message: string;
-  context?: string; // Контекст из текущего урока
+  context?: string;
   conversationHistory?: ChatGPTMessage[];
 }
 
@@ -54,6 +55,31 @@ export interface ChatGPTResponse {
   response: string;
   conversationId?: string;
 }
+
+// Типы для синхронизации данных пользователя
+export interface UserData {
+  userId: string;
+  categories?: any[];
+  wallets?: any[];
+  expences?: any[];
+  incomes?: any[];
+  actives?: any[];
+  passives?: any[];
+  goals?: any[];
+  personalFinancialPlan?: any;
+  theme?: string;
+  language?: string;
+  currency?: string;
+  lastSyncedAt?: string;
+}
+
+export interface SyncResponse {
+  success: boolean;
+  data?: UserData;
+  message?: string;
+}
+
+// ========== Существующие функции ==========
 
 export const fetchQuestions = async (): Promise<Question[]> => {
   try {
@@ -65,7 +91,6 @@ export const fetchQuestions = async (): Promise<Question[]> => {
   }
 };
 
-// Сохранить результат теста
 export const saveTestResult = async (result: TestResult): Promise<void> => {
   try {
     await api.post('/results', result);
@@ -75,7 +100,6 @@ export const saveTestResult = async (result: TestResult): Promise<void> => {
   }
 };
 
-// Получить советы
 export const fetchTips = async (page?: string): Promise<Tip[]> => {
   try {
     const url = page ? `/tips?page=${encodeURIComponent(page)}` : '/tips';
@@ -87,7 +111,6 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
   }
 };
 
-// ChatGPT интеграция
 export const sendChatGPTMessage = async (
   request: ChatGPTRequest
 ): Promise<ChatGPTResponse> => {
@@ -96,6 +119,107 @@ export const sendChatGPTMessage = async (
     return response.data;
   } catch (error) {
     console.error('Error calling ChatGPT:', error);
+    throw error;
+  }
+};
+
+/**
+ * Отправка все данные пользователя на сервер
+ */
+export const syncUserDataToServer = async (
+  userId: string,
+  storeData: Partial<AppState>
+): Promise<SyncResponse> => {
+  try {
+    const userData: UserData = {
+      userId,
+      categories: storeData.categories,
+      wallets: storeData.wallets,
+      expences: storeData.expences,
+      incomes: storeData.incomes,
+      actives: storeData.actives,
+      passives: storeData.passives,
+      goals: storeData.goals,
+      personalFinancialPlan: storeData.personalFinancialPlan,
+      theme: storeData.theme,
+      language: storeData.language,
+      currency: storeData.currency,
+      lastSyncedAt: new Date().toISOString(),
+    };
+
+    const response = await api.post('/user-data/sync', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error syncing user data to server:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получить данные пользователя с сервера
+ */
+export const fetchUserDataFromServer = async (
+  userId: string
+): Promise<UserData | null> => {
+  try {
+    const response = await api.get(`/user-data/${userId}`);
+    return response.data;
+  } catch (error: any) {
+    // Если пользователь не найден (404), возвращаем null
+    if (error.response?.status === 404) {
+      return null;
+    }
+    console.error('Error fetching user data from server:', error);
+    throw error;
+  }
+};
+
+/**
+ * Обновление конкретной части данных пользователя
+ */
+export const updateUserDataPartial = async (
+  userId: string,
+  dataType: 'categories' | 'wallets' | 'expences' | 'incomes' | 'actives' | 'passives' | 'goals' | 'personalFinancialPlan',
+  data: any
+): Promise<SyncResponse> => {
+  try {
+    const response = await api.patch(`/user-data/${userId}/${dataType}`, { data });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating ${dataType}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Удалить все данные пользователя с сервера
+ */
+export const deleteUserDataFromServer = async (
+  userId: string
+): Promise<SyncResponse> => {
+  try {
+    const response = await api.delete(`/user-data/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user data from server:', error);
+    throw error;
+  }
+};
+
+/**
+ * Проверить, нужна ли синхронизация (сравнение timestamp)
+ */
+export const checkSyncStatus = async (
+  userId: string,
+  localLastSyncedAt?: string
+): Promise<{ needsSync: boolean; serverTimestamp?: string }> => {
+  try {
+    const response = await api.get(`/user-data/${userId}/sync-status`, {
+      params: { localTimestamp: localLastSyncedAt }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error checking sync status:', error);
     throw error;
   }
 };

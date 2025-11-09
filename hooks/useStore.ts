@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
-import { Platform } from 'react-native';
 
 // Типы данных
 export interface Goal {
@@ -112,7 +111,6 @@ export interface Asset {
 
 }
 
-// Новый интерфейс для ЛФП данных
 export interface PersonalFinancialPlan {
   id: string;
   fio: string;
@@ -260,7 +258,6 @@ export interface AppState {
   getPersonalFinancialPlan: () => PersonalFinancialPlan | null;
 }
 
-// Начальные данные
 const initialCategories: FinancialCategory[] = [
   {
     id: 'income',

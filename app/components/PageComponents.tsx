@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
@@ -15,6 +14,7 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
 import { fetchTips, Tip } from '@/services/api';
 import InfoModal from './HintWithChat';
+import TutorialTooltip from './TutorialTooltip';
 
 interface PageComponentProps {
   title: string;
@@ -53,6 +53,33 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [showTooltip, setShowTooltip] = useState(false);
+
+   useEffect(() => {
+
+    const timer = setTimeout(() => {
+      setShowTooltip(true);
+    }, 500); // небольшая задержка после загрузки экрана
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const tutorialSteps = [
+    {
+      text: 'Нажмите здесь, чтобы добавить новую запись',
+      position: { x: 20, y: 10, width: 150, height: 50 },
+      arrowDirection: 'top' as const,
+      duration: 4000,
+    }
+  ];
+
+  const handleTooltipClose = () => {
+  
+      setShowTooltip(false);
+    
+  };
+
 
   useEffect(() => {
     loadTips();
@@ -523,6 +550,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           
           
           />
+
+           <TutorialTooltip
+        visible={showTooltip}
+        text={tutorialSteps[0].text}
+        position={tutorialSteps[0].position}
+        autoCloseDuration={tutorialSteps[0].duration}
+        onClose={handleTooltipClose}
+      />
       
     </SafeAreaView>
   );
