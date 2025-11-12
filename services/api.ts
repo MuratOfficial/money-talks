@@ -1,7 +1,7 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://moneytalks-admin.netlify.app/api/public'; 
+const API_BASE_URL = 'http://localhost:3000'; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -41,7 +41,7 @@ export interface Tip {
 }
 
 export interface ChatGPTMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
@@ -54,7 +54,11 @@ export interface ChatGPTRequest {
 export interface ChatGPTResponse {
   response: string;
   conversationId?: string;
+  messageId?: string;
+  tokenUsage?: number;
 }
+
+
 
 // Типы для синхронизации данных пользователя
 export interface UserData {
@@ -111,16 +115,93 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
   }
 };
 
-export const sendChatGPTMessage = async (
-  request: ChatGPTRequest
-): Promise<ChatGPTResponse> => {
+export const sendChatGPTMessage = async (request: ChatGPTRequest): Promise<ChatGPTResponse> => {
   try {
-    const response = await api.post('/chatgpt', request);
-    return response.data;
+    const response = await fetch(`${API_BASE_URL}/api/public/chat/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Добавьте авторизацию, если используется
+        // 'Authorization': `Bearer ${userToken}`
+      },
+      body: JSON.stringify({
+        message: request.message,
+        context: request.context,
+        // Отправляем всю историю для поддержания контекста
+        history: request.conversationHistory
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      response: data.message,
+      conversationId: data.conversationId,
+      messageId: data.messageId,
+      tokenUsage: data.tokenUsage,
+    };
   } catch (error) {
-    console.error('Error calling ChatGPT:', error);
+    console.error('API Error:', error);
     throw error;
   }
+};
+
+// Функция для создания новой беседы
+export const createConversation = async (title?: string, context?: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title: title || 'Новая беседа',
+      context,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create conversation');
+  }
+
+  return response.json();
+};
+
+// Функция для получения истории бесед
+export const getConversations = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch conversations');
+  }
+
+  return response.json();
+};
+
+// Функция для получения конкретной беседы
+export const getConversation = async (conversationId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations/${conversationId}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch conversation');
+  }
+
+  return response.json();
+};
+
+// Функция для проверки лимитов использования
+export const getUsageStats = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/public/chat/usage`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch usage stats');
+  }
+
+  return response.json();
 };
 
 /**

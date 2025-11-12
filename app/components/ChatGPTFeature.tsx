@@ -82,70 +82,64 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({
     }).start();
   };
 
-  const sendMessage = async () => {
-    if (!inputText.trim() || isLoading) return;
+const sendMessage = async () => {
+  if (!inputText.trim() || isLoading) return;
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      text: inputText.trim(),
-      isUser: true,
+  const userMessage: ChatMessage = {
+    id: Date.now().toString(),
+    text: inputText.trim(),
+    isUser: true,
+    timestamp: new Date(),
+  };
+
+  setMessages(prev => [...prev, userMessage]);
+  setInputText('');
+  setIsLoading(true);
+  startPulseAnimation();
+
+  try {
+    const response = await sendChatGPTMessage({
+      message: userMessage.text,
+      context: context,
+      conversationHistory: conversationHistory
+    });
+    
+    const botMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      text: response.response,
+      isUser: false,
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setIsLoading(true);
-    startPulseAnimation();
+    setMessages(prev => [...prev, botMessage]);
+    
+    // Обновляем историю с ответом ассистента
+    setConversationHistory(prev => [
+      ...prev,
+      { role: 'assistant', content: response.response }
+    ]);
 
-    // Обновляем историю разговора
-    const newHistory: ChatGPTMessage[] = [
-      ...conversationHistory,
-      { role: 'user', content: userMessage.text }
-    ];
-
-    try {
-      const response = await sendChatGPTMessage({
-        message: userMessage.text,
-        context: context,
-        conversationHistory: newHistory
-      });
-      
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: response.response,
-        isUser: false,
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-      
-      // Обновляем историю с ответом ассистента
-      setConversationHistory([
-        ...newHistory,
-        { role: 'assistant', content: response.response }
-      ]);
-
-    } catch (error) {
-      console.error('ChatGPT Error:', error);
-      
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: "Извини, не могу подключиться к серверу. Проверь интернет и попробуй еще раз.",
-        isUser: false,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      
-      Alert.alert(
-        'Ошибка подключения',
-        'Не удалось связаться с AI ассистентом. Попробуй позже.',
-        [{ text: 'OK' }]
-      );
-    } finally {
-      setIsLoading(false);
-      stopPulseAnimation();
-    }
-  };
+  } catch (error) {
+    console.error('ChatGPT Error:', error);
+    
+    const errorMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      text: "Извини, не могу подключиться к серверу. Проверь интернет и попробуй еще раз.",
+      isUser: false,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, errorMessage]);
+    
+    Alert.alert(
+      'Ошибка подключения',
+      'Не удалось связаться с AI ассистентом. Попробуй позже.',
+      [{ text: 'OK' }]
+    );
+  } finally {
+    setIsLoading(false);
+    stopPulseAnimation();
+  }
+};
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
