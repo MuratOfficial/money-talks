@@ -1,7 +1,9 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000'; 
+const API_BASE_URL = __DEV__ 
+  ? process.env.EXPO_PUBLIC_API_BASE_LOCAL 
+  : process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -58,8 +60,6 @@ export interface ChatGPTResponse {
   tokenUsage?: number;
 }
 
-
-
 // Типы для синхронизации данных пользователя
 export interface UserData {
   userId: string;
@@ -83,12 +83,23 @@ export interface SyncResponse {
   message?: string;
 }
 
-// ========== Существующие функции ==========
+// ========== Функции с единым стилем fetch ==========
 
 export const fetchQuestions = async (): Promise<Question[]> => {
   try {
-    const response = await api.get('/questions');
-    return response.data;
+    const response = await fetch(`${API_BASE_URL}/api/public/questions`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching questions:', error);
     throw error;
@@ -97,7 +108,20 @@ export const fetchQuestions = async (): Promise<Question[]> => {
 
 export const saveTestResult = async (result: TestResult): Promise<void> => {
   try {
-    await api.post('/results', result);
+    const response = await fetch(`${API_BASE_URL}/api/public/results`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(result),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    await response.json();
   } catch (error) {
     console.error('Error saving test result:', error);
     throw error;
@@ -106,9 +130,23 @@ export const saveTestResult = async (result: TestResult): Promise<void> => {
 
 export const fetchTips = async (page?: string): Promise<Tip[]> => {
   try {
-    const url = page ? `/tips?page=${encodeURIComponent(page)}` : '/tips';
-    const response = await api.get(url);
-    return response.data;
+    const url = page 
+      ? `${API_BASE_URL}/api/public/tips?page=${encodeURIComponent(page)}` 
+      : `${API_BASE_URL}/api/public/tips`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching tips:', error);
     throw error;
