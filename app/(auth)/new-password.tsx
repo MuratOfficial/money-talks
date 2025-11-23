@@ -1,4 +1,4 @@
-// app/(auth)/new-password.tsx
+
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -28,7 +28,17 @@ export default function NewPasswordScreen() {
   const [fetchErr, setFetchErr] = useState("")
 
   const router = useRouter();
-  const { updatePassword } = useFinancialStore();
+  const { updatePassword, theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const labelColor = isDark ? 'text-[#BDBDBD]' : 'text-gray-700';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const requirementsBg = isDark ? 'bg-[#1A1A1A]' : 'bg-gray-50';
 
 
   const validatePassword = (password: string) => {
@@ -123,7 +133,7 @@ export default function NewPasswordScreen() {
   };
 
   return (
-    <View className="flex-1 bg-black px-6">
+    <View className={`flex-1 ${bgColor} px-6`}>
       {/* Header */}
       <View className="flex-row items-center pt-12 pb-8">
         <TouchableOpacity 
@@ -131,30 +141,30 @@ export default function NewPasswordScreen() {
           onPress={() => router.back()}
           disabled={loading}
         >
-          <MaterialIcons name="arrow-back" size={24} color="white" />
+          <MaterialIcons name="arrow-back" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
 
             {/* Title */}
-      <Text className="font-['SFProDisplaySemiBold'] text-white text-2xl font-bold mb-4 text-left">
+      <Text className={`font-['SFProDisplaySemiBold'] ${textColor} text-2xl font-bold mb-4 text-left`}>
         Новый пароль
       </Text>
       
       {/* Description */}
-      <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-8">
+      <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} text-base mb-8`}>
         Создайте новый надежный пароль для вашего аккаунта
       </Text>
       
       {/* New Password Input */}
       <View className="mb-4">
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
+        <Text className={`font-['SFProDisplayRegular'] ${labelColor} text-sm mb-2`}>
           Новый пароль
         </Text>
         <View className="relative">
           <TextInput
-            className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 pr-12 text-base bg-[#333333] text-white"
+            className={`font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 pr-12 text-base ${inputBgColor} ${inputTextColor}`}
             value={password}
             onChangeText={(text) => {
               setPassword(text);
@@ -165,7 +175,7 @@ export default function NewPasswordScreen() {
               }
             }}
             placeholder="Введите новый пароль"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
             secureTextEntry={!showPassword}
             autoCapitalize="none"
             editable={!loading}
@@ -177,7 +187,7 @@ export default function NewPasswordScreen() {
             <MaterialIcons 
               name={showPassword ? "visibility" : "visibility-off"} 
               size={24} 
-              color="#666" 
+              color={isDark ? "#666" : "#999"} 
             />
           </TouchableOpacity>
         </View>
@@ -190,12 +200,12 @@ export default function NewPasswordScreen() {
 
       {/* Confirm Password Input */}
       <View className="mb-6">
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
+        <Text className={`font-['SFProDisplayRegular'] ${labelColor} text-sm mb-2`}>
           Подтвердите пароль
         </Text>
         <View className="relative">
           <TextInput
-            className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 pr-12 text-base bg-[#333333] text-white"
+            className={`font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 pr-12 text-base ${inputBgColor} ${inputTextColor}`}
             value={confirmPassword}
             onChangeText={(text) => {
               setConfirmPassword(text);
@@ -206,7 +216,7 @@ export default function NewPasswordScreen() {
               }
             }}
             placeholder="Подтвердите новый пароль"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
             secureTextEntry={!showConfirmPassword}
             autoCapitalize="none"
             editable={!loading}
@@ -218,7 +228,7 @@ export default function NewPasswordScreen() {
             <MaterialIcons 
               name={showConfirmPassword ? "visibility" : "visibility-off"} 
               size={24} 
-              color="#666" 
+              color={isDark ? "#666" : "#999"} 
             />
           </TouchableOpacity>
         </View>
@@ -230,8 +240,8 @@ export default function NewPasswordScreen() {
       </View>
 
       {/* Password Requirements */}
-      <View className="mb-6 p-4 bg-[#1A1A1A] rounded-2xl">
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-3">
+      <View className={`mb-6 p-4 ${requirementsBg} rounded-2xl`}>
+        <Text className={`font-['SFProDisplayRegular'] ${labelColor} text-sm mb-3`}>
           Требования к паролю:
         </Text>
         
@@ -248,7 +258,7 @@ export default function NewPasswordScreen() {
               color={requirement.check ? "#4CAF50" : "#666"}
             />
             <Text className={`font-['SFProDisplayRegular'] text-sm ml-2 ${
-              requirement.check ? 'text-[#4CAF50]' : 'text-gray-400'
+              requirement.check ? 'text-[#4CAF50]' : (isDark ? 'text-gray-400' : 'text-gray-600')
             }`}>
               {requirement.text}
             </Text>
@@ -264,7 +274,7 @@ export default function NewPasswordScreen() {
       {/* Submit Button */}
       <TouchableOpacity 
         className={`h-[50px] rounded-[16px] justify-center items-center my-4 ${
-          loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
+          loading ? (isDark ? 'bg-gray-600' : 'bg-gray-400') : 'bg-[#4CAF50]'
         }`}
         onPress={handleUpdatePassword}
         disabled={loading || !password || !confirmPassword}

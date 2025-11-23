@@ -26,7 +26,15 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
 
   const router = useRouter();
 
-  const {addPassives, currentAsset, updatePassives, currentRegOption} = useFinancialStore();
+  const {addPassives, currentAsset, updatePassives, currentRegOption, theme} = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const iconColor = isDark ? '#FFFFFF' : '#11181C';
 
   
     useEffect(()=>{
@@ -73,16 +81,16 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
   const isFormValid = title.trim() && amount.trim() && planningHorizon;
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
-        <Text className="text-white text-base font-['SFProDisplaySemiBold'] mx-auto">
+        <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mx-auto`}>
          Добавить пассивы
         </Text>
       </View>
@@ -90,45 +98,45 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
 
                 <View className="mb-4">
-                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                  <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
                     Название
                   </Text>
                   <TextInput
                     value={title}
                     onChangeText={setTitle}
-                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
                     placeholder="Введите название"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={isDark ? "#666" : "#999"}
                     keyboardType="default"
                     autoCapitalize="none"
                   />
                   
                 </View>
                 <View className="mb-4">
-                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                  <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
                     Текущая сумма пассива
                   </Text>
                   <TextInput
                     value={amount}
                     onChangeText={setAmount}
-                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
                     placeholder="Введите сумму"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={isDark ? "#666" : "#999"}
                     keyboardType="number-pad"
                     autoCapitalize="none"
                   />
                   
                 </View>
                 <View className="mb-4">
-                  <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+                  <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
                     Расход на содержание пассива в год
                   </Text>
                   <TextInput
                     value={planningHorizon}
                     onChangeText={setPlanningHorizon}
-                    className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+                    className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
                     placeholder="Введите расход пассива"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={isDark ? "#666" : "#999"}
                     keyboardType="number-pad"
                     autoCapitalize="none"
                   />

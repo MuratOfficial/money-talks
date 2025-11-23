@@ -8,7 +8,11 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
-  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance } = useFinancialStore();
+  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const gradientColors = isDark ? ['#1B5E20', '#000000'] : ['#4CAF50', '#FFFFFF'];
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
   
 
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
@@ -154,13 +158,13 @@ const MainScreen = () => {
 
   return (
     <LinearGradient
-      colors={['#1B5E20', '#000000']}
+      colors={gradientColors}
       className="flex-1"
     >
       <SafeAreaView className="flex-1">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3">
-          <Text className="text-white text-xl font-['SFProDisplayBold']">
+          <Text className={`${textColor} text-xl font-['SFProDisplayBold']`}>
             Главная
           </Text>
         </View>

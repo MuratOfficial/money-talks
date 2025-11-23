@@ -12,6 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import useFinancialStore from '@/hooks/useStore';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android') {
@@ -43,7 +44,17 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
   title,
   items,
 }) => {
+  const { theme } = useFinancialStore();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  
+  const isDark = theme === 'dark';
+  const modalBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-300' : 'text-gray-700';
+  const cardBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const iconColor = isDark ? '#9CA3AF' : '#6B7280';
+  const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
+  const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
 
   const toggleItem = (id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -65,22 +76,22 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
       <View key={item.id} className="mb-3">
         <TouchableOpacity
           onPress={() => toggleItem(item.id)}
-          className="bg-[#333333] p-4 rounded-lg flex-row items-center justify-between"
+          className={`${cardBgColor} p-4 rounded-lg flex-row items-center justify-between`}
           activeOpacity={0.7}
         >
-          <Text className="text-white text-sm flex-1 pr-3 leading-5 font-['SFProDisplayRegular']">
+          <Text className={`${textColor} text-sm flex-1 pr-3 leading-5 font-['SFProDisplayRegular']`}>
             {item.question}
           </Text>
           <Ionicons
             name={isExpanded ? "chevron-up" : "chevron-down"}
             size={20}
-            color="#9CA3AF"
+            color={iconColor}
           />
         </TouchableOpacity>
         
         {isExpanded && (
-          <View className="bg-[#333333] px-4 py-3 rounded-b-lg -mt-1">
-            <Text className="text-gray-300 text-sm leading-5 font-['SFProDisplayRegular']">
+          <View className={`${cardBgColor} px-4 py-3 rounded-b-lg -mt-1`}>
+            <Text className={`${textSecondaryColor} text-sm leading-5 font-['SFProDisplayRegular']`}>
               {item.answer}
             </Text>
           </View>
@@ -97,13 +108,13 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-end">
-        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
+        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}>
           {/* Header */}
-          <View className="flex-row items-center justify-between p-4 border-b border-gray-700">
+          <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="chevron-back" size={24} color="white" />
+              <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
-            <Text className="text-white text-lg font-semibold font-['SFProDisplaySemibold']">
+            <Text className={`${textColor} text-lg font-semibold font-['SFProDisplaySemibold']`}>
               {title}
             </Text>
             <View className="w-6" />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import useFinancialStore from '@/hooks/useStore';
 
 interface DrawerProps {
   visible: boolean;
@@ -28,9 +29,17 @@ const Drawer: React.FC<DrawerProps> = ({
   title, 
   animationType = "none"  
 }) => {
+  const { theme } = useFinancialStore();
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 
   const sortOptions = options;
+  const isDark = theme === 'dark';
+  const drawerBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const optionBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const borderColor = isDark ? 'border-gray-500' : 'border-gray-400';
 
   const handleSelect = () => {
     onSelect(selectedOption);
@@ -40,14 +49,14 @@ const Drawer: React.FC<DrawerProps> = ({
   const RadioOption = ({ option }: { option: string }) => (
     <TouchableOpacity
       onPress={() => setSelectedOption(option)}
-      className="bg-[#333333] rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+      className={`${optionBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
       activeOpacity={0.7}
     >
-      <Text className="text-white text-base font-['SFProDisplayRegular']">
+      <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
         {option}
       </Text>
       
-      <View className="w-6 h-6 rounded-full border-2 border-gray-500 items-center justify-center">
+      <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
         {selectedOption === option && (
           <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
         )}
@@ -75,20 +84,20 @@ const Drawer: React.FC<DrawerProps> = ({
         />
         
         {/* Drawer Content */}
-        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
+        <View className={`${drawerBgColor} rounded-t-3xl px-4 pt-6 pb-4`}>
           {/* Handle Bar */}
-          <View className="w-10 h-1 bg-gray-600 rounded-full self-center mb-6" />
+          <View className={`w-10 h-1 ${handleBarColor} rounded-full self-center mb-6`} />
           
           {/* Header */}
           <View className="flex-row items-center justify-between mb-6">
-            <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+            <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
               {title}
             </Text>
             <TouchableOpacity 
               onPress={onClose}
               className="p-1"
             >
-              <Ionicons name="close" size={24} color="white" />
+              <Ionicons name="close" size={24} color={iconColor} />
             </TouchableOpacity>
           </View>
 

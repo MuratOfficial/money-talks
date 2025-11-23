@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import ChatGPTFeature from './ChatGPTFeature';
+import useFinancialStore from '@/hooks/useStore';
 
 interface InfoModalProps {
   visible: boolean;
@@ -35,8 +36,17 @@ const InfoModal: React.FC<InfoModalProps> = ({
   linkText,
   enableChatGPT = true
 }) => {
+  const { theme } = useFinancialStore();
   const [showChat, setShowChat] = useState(false);
   const chatButtonAnim = useRef(new Animated.Value(1)).current;
+  
+  const isDark = theme === 'dark';
+  const modalBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? '#D1D5DB' : '#374151';
+  const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
+  const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
+  const iconColor = isDark ? 'white' : '#11181C';
 
   const handleLinkPress = async () => {
     if (!linkUrl) return;
@@ -81,18 +91,18 @@ const InfoModal: React.FC<InfoModalProps> = ({
           onPress={onClose}
         />
 
-        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
+        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}>
           {/* Drag Indicator */}
           <View className="items-center py-2">
-            <View className="w-10 h-1 bg-gray-600 rounded-full" />
+            <View className={`w-10 h-1 ${handleBarColor} rounded-full`} />
           </View>
 
           {/* Header */}
-          <View className="flex-row items-center justify-between p-4 border-b border-gray-700">
+          <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="white" />
+              <Ionicons name="close" size={24} color={iconColor} />
             </TouchableOpacity>
-            <Text className="text-white text-lg font-semibold font-['SFProDisplaySemiBold']">
+            <Text className={`${textColor} text-lg font-semibold font-['SFProDisplaySemiBold']`}>
               {title}
             </Text>
             {enableChatGPT && (
@@ -125,25 +135,25 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 <Markdown
                   style={{
                     body: {
-                      color: '#D1D5DB',
+                      color: isDark ? '#D1D5DB' : '#374151',
                       fontSize: 14,
                       lineHeight: 20,
                       fontFamily: "SFProDisplayRegular"
                     },
                     heading1: {
-                      color: '#FFFFFF',
+                      color: isDark ? '#FFFFFF' : '#11181C',
                       fontSize: 20,
                       fontWeight: '600',
                       marginBottom: 12,
                     },
                     heading2: {
-                      color: '#FFFFFF',
+                      color: isDark ? '#FFFFFF' : '#11181C',
                       fontSize: 18,
                       fontWeight: '600',
                       marginBottom: 8,
                     },
                     heading3: {
-                      color: '#FFFFFF',
+                      color: isDark ? '#FFFFFF' : '#11181C',
                       fontSize: 16,
                       fontWeight: '600',
                       marginBottom: 6,
@@ -152,7 +162,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                       marginBottom: 8,
                     },
                     list_item: {
-                      color: '#D1D5DB',
+                      color: isDark ? '#D1D5DB' : '#374151',
                       fontSize: 14,
                       marginBottom: 4,
                     },
@@ -165,27 +175,27 @@ const InfoModal: React.FC<InfoModalProps> = ({
                       fontStyle: 'italic',
                     },
                     paragraph: {
-                      color: '#D1D5DB',
+                      color: isDark ? '#D1D5DB' : '#374151',
                       fontSize: 14,
                       lineHeight: 20,
                       marginBottom: 8,
                     },
                     code_inline: {
-                      backgroundColor: '#374151',
-                      color: '#F3F4F6',
+                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
+                      color: isDark ? '#F3F4F6' : '#11181C',
                       paddingHorizontal: 4,
                       paddingVertical: 2,
                       borderRadius: 4,
                     },
                     code_block: {
-                      backgroundColor: '#374151',
-                      color: '#F3F4F6',
+                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
+                      color: isDark ? '#F3F4F6' : '#11181C',
                       padding: 12,
                       borderRadius: 8,
                       marginBottom: 12,
                     },
                     blockquote: {
-                      backgroundColor: '#374151',
+                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
                       borderLeftWidth: 4,
                       borderLeftColor: '#F97316',
                       paddingLeft: 12,
@@ -197,28 +207,28 @@ const InfoModal: React.FC<InfoModalProps> = ({
                   {safeContent}
                 </Markdown>
               ) : (
-                <Text className="text-gray-400 text-center py-4">
+                <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-center py-4`}>
                   Нет доступного контента
                 </Text>
               )}
 
               {/* Link Section */}
               {linkUrl && (
-                <View className="mt-6 pt-4 border-t border-gray-700">
-                  <Text className="text-gray-400 text-sm mb-3">
+                <View className={`mt-6 pt-4 border-t ${borderColor}`}>
+                  <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mb-3`}>
                     Ссылка на видеоурок:
                   </Text>
                   
                   <TouchableOpacity
                     onPress={handleLinkPress}
-                    className="flex-row items-center p-3 bg-gray-700 rounded-lg"
+                    className={`flex-row items-center p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg`}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name="link" size={16} color="#9CA3AF" />
+                    <Ionicons name="link" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
                     <Text className="text-blue-400 text-sm ml-2 flex-1" numberOfLines={1}>
                       {linkText || linkUrl}
                     </Text>
-                    <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
                   </TouchableOpacity>
                 </View>
               )}

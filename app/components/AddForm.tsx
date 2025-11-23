@@ -43,7 +43,15 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
     }
   }, [formItem])
 
-  const {addIncomes, addExpences, updateIncomes, updateExpences, currentCategoryOption, currentRegOption} = useFinancialStore();
+  const {addIncomes, addExpences, updateIncomes, updateExpences, currentCategoryOption, currentRegOption, theme} = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const iconColor = isDark ? '#FFFFFF' : '#11181C';
 
   const handleCategorySelect = (categoryId: string) => {
     try {
@@ -192,8 +200,8 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
@@ -202,10 +210,10 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           onPress={handleGoBack}
           activeOpacity={0.7}
         >
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
-        <Text className="text-white text-base font-['SFProDisplaySemiBold'] mx-auto">
+        <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mx-auto`}>
           {name}
         </Text>
       </View>
@@ -214,30 +222,30 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         
        
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Название
           </Text>
           <TextInput
             value={title}
             onChangeText={setTitle}
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите название"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
             keyboardType="default"
             autoCapitalize="none"
           />
         </View>
 
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Сумма
           </Text>
           <TextInput
             value={amount}
             onChangeText={setAmount}
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите сумму"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
             keyboardType="decimal-pad"
             autoCapitalize="none"
           />
@@ -245,7 +253,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
         {/* Category Selection */}
         <View className="mb-8">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Выберите значок
           </Text>
           
@@ -267,7 +275,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
                   },
                   selectedCategory === category.id && {
                     borderWidth: 2,
-                    borderColor: 'white',
+                    borderColor: isDark ? 'white' : '#11181C',
                   }
                 ]}
               >
@@ -282,7 +290,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
       <View className='px-2 pb-2'>
         <TouchableOpacity
           className={`w-full mb-2 py-4 rounded-xl items-center justify-center ${
-            isFormValid ? 'bg-[#4CAF50]' : 'bg-gray-600'
+            isFormValid ? 'bg-[#4CAF50]' : (isDark ? 'bg-gray-600' : 'bg-gray-400')
           }`}
           onPress={handleAdd}
           disabled={!isFormValid}

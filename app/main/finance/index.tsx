@@ -1,6 +1,7 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import useFinancialStore from '@/hooks/useStore';
 import {
   View,
   Text,
@@ -25,8 +26,9 @@ const images = {
   img5: require('../../../assets/images/img5.png'),
 };
 
-const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress }) => {
-
+const FinanceCard: React.FC<FinanceCardProps & { isDark: boolean }> = ({ title, iconName, onPress, isDark }) => {
+  const cardBgColor = isDark ? 'bg-white/15' : 'bg-gray-100';
+  const cardTextColor = isDark ? 'text-gray-50' : 'text-gray-900';
 
   const renderIcon = () => {
     return <Image 
@@ -38,14 +40,14 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress })
 
   return (
     <TouchableOpacity 
-      className="w-[48%] aspect-[10/8] bg-white/15 rounded-2xl mb-4 active:opacity-80"
+      className={`w-[48%] aspect-[10/8] ${cardBgColor} rounded-2xl mb-4 active:opacity-80`}
       onPress={onPress}
       activeOpacity={0.8}
     >
       <View className="flex-1 justify-between items-start p-4">
           {renderIcon()}
           
-        <Text className="text-gray-50 text-sm mt-3 text-left font-['SFProDisplayRegular']">
+        <Text className={`${cardTextColor} text-sm mt-3 text-left font-['SFProDisplayRegular']`}>
           {title}
         </Text>
       </View>
@@ -54,9 +56,14 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ title,  iconName,  onPress })
 };
 
 const FinanceApp: React.FC = () => {
-
-
   const router = useRouter();
+  const { theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const cardBgColor = isDark ? 'bg-white/15' : 'bg-gray-100';
+  const cardTextColor = isDark ? 'text-gray-50' : 'text-gray-900';
 
   const financeItems:FinanceCardProps[] = [
     {
@@ -87,12 +94,12 @@ const FinanceApp: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
  
    
       <View className="px-4 py-3">
-        <Text className="text-xl text-white font-['SFProDisplaySemiBold']">
+        <Text className={`text-xl ${textColor} font-['SFProDisplaySemiBold']`}>
           Финансы
         </Text>
       </View>
@@ -105,6 +112,7 @@ const FinanceApp: React.FC = () => {
               title={item.title}
               iconName={item.iconName}
               onPress={item.onPress}
+              isDark={isDark}
             />
           ))}
         </View>

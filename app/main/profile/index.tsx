@@ -15,6 +15,14 @@ const ProfileScreen = () => {
 
     const { signOut, user, setTheme, theme } = useFinancialStore();
   const router = useRouter();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const cardBgColor = isDark ? 'bg-white/20' : 'bg-gray-100';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const avatarBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-200';
 
 
   const performLogout = async () => {
@@ -74,7 +82,7 @@ const ProfileScreen = () => {
 
 
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
-  const [selectedSortTheme, setSelectedSortTheme] = useState(theme==="dark"? 'Темная':'Яркая');
+  const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
 
 
   const profileName = user?.name || "Unknown";
@@ -158,18 +166,18 @@ const ProfileScreen = () => {
   const MenuItem = ({ item }:{item:any}) => (
     <TouchableOpacity
       onPress={item.onPress}
-      className="bg-white/20 rounded-xl p-3.5 mb-3 flex-row items-center justify-between"
+      className={`${cardBgColor} rounded-xl p-3.5 mb-3 flex-row items-center justify-between`}
       activeOpacity={0.7}
     >
       <View className="flex-row items-center">
-        <Ionicons name={item.icon} size={20} color="white" />
-        <Text className="text-white text-sm font-['SFProDisplayRegular'] ml-3">
+        <Ionicons name={item.icon} size={20} color={iconColor} />
+        <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] ml-3`}>
           {item.title}
         </Text>
       </View>
       
       {item.hasArrow && (
-        <Ionicons name="chevron-forward" size={20} color="#FFF" />
+        <Ionicons name="chevron-forward" size={20} color={iconColor} />
       )}
       
       {item.hasSwitch && (
@@ -184,7 +192,7 @@ const ProfileScreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
@@ -197,7 +205,7 @@ const ProfileScreen = () => {
             onError={handleFaceIDError}
           />
         {/* Header */}
-        <Text className="text-white text-xl font-['SFProDisplayBold'] mt-3 mb-8">
+        <Text className={`${textColor} text-xl font-['SFProDisplayBold'] mt-3 mb-8`}>
           Профиль
         </Text>
 
@@ -216,15 +224,15 @@ const ProfileScreen = () => {
               </>
             ) : (
 
-              <View className="w-24 h-24 bg-[#333333] rounded-full items-center justify-center mb-4 relative">
-                <Ionicons name="person" size={32} color="white" />
+              <View className={`w-24 h-24 ${avatarBgColor} rounded-full items-center justify-center mb-4 relative`}>
+                <Ionicons name="person" size={32} color={iconColor} />
               </View>
               
             )}
           
           
           {/* Name */}
-          <Text className="text-white text-lg font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textColor} text-lg font-['SFProDisplayRegular'] mb-2`}>
             {profileName}
           </Text>
           

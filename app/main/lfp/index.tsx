@@ -23,6 +23,7 @@ const PersonalFinancialPlanScreen = () => {
     goals,
     currency,
     language,
+    theme,
     updatePersonalFinancialPlan,
     clearPersonalFinancialPlan,
     resetPersonalFinancialPlan,
@@ -33,6 +34,16 @@ const PersonalFinancialPlanScreen = () => {
     passives,     // Если есть в store
     expences      // Если есть в store
   } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const cardBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const borderColor = isDark ? 'border-white' : 'border-gray-900';
   
   // Используем хук с ПОЛНЫМИ данными
   const {
@@ -186,10 +197,10 @@ const PersonalFinancialPlanScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-        <Text className="text-white text-xl font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold']`}>
           Личный финансовый план
         </Text>
         <View className="w-8" />
@@ -201,21 +212,21 @@ const PersonalFinancialPlanScreen = () => {
       >
         {/* ============== ПОЛЕ ФИО ============== */}
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             ФИО
           </Text>
           <TextInput
             value={personalFinancialPlan?.fio || user?.name || ''}
             onChangeText={updateFio}  
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите ФИО"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
           />
         </View>
 
         {/* ============== ДАТА РОЖДЕНИЯ ============== */}
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Дата рождения
           </Text>
           <View className="flex-row">
@@ -239,48 +250,48 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* ============== ДЕЯТЕЛЬНОСТЬ ============== */}
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Деятельность
           </Text>
           <TextInput
             value={personalFinancialPlan?.activity || ''}
             onChangeText={updateActivity}
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите деятельность"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
           />
         </View>
 
         {/* ============== ФИНАНСОВО-ЗАВИСИМЫЕ ЛЮДИ ============== */}
         <View className="mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-2">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Финансово-зависимые люди
           </Text>
           <TextInput
             value={personalFinancialPlan?.financialDependents || ''}
             onChangeText={updateFinancialDependents} 
-            className="bg-white/10 rounded-xl px-4 py-3 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-3 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите количество"
             keyboardType="number-pad"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
           />
         </View>
 
         <View className="mb-6">
-          <Text className="text-white text-lg font-['SFProDisplaySemiBold'] mb-4">
+          <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] mb-4`}>
             ЛФП
           </Text>
           
           <View className="flex-row items-center justify-between ">
             <TouchableOpacity
               onPress={() => setShowDrawer(true)}
-              className="px-3 py-1.5 border border-white w-fit rounded-2xl flex flex-row items-center justify-center gap-2"
+              className={`px-3 py-1.5 border ${borderColor} w-fit rounded-2xl flex flex-row items-center justify-center gap-2`}
             >
-              <Text className="text-white text-xs font-['SFProDisplayRegular']">
+              <Text className={`${textColor} text-xs font-['SFProDisplayRegular']`}>
                 {selectedSort}
               </Text>
               <View className="w-4 h-4 rounded items-center justify-center">
-                <Ionicons name="funnel-outline" size={14} color="white" />
+                <Ionicons name="funnel-outline" size={14} color={iconColor} />
               </View>
             </TouchableOpacity>
             <Drawer 
@@ -301,7 +312,7 @@ const PersonalFinancialPlanScreen = () => {
               }`}
               activeOpacity={0.8}
             >
-              <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
                 {loadingState.isVisible ? 
                   (loadingState.status === 'generating' ? 'Создание PDF...' : 
                    loadingState.status === 'sharing' ? 'Подготовка...' : 
@@ -321,61 +332,61 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* Financial Details */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Расчет деталей
           </Text>
           
-          <View className="space-y-3 p-3 rounded-xl bg-white/10">
+          <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Расходы</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Расходы</Text>
               <View className="flex-row items-center">
-                <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{expence} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" onPress={() => router.push("/main/finance/expences/main")}/>
+                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{expence} ₸</Text>
+                <Ionicons name="create-outline" size={16} color={iconColor} onPress={() => router.push("/main/finance/expences/main")}/>
               </View>
             </View>
             
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Доходы</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Доходы</Text>
               <View className="flex-row items-center">
-                <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">{income} ₸</Text>
-                <Ionicons name="create-outline" size={16} color="white" onPress={() => router.push("/main/finance/incomes/main")} />
+                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{income} ₸</Text>
+                <Ionicons name="create-outline" size={16} color={iconColor} onPress={() => router.push("/main/finance/incomes/main")} />
               </View>
             </View>
             
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Дельта</Text>
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">{delta} ₸</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Дельта</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{delta} ₸</Text>
             </View>
           </View>
         </View>
 
         {/* Net Worth Calculation */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Расчет чистого капитала
           </Text>
           
-          <View className="space-y-3 p-3 rounded-xl bg-white/10">
+          <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Активы</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Активы</Text>
               <View className="flex-row items-center">
-                <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">79 200 000 ₸</Text>
-                <Ionicons onPress={() => router.push("/main/finance/actives/main")} name="create-outline" size={16} color="white" />
+                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>79 200 000 ₸</Text>
+                <Ionicons onPress={() => router.push("/main/finance/actives/main")} name="create-outline" size={16} color={iconColor} />
               </View>
             </View>
             
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Пассивы</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Пассивы</Text>
               <View className="flex-row items-center">
-                <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">5 700 000 ₸</Text>
-                <Ionicons onPress={() => router.push("/main/finance/passives/main")} name="create-outline" size={16} color="white" />
+                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>5 700 000 ₸</Text>
+                <Ionicons onPress={() => router.push("/main/finance/passives/main")} name="create-outline" size={16} color={iconColor} />
               </View>
             </View>
             
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Чистый капитал</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Чистый капитал</Text>
               <View className="flex-row items-center">
-                <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">74 500 000 ₸</Text>
+                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>74 500 000 ₸</Text>
               </View>
             </View>
           </View>
@@ -383,45 +394,45 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* ============== ПОДУШКА БЕЗОПАСНОСТИ ============== */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Подушка безопасности на 3 месяца
           </Text>
-          <View className="flex-row justify-between items-center p-3 rounded-xl bg-white/10">
-            <Text className="text-white text-sm font-['SFProDisplayRegular']">По постоянному расходу</Text>
+          <View className={`flex-row justify-between items-center p-3 rounded-xl ${cardBgColor}`}>
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>По постоянному расходу</Text>
             <Text 
-              className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+              className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
             >{personalFinancialPlan?.securityPillow || ''}</Text>
           </View>
         </View>
 
         {/* ============== СТРАХОВАЯ ЗАЩИТА ============== */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Страховая защита
           </Text>
           
-          <View className="space-y-3 p-3 rounded-xl bg-white/10">
+          <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
             {/* Страхование жизни */}
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Уход из жизни</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Уход из жизни</Text>
               <Text
-                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
               >{personalFinancialPlan?.insurance.life || ''}</Text>
             </View>
             
             {/* Страхование от инвалидности */}
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Инвалидность</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Инвалидность</Text>
               <Text
-                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
               >{personalFinancialPlan?.insurance.disability || ''}</Text>
             </View>
             
             {/* Медицинское страхование */}
             <View className="flex-row justify-between items-center">
-              <Text className="text-white text-sm font-['SFProDisplayRegular']">Болезненный лист</Text>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Болезненный лист</Text>
               <Text
-                className="text-white text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]"
+                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
               >{personalFinancialPlan?.insurance.medical || ''}</Text>
             </View>
           </View>
@@ -429,7 +440,7 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* ============== РИСК-ПРОФИЛЬ ============== */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Риск-профиль
           </Text>
           <DropdownButton 
@@ -440,7 +451,7 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* Goals */}
         <View className="mb-6">
-          <Text className="text-white text-base font-['SFProDisplaySemiBold'] mb-4">
+          <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mb-4`}>
             Цели
           </Text>
           

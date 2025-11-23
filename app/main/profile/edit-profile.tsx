@@ -8,7 +8,17 @@ import useFinancialStore from '@/hooks/useStore';
 
 const EditProfilePage: React.FC = () => {
 
-  const {user, updateUserProfile} = useFinancialStore();
+  const {user, updateUserProfile, theme} = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const avatarBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-200';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const iconSecondaryColor = isDark ? '#9CA3AF' : '#6B7280';
 
   const initialName = user?.name || "Unknown";
   const initialEmail = user?.email || "unknown@gmail.com";
@@ -107,13 +117,13 @@ const EditProfilePage: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-black">
+    <View className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 pb-6">
         <TouchableOpacity className="mr-4" onPress={()=>router.replace('/main/profile')}>
-           <Ionicons name="chevron-back" size={24} color="white" />
+           <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
-        <Text className="text-white text-lg font-['SFProDisplayRegular']">
+        <Text className={`${textColor} text-lg font-['SFProDisplayRegular']`}>
           Редактировать профиль
         </Text>
       </View>
@@ -123,7 +133,7 @@ const EditProfilePage: React.FC = () => {
         <View className="items-center mb-2">
           <TouchableOpacity 
             onPress={showImagePickerOptions}
-            className="w-24 h-24 bg-[#333333] rounded-full items-center justify-center mb-4 relative"
+            className={`w-24 h-24 ${avatarBgColor} rounded-full items-center justify-center mb-4 relative`}
             activeOpacity={0.7}
           >
             {avatarUri ? (
@@ -135,14 +145,14 @@ const EditProfilePage: React.FC = () => {
                 />
                 {/* Overlay с иконкой камеры */}
                 <View className="absolute inset-0 bg-black/30 rounded-full items-center justify-center">
-                  <MaterialIcons name="camera-alt" size={24} color="white" />
+                  <MaterialIcons name="camera-alt" size={24} color={iconColor} />
                 </View>
               </>
             ) : (
-              <MaterialIcons name="camera-alt" size={32} color="#9CA3AF" />
+              <MaterialIcons name="camera-alt" size={32} color={iconSecondaryColor} />
             )}
           </TouchableOpacity>
-          <Text className="text-gray-400 text-xs text-center font-['SFProDisplayRegular']">
+          <Text className={`${textSecondaryColor} text-xs text-center font-['SFProDisplayRegular']`}>
             Нажмите для изменения фото
           </Text>
         </View>
@@ -151,28 +161,28 @@ const EditProfilePage: React.FC = () => {
         <View className="px-4">
           {/* ФИО Field */}
           <View className="mb-4">
-            <Text className="text-gray-400 text-sm mb-2 font-['SFProDisplayRegular']">ФИО</Text>
-            <View className="bg-[#333333] rounded-2xl">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>ФИО</Text>
+            <View className={`${inputBgColor} rounded-2xl`}>
               <TextInput
                 value={name}
                 onChangeText={setName}
-                className="text-white p-3.5 text-sm font-['SFProDisplayRegular']"
-                placeholderTextColor="#9CA3AF"
+                className={`${inputTextColor} p-3.5 text-sm font-['SFProDisplayRegular']`}
+                placeholderTextColor={iconSecondaryColor}
               />
             </View>
           </View>
 
           {/* Email Field */}
           <View className="mb-4">
-            <Text className="text-gray-400 text-sm mb-2 font-['SFProDisplayRegular']">Email</Text>
-            <View className="bg-[#333333] rounded-2xl">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>Email</Text>
+            <View className={`${inputBgColor} rounded-2xl`}>
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                className="text-white p-3.5 text-sm font-['SFProDisplayRegular']"
+                className={`${inputTextColor} p-3.5 text-sm font-['SFProDisplayRegular']`}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={iconSecondaryColor}
               />
             </View>
           </View>

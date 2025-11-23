@@ -3,9 +3,17 @@ import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import useFinancialStore from '@/hooks/useStore';
 
 const AchievementsScreen = () => {
   const router = useRouter();
+  const { theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white/80' : 'text-gray-900';
+  const iconColor = isDark ? 'white' : '#11181C';
+  
   const images = {
     ach1: require('../../../assets/images/ach1.png'),
     ach2: require('../../../assets/images/ach2.png'),
@@ -75,7 +83,7 @@ const AchievementsScreen = () => {
         />
       </View>
       
-      <Text className="text-white/80 text-xs text-center font-['SFProDisplayRegular'] ml-3">
+      <Text className={`${textColor} text-xs text-center font-['SFProDisplayRegular'] ml-3`}>
           {item.title}
         </Text>
       
@@ -84,16 +92,16 @@ const AchievementsScreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
          <View className="flex-row items-center  py-3 pb-6 w-full">
                 <TouchableOpacity  onPress={()=>router.replace('/main/profile')}>
-                   <Ionicons name="chevron-back" size={24} color="white" />
+                   <Ionicons name="chevron-back" size={24} color={iconColor} />
                 </TouchableOpacity>
-                <Text className="text-white text-center w-full text-lg font-semibold font-['SFProDisplayRegular']">
+                <Text className={`${isDark ? 'text-white' : 'text-gray-900'} text-center w-full text-lg font-semibold font-['SFProDisplayRegular']`}>
                   Достижения
                 </Text>
               </View>

@@ -10,7 +10,14 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-   const { signIn, user, resetCategory } = useFinancialStore();
+   const { signIn, user, resetCategory, theme } = useFinancialStore();
+   
+   const isDark = theme === 'dark';
+   const bgColor = isDark ? 'bg-black' : 'bg-white';
+   const textColor = isDark ? 'text-white' : 'text-gray-900';
+   const textSecondaryColor = isDark ? 'text-[#BDBDBD]' : 'text-gray-700';
+   const inputBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+   const inputTextColor = isDark ? 'text-[#BDBDBD]' : 'text-gray-900';
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -70,50 +77,51 @@ export default function LoginScreen() {
 
 
   return (
-    <View className=' flex-1 bg-black justify-center p-6'>
-      <Text className="font-['SFProDisplayRegular'] text-3xl font-bold text-white mb-8 text-left">
+    <View className={`flex-1 ${bgColor} justify-center p-6`}>
+      <Text className={`font-['SFProDisplayRegular'] text-3xl font-bold ${textColor} mb-8 text-left`}>
         Вход
       </Text>
 
       <View className='mb-5'>
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] mb-2" >
+        <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} mb-2`}>
           Email
         </Text>
         <TextInput
           value={email}
-          className="font-['SFProDisplayRegular'] h-12 text-[#BDBDBD] bg-[#333333] rounded-2xl px-4"
+          className={`font-['SFProDisplayRegular'] h-12 ${inputTextColor} ${inputBgColor} rounded-2xl px-4`}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
           placeholder="Введите почту"
-          placeholderTextColor="#666"
+          placeholderTextColor={isDark ? "#666" : "#999"}
           editable={!loading}
         />
       </View>
 
       <View className='mb-5'>
-        <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] mb-2">
+        <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} mb-2`}>
           Пароль
         </Text>
         <TextInput
-          className="font-['SFProDisplayRegular'] h-12 text-[#BDBDBD] bg-[#333333] rounded-2xl px-4"
-          
+          className={`font-['SFProDisplayRegular'] h-12 ${inputTextColor} ${inputBgColor} rounded-2xl px-4`}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           placeholder="Введите пароль"
-          placeholderTextColor="#666"
+          placeholderTextColor={isDark ? "#666" : "#999"}
           editable={!loading}
         />
         {error ? <Text className='text-[#FF6F71] mt-2'>{error}</Text> : null}
       </View>
 
       <TouchableOpacity
-        style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+        className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
+          loading ? (isDark ? 'bg-gray-600' : 'bg-gray-400') : 'bg-[#4CAF50]'
+        }`}
         onPress={handleLogin}
         disabled={loading}
       >
-        <Text className="font-['SFProDisplayRegular'] text-[#fff] font-medium " >
+        <Text className="font-['SFProDisplayRegular'] text-white font-medium">
           {loading ? 'Вход...' : 'Войти'}
         </Text>
       </TouchableOpacity>
@@ -142,21 +150,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-
-  loginButton: {
-    backgroundColor: '#4CAF50',
-    height: 50,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  loginButtonDisabled: {
-    backgroundColor: '#2E7D32',
-    opacity: 0.6,
-  },
-
-
   forgotPassword: {
     color: '#4CAF50',
     textAlign: 'center',

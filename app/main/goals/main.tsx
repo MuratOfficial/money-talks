@@ -11,7 +11,18 @@ import InfoModal from '@/app/components/HintWithChat';
 
 const GoalsScreen = () => {
   const router = useRouter();
-  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId, currency} = useFinancialStore();
+  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId, currency, theme} = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const cardBgColor = isDark ? 'bg-gray-800' : 'bg-gray-100';
+  const buttonBgColor = isDark ? 'bg-gray-700' : 'bg-gray-200';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const borderColor = isDark ? 'border-gray-600' : 'border-gray-300';
+  const modalBgColor = isDark ? 'bg-gray-800' : 'bg-white';
+  const modalOverlayColor = isDark ? 'bg-black/50' : 'bg-black/30';
 
   const [goalTitle, setTitle] = useState("");
 
@@ -132,12 +143,12 @@ useEffect(() => {
       className={`px-4 py-2 rounded-full mr-3 ${
         isSelected 
           ? 'bg-[#4CAF50]' 
-          : 'bg-transparent border border-gray-600'
+          : `bg-transparent border ${borderColor}`
       }`}
       activeOpacity={0.8}
     >
       <Text className={`text-sm font-['SFProDisplayRegular'] ${
-        isSelected ? 'text-white' : 'text-gray-400'
+        isSelected ? 'text-white' : textSecondaryColor
       }`}>
         {term}
       </Text>
@@ -149,13 +160,13 @@ useEffect(() => {
       onPress={onPress}
       className={`px-4 py-2 rounded-full mr-3 ${
         isSelected 
-          ? 'bg-gray-700' 
-          : 'bg-transparent border border-gray-600'
+          ? buttonBgColor
+          : `bg-transparent border ${borderColor}`
       }`}
       activeOpacity={0.8}
     >
       <Text className={`text-sm font-['SFProDisplayRegular'] ${
-        isSelected ? 'text-white' : 'text-gray-400'
+        isSelected ? textColor : textSecondaryColor
       }`}>
         {status}
       </Text>
@@ -171,18 +182,18 @@ useEffect(() => {
       animationType="fade"
       onRequestClose={() => setShowSortModal(false)}
     >
-      <View className="flex-1 bg-black/50 justify-center items-center px-4">
-        <View className="bg-gray-800 rounded-2xl w-full max-w-sm p-6">
+      <View className={`flex-1 ${modalOverlayColor} justify-center items-center px-4`}>
+        <View className={`${modalBgColor} rounded-2xl w-full max-w-sm p-6`}>
           {/* Header */}
           <View className="flex-row items-center justify-between mb-6">
-            <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+            <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
               Сортировка
             </Text>
             <TouchableOpacity 
               onPress={() => setShowSortModal(false)}
               className="p-1"
             >
-              <Ionicons name="close" size={24} color="white" />
+              <Ionicons name="close" size={24} color={iconColor} />
             </TouchableOpacity>
           </View>
 
@@ -190,30 +201,30 @@ useEffect(() => {
           <View className="mb-6">
             <TouchableOpacity
               onPress={() => setSelectedSort('По дате')}
-              className="bg-gray-700 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
               activeOpacity={0.7}
             >
-              <Text className="text-white text-base font-['SFProDisplayRegular']">
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
                 По дате
               </Text>
               
-              <View className="w-6 h-6 rounded-full border-2 border-gray-500 items-center justify-center">
+              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
                 {selectedSort === 'По дате' && (
-                  <View className="w-3 h-3 rounded-full bg-white" />
+                  <View className={`w-3 h-3 rounded-full ${isDark ? 'bg-white' : 'bg-gray-900'}`} />
                 )}
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setSelectedSort('По %')}
-              className="bg-gray-700 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
               activeOpacity={0.7}
             >
-              <Text className="text-white text-base font-['SFProDisplayRegular']">
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
                 По %
               </Text>
               
-              <View className="w-6 h-6 rounded-full border-2 border-gray-500 items-center justify-center">
+              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
                 {selectedSort === 'По %' && (
                   <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
                 )}
@@ -240,22 +251,22 @@ useEffect(() => {
   );
 
   const GoalCard = ( goal:Goal ) => (
-    <View className="bg-gray-800 rounded-2xl p-4 mb-4">
+    <View className={`${cardBgColor} rounded-2xl p-4 mb-4`}>
       <View className="flex-row items-start justify-between mb-4">
         <View className="flex-1">
-          <Text className="text-white text-lg font-['SFProDisplaySemiBold'] mb-2">
+          <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] mb-2`}>
             {goal.name}
           </Text>
           
             {goal.timeframe ? 
-            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
               Срок достижения цели {goal.timeframe.day} {goal.timeframe.month} {goal.timeframe.year}
-            </Text>:<Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-1">
+            </Text>:<Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
               Выберите срок
               </Text>}
             
           
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             Собрано {goal.collected ?? 0} из {goal.amount}
           </Text>
         </View>
@@ -264,18 +275,18 @@ useEffect(() => {
       </View>
       
       <View className="flex-row space-x-3">
-        <TouchableOpacity onPress={()=>handleTopUp(goal.id, goal.name)} className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
-          <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
+        <TouchableOpacity onPress={()=>handleTopUp(goal.id, goal.name)} className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}>
+          <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
             Пополнить
           </Text>
-          <Ionicons name="add-circle-outline" size={16} color="white" />
+          <Ionicons name="add-circle-outline" size={16} color={iconColor} />
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={()=>handleEdit(goal.id)} className="flex-1 bg-gray-700 rounded-xl py-3 items-center justify-center flex-row">
-          <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-2">
+        <TouchableOpacity onPress={()=>handleEdit(goal.id)} className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}>
+          <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
             Редактировать
           </Text>
-          <Ionicons name="pencil" size={16} color="white" />
+          <Ionicons name="pencil" size={16} color={iconColor} />
         </TouchableOpacity>
       </View>
       
@@ -292,22 +303,22 @@ useEffect(() => {
   );
 
 return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity 
           onPress={() => router.replace('/main')}
           className="p-2"
         >
-          <Ionicons name="chevron-back" size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
-        <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
           Цели
         </Text>
         
         <TouchableOpacity className="p-2" onPress={openModal}>
-          <Ionicons name="information-circle-outline" size={24} color="white" />
+          <Ionicons name="information-circle-outline" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
 
@@ -343,13 +354,13 @@ return (
           ))}
           
           <TouchableOpacity 
-            className="px-4 py-2 rounded-full border border-gray-600 flex-row items-center ml-auto"
+            className={`px-4 py-2 rounded-full border ${borderColor} flex-row items-center ml-auto`}
             onPress={() => setShowSortModal(true)}
           >
-            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mr-2">
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
               Сортировка
             </Text>
-            <Ionicons name="swap-vertical" size={16} color="#666" />
+            <Ionicons name="swap-vertical" size={16} color={isDark ? "#666" : "#9CA3AF"} />
           </TouchableOpacity>
         </View>
 

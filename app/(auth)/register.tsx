@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
+import useFinancialStore from '@/hooks/useStore';
 
 const RegistrationScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -26,6 +27,16 @@ const RegistrationScreen: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const router = useRouter();
+  const { theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-300' : 'text-gray-700';
+  const inputBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const eyeIconColor = isDark ? '#9CA3AF' : '#6B7280';
 
   // Правильная валидация email для Supabase
   const isValidEmail = (email: string) => {
@@ -152,8 +163,8 @@ const RegistrationScreen: React.FC = () => {
                      password === confirmPassword;
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       <KeyboardAvoidingView 
         className="flex-1" 
@@ -167,10 +178,10 @@ const RegistrationScreen: React.FC = () => {
             activeOpacity={0.7}
             disabled={isLoading}
           >
-            <Ionicons name="chevron-back" size={24} color="white" />
+            <Ionicons name="chevron-back" size={24} color={iconColor} />
           </TouchableOpacity>
           
-          <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+          <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
             Регистрация
           </Text>
           
@@ -180,7 +191,7 @@ const RegistrationScreen: React.FC = () => {
         <View className="flex-1 px-4 pt-4">
           {/* Full Name Input */}
           <View className="mb-4">
-            <Text className="text-gray-300 text-sm mb-2 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
               ФИО *
             </Text>
             <TextInput
@@ -190,8 +201,8 @@ const RegistrationScreen: React.FC = () => {
                 if (errors.fullName) setErrors({...errors, fullName: ''});
               }}
               placeholder="Иван Иванов"
-              placeholderTextColor="#666"
-              className="bg-[#333333] text-white px-4 py-4 rounded-2xl text-base font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#666" : "#999"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl text-base font-['SFProDisplayRegular']`}
               autoCapitalize="words"
               autoCorrect={false}
               editable={!isLoading}
@@ -205,7 +216,7 @@ const RegistrationScreen: React.FC = () => {
 
           {/* Email Input */}
           <View className="mb-4">
-            <Text className="text-gray-300 text-sm mb-2 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
               Email *
             </Text>
             <TextInput
@@ -215,8 +226,8 @@ const RegistrationScreen: React.FC = () => {
                 if (errors.email) setErrors({...errors, email: ''});
               }}
               placeholder="user@gmail.com"
-              placeholderTextColor="#666"
-              className="bg-[#333333] text-white px-4 py-4 rounded-2xl text-base font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#666" : "#999"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl text-base font-['SFProDisplayRegular']`}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -232,7 +243,7 @@ const RegistrationScreen: React.FC = () => {
 
           {/* Password Input */}
           <View className="mb-4">
-            <Text className="text-gray-300 text-sm mb-2 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
               Пароль * (минимум 6 символов)
             </Text>
             <View className="relative">
@@ -246,8 +257,8 @@ const RegistrationScreen: React.FC = () => {
                   }
                 }}
                 placeholder="Введите пароль"
-                placeholderTextColor="#666"
-                className="bg-[#333333] text-white px-4 py-4 pr-12 rounded-2xl text-base font-['SFProDisplayRegular']"
+                placeholderTextColor={isDark ? "#666" : "#999"}
+                className={`${inputBgColor} ${inputTextColor} px-4 py-4 pr-12 rounded-2xl text-base font-['SFProDisplayRegular']`}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -263,7 +274,7 @@ const RegistrationScreen: React.FC = () => {
                 <Ionicons 
                   name={showPassword ? "eye-off" : "eye"} 
                   size={20} 
-                  color="#9CA3AF" 
+                  color={eyeIconColor} 
                 />
               </TouchableOpacity>
             </View>
@@ -276,7 +287,7 @@ const RegistrationScreen: React.FC = () => {
 
           {/* Confirm Password Input */}
           <View className="mb-6">
-            <Text className="text-gray-300 text-sm mb-2 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
               Повторите пароль *
             </Text>
             <View className="relative">
@@ -287,8 +298,8 @@ const RegistrationScreen: React.FC = () => {
                   if (errors.confirmPassword) setErrors({...errors, confirmPassword: ''});
                 }}
                 placeholder="Повторите пароль"
-                placeholderTextColor="#666"
-                className="bg-[#333333] text-white px-4 py-4 pr-12 rounded-2xl text-base font-['SFProDisplayRegular']"
+                placeholderTextColor={isDark ? "#666" : "#999"}
+                className={`${inputBgColor} ${inputTextColor} px-4 py-4 pr-12 rounded-2xl text-base font-['SFProDisplayRegular']`}
                 secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -304,7 +315,7 @@ const RegistrationScreen: React.FC = () => {
                 <Ionicons 
                   name={showConfirmPassword ? "eye-off" : "eye"} 
                   size={20} 
-                  color="#9CA3AF" 
+                  color={eyeIconColor} 
                 />
               </TouchableOpacity>
             </View>
@@ -341,7 +352,7 @@ const RegistrationScreen: React.FC = () => {
 
         {/* Login Link */}
         <View className="px-4 pb-8">
-          <Text className="text-gray-400 text-center text-sm mb-2 font-['SFProDisplayRegular']">
+          <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-center text-sm mb-2 font-['SFProDisplayRegular']`}>
             Уже есть аккаунт?
           </Text>
           <TouchableOpacity

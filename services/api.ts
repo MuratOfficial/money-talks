@@ -266,7 +266,7 @@ export const syncUserDataToServer = async (
       lastSyncedAt: new Date().toISOString(),
     };
 
-    const response = await api.post('/user-data/sync', userData);
+    const response = await api.post('/api/public/user-data/sync', userData);
     return response.data;
   } catch (error) {
     console.error('Error syncing user data to server:', error);
@@ -281,7 +281,7 @@ export const fetchUserDataFromServer = async (
   userId: string
 ): Promise<UserData | null> => {
   try {
-    const response = await api.get(`/user-data/${userId}`);
+    const response = await api.get(`/api/public/user-data/${userId}`);
     return response.data;
   } catch (error: any) {
     // Если пользователь не найден (404), возвращаем null
@@ -302,7 +302,7 @@ export const updateUserDataPartial = async (
   data: any
 ): Promise<SyncResponse> => {
   try {
-    const response = await api.patch(`/user-data/${userId}/${dataType}`, { data });
+    const response = await api.patch(`/api/public/user-data/${userId}/${dataType}`, { data });
     return response.data;
   } catch (error) {
     console.error(`Error updating ${dataType}:`, error);
@@ -317,7 +317,7 @@ export const deleteUserDataFromServer = async (
   userId: string
 ): Promise<SyncResponse> => {
   try {
-    const response = await api.delete(`/user-data/${userId}`);
+    const response = await api.delete(`/api/public/user-data/${userId}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting user data from server:', error);
@@ -333,7 +333,7 @@ export const checkSyncStatus = async (
   localLastSyncedAt?: string
 ): Promise<{ needsSync: boolean; serverTimestamp?: string }> => {
   try {
-    const response = await api.get(`/user-data/${userId}/sync-status`, {
+    const response = await api.get(`/api/public/user-data/${userId}/sync-status`, {
       params: { localTimestamp: localLastSyncedAt }
     });
     return response.data;

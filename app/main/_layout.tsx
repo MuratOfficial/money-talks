@@ -2,6 +2,7 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
+import useFinancialStore from '@/hooks/useStore';
 
 type NavButton = {
   route: "/main" | '/main/finance' | '/main/lfp' | '/main/invest' | '/main/profile';
@@ -12,7 +13,12 @@ type NavButton = {
 export default function RootLayout(): ReactElement {
   const router = useRouter();
   const segments = useSegments();
+  const { theme } = useFinancialStore();
   const activeRoute = (segments[1] ? segments[1] : segments[0]) || "main";
+  
+  const isDark = theme === 'dark';
+  const navBgColor = isDark ? 'bg-[#1D1F24]' : 'bg-gray-100';
+  const navInactiveColor = isDark ? '#666' : '#9CA3AF';
 
   const navButtons: NavButton[] = [
     { route: '/main', iconName: 'home', label: 'Главная' },
@@ -30,7 +36,7 @@ export default function RootLayout(): ReactElement {
       </View>
 
       {/* Нижняя навигация */}
-      <View className="absolute bottom-0 left-0 right-0 flex-row bg-[#1D1F24] py-[15px] px-5 justify-around h-[70px]">
+      <View className={`absolute bottom-0 left-0 right-0 flex-row ${navBgColor} py-[15px] px-5 justify-around h-[70px]`}>
         {navButtons.map((button) => (
           <TouchableOpacity
             key={button.route}
@@ -40,10 +46,10 @@ export default function RootLayout(): ReactElement {
             <Ionicons
               name={button.iconName}
               size={24}
-              color={button.route.includes(activeRoute) ? '#66BB6A' : '#666'}
+              color={button.route.includes(activeRoute) ? '#66BB6A' : navInactiveColor}
             />
             <Text className={`text-[10px] mt-[5px] ${
-              button.route.includes(activeRoute) ? 'text-[#66BB6A]' : 'text-[#666]'
+              button.route.includes(activeRoute) ? 'text-[#66BB6A]' : (isDark ? 'text-[#666]' : 'text-gray-600')
             }`}>
               {button.label}
             </Text>

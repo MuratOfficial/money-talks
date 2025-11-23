@@ -32,11 +32,17 @@ interface ChartScreenProps {
 }
 
 const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
-
-
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
-  const {currency} = useFinancialStore();  
+  const {currency, theme} = useFinancialStore();  
   const router = useRouter();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const cardBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const iconColor = isDark ? '#FFFFFF' : '#11181C';
+  const borderColor = isDark ? 'border-gray-600' : 'border-gray-300';
 
     const [expenseData, setExpenseData] = useState<ExpenseCategory[]|null>(null)
 
@@ -86,16 +92,16 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 relative">
         <TouchableOpacity onPress={handleBack} className="p-2">
-                  <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+                  <Ionicons name="chevron-back" size={24} color={iconColor} />
                 </TouchableOpacity>
         
-        <Text className="text-white text-lg font-['SFProDisplaySemiBold'] pr-4">
+        <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] pr-4`}>
           Диаграмма
         </Text>
         <View></View>
@@ -130,12 +136,12 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
                   className={`px-2 py-1 rounded-full border ${
                     selectedPeriod === period.key
                       ? 'bg-[#2AA651] border-[#2AA651]'
-                    : 'border-gray-600 bg-transparent'
+                    : `${borderColor} bg-transparent`
                   }`}
                   onPress={() => setSelectedPeriod(period.key as any)}
                 >
-                  <Text className={`text-xs font-['SFProDisplayRegular'] text-white ${
-                    selectedPeriod === period.key ? 'font-medium' : ''
+                  <Text className={`text-xs font-['SFProDisplayRegular'] ${
+                    selectedPeriod === period.key ? 'text-white font-medium' : textColor
                   }`}>
                     {period.label}
                   </Text>
@@ -147,7 +153,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
 
         {/* Date and Total */}
         <View className="flex-row justify-between items-center px-4 mb-4">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             1 янв 2025
           </Text>
           <Text className="text-emerald-400 text-sm  font-['SFProDisplayRegular']">
@@ -157,7 +163,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
 
         {/* Expense Categories */}
         <View className="px-4 pb-6">
-          <View className="bg-white/10 rounded-xl px-3">
+          <View className={`${cardBgColor} rounded-xl px-3`}>
             {expenseData?.map((item, index) => (
               <View key={item.id}>
                 <View className="flex-row items-center justify-between py-3">
@@ -167,16 +173,16 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
                       style={{ backgroundColor: item.color }}
                     />
                     <View className="flex-1">
-                      <Text className="text-white text-sm font-['SFProDisplayRegular']">
+                      <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>
                         {item.name}
                       </Text>
                     </View>
-                    <Text className="text-gray-400 text-sm mr-3 font-['SFProDisplayRegular']">
+                    <Text className={`${textSecondaryColor} text-sm mr-3 font-['SFProDisplayRegular']`}>
                       {item.percentage.toFixed(1)}%
                     </Text>
                   </View>
                   
-                  <Text className="text-white text-sm font-medium font-['SFProDisplayRegular']">
+                  <Text className={`${textColor} text-sm font-medium font-['SFProDisplayRegular']`}>
                     {formatAmount(item.amount)}
                   </Text>
                 </View>

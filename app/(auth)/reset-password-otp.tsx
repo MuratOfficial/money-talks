@@ -1,4 +1,4 @@
-// app/(auth)/reset-password-otp.tsx
+
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
@@ -27,7 +27,15 @@ export default function ResetPasswordOtpScreen() {
   const [canResend, setCanResend] = useState(false);
 
   const router = useRouter();
-  const { verifyOtp, resetPassword } = useFinancialStore();
+  const { verifyOtp, resetPassword, theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const iconColor = isDark ? 'white' : '#11181C';
   
   // Refs для инпутов
   const inputRefs = useRef<TextInput[]>([]);
@@ -158,7 +166,7 @@ export default function ResetPasswordOtpScreen() {
   };
 
   return (
-    <View className="flex-1 bg-black px-6">
+    <View className={`flex-1 ${bgColor} px-6`}>
       {/* Header */}
       <View className="flex-row items-center pt-12 pb-8">
         <TouchableOpacity 
@@ -166,17 +174,17 @@ export default function ResetPasswordOtpScreen() {
           onPress={() => router.back()}
           disabled={loading}
         >
-          <MaterialIcons name="arrow-back" size={24} color="white" />
+          <MaterialIcons name="arrow-back" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
       
       {/* Title */}
-      <Text className="font-['SFProDisplayRegular'] text-white text-2xl font-bold mb-4 text-left">
+      <Text className={`font-['SFProDisplayRegular'] ${textColor} text-2xl font-bold mb-4 text-left`}>
         Введите код
       </Text>
       
       {/* Description */}
-      <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-8">
+      <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} text-base mb-8`}>
         Мы отправили 6-значный код на {email}
       </Text>
       
@@ -188,7 +196,7 @@ export default function ResetPasswordOtpScreen() {
             ref={(ref) => {
               if (ref) inputRefs.current[index] = ref;
             }}
-            className="font-['SFProDisplayRegular'] w-12 h-12 rounded-lg bg-[#333333] text-white text-center text-lg font-medium"
+            className={`font-['SFProDisplayRegular'] w-12 h-12 rounded-lg ${inputBgColor} ${inputTextColor} text-center text-lg font-medium`}
             value={otp[index]}
             onChangeText={(value) => handleOtpChange(value, index)}
             onKeyPress={(e) => handleKeyPress(e, index)}
@@ -213,7 +221,7 @@ export default function ResetPasswordOtpScreen() {
       {/* Verify Button */}
       <TouchableOpacity 
         className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
-          loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
+          loading ? (isDark ? 'bg-gray-600' : 'bg-gray-400') : 'bg-[#4CAF50]'
         }`}
         onPress={() => handleVerifyOtp()}
         disabled={loading || otp.join('').length !== OTP_LENGTH}
@@ -229,7 +237,7 @@ export default function ResetPasswordOtpScreen() {
 
       {/* Resend Section */}
       <View className="items-center mt-8">
-        <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-4">
+        <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} text-base mb-4`}>
           Не получили код?
         </Text>
         
@@ -248,7 +256,7 @@ export default function ResetPasswordOtpScreen() {
             )}
           </TouchableOpacity>
         ) : (
-          <Text className="font-['SFProDisplayRegular'] text-gray-500 text-base">
+          <Text className={`font-['SFProDisplayRegular'] ${isDark ? 'text-gray-500' : 'text-gray-600'} text-base`}>
             Повторить через {formatTime(timer)}
           </Text>
         )}

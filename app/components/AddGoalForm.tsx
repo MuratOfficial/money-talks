@@ -32,7 +32,19 @@ interface GoalData {
 }
 
 const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }) => {
-  const { addGoal, updateGoal, getGoalById, } = useFinancialStore(); 
+  const { addGoal, updateGoal, getGoalById, theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-gray-800' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const cardBgColor = isDark ? 'bg-gray-700' : 'bg-gray-200';
+  const inactiveCardBgColor = isDark ? 'bg-gray-800' : 'bg-gray-100';
+  const borderColor = isDark ? 'border-gray-500' : 'border-gray-400';
+  const inactiveBorderColor = isDark ? 'border-gray-700' : 'border-gray-300';
+  const iconColor = isDark ? 'white' : '#11181C'; 
   
   const [formData, setFormData] = useState<GoalData>({
     name: '',
@@ -156,26 +168,26 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   const DropdownButton = ({ value, onPress, isLast = false }: any) => (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex-1 px-4 py-3 rounded-2xl border flex-row justify-between bg-gray-700 border-gray-500 ${
+      className={`flex-1 px-4 py-3 rounded-2xl border flex-row justify-between ${cardBgColor} ${borderColor} ${
         !isLast ? 'mr-2' : ''
       }`}
       activeOpacity={0.7}
     >
-      <Text className="text-white text-sm font-['SFProDisplayRegular']">
+      <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>
         {value}
       </Text>
-      <Ionicons name="chevron-down" size={16} color="white" />
+      <Ionicons name="chevron-down" size={16} color={iconColor} />
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 pt-4">
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
-        <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-xl font-semibold font-['SFProDisplaySemiBold']`}>
           {editGoalId ? 'Редактировать цель' : 'Добавить цель'}
         </Text>
         <View className="w-6" />
@@ -185,21 +197,21 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
         <View className="px-4 py-2">
           {/* Goal Name */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Название
             </Text>
             <TextInput
               value={formData.name}
               onChangeText={(text) => setFormData({ ...formData, name: text })}
               placeholder="Купить мебель"
-              placeholderTextColor="#6B7280"
-              className="bg-gray-800 text-white px-4 py-4 rounded-2xl border border-gray-700 font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
             />
           </View>
 
           {/* Goal Types */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Типы целей
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -209,8 +221,8 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
                   onPress={() => setFormData({ ...formData, type: type.key as any })}
                   className={`px-4 py-3 rounded-2xl border ${
                     formData.type === type.key
-                      ? 'bg-gray-700 border-gray-500'
-                      : 'bg-gray-800 border-gray-700'
+                      ? `${cardBgColor} ${borderColor}`
+                      : `${inactiveCardBgColor} ${inactiveBorderColor}`
                   }`}
                   activeOpacity={0.8}
                 >
@@ -218,15 +230,15 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
                     <View className={`w-5 h-5 rounded-full border-2 mr-3 ${
                       formData.type === type.key
                         ? 'bg-green-500 border-green-500'
-                        : 'border-gray-500'
+                        : borderColor
                     }`}>
                       {formData.type === type.key && (
                         <View className="w-full h-full items-center justify-center">
-                          <View className="w-2 h-2 bg-white rounded-full" />
+                          <View className={`w-2 h-2 ${isDark ? 'bg-white' : 'bg-gray-900'} rounded-full`} />
                         </View>
                       )}
                     </View>
-                    <Text className="text-white font-['SFProDisplayRegular']">
+                    <Text className={`${textColor} font-['SFProDisplayRegular']`}>
                       {type.label}
                     </Text>
                   </View>
@@ -237,7 +249,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
 
           {/* Timeframe */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Срок достижения цели
             </Text>
             <View className="flex-row gap-3">
@@ -249,7 +261,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
 
           {/* Currency */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Валюта
             </Text>
             <View className="flex-row gap-3">
@@ -259,8 +271,8 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
                   onPress={() => setFormData({ ...formData, currency: currency.key as any })}
                   className={`flex-1 px-4 py-3 rounded-2xl border ${
                     formData.currency === currency.key
-                      ? 'bg-gray-700 border-gray-500'
-                      : 'bg-gray-800 border-gray-700'
+                      ? `${cardBgColor} ${borderColor}`
+                      : `${inactiveCardBgColor} ${inactiveBorderColor}`
                   }`}
                   activeOpacity={0.8}
                 >
@@ -268,15 +280,15 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
                     <View className={`w-5 h-5 rounded-full border-2 mr-3 ${
                       formData.currency === currency.key
                         ? 'bg-green-500 border-green-500'
-                        : 'border-gray-500'
+                        : borderColor
                     }`}>
                       {formData.currency === currency.key && (
                         <View className="w-full h-full items-center justify-center">
-                          <View className="w-2 h-2 bg-white rounded-full" />
+                          <View className={`w-2 h-2 ${isDark ? 'bg-white' : 'bg-gray-900'} rounded-full`} />
                         </View>
                       )}
                     </View>
-                    <Text className="text-white font-['SFProDisplayRegular']">
+                    <Text className={`${textColor} font-['SFProDisplayRegular']`}>
                       {currency.label}
                     </Text>
                   </View>
@@ -287,60 +299,60 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
 
           {/* Amount */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Сумма цели
             </Text>
             <TextInput
               value={formData.amount}
               onChangeText={(text) => setFormData({ ...formData, amount: text })}
               placeholder="300 000 $"
-              placeholderTextColor="#6B7280"
-              className="bg-gray-800 text-white px-4 py-4 rounded-2xl border border-gray-700 font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
               keyboardType="numeric"
             />
           </View>
 
           {/* Inflation Rate */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Средняя инфляция в валюте
             </Text>
             <TextInput
               value={formData.currency==="USD"?'3':formData.inflationRate}
               onChangeText={(text) => setFormData({ ...formData, inflationRate: text })}
               placeholder="3,00%"
-              placeholderTextColor="#6B7280"
-              className="bg-gray-800 text-white px-4 py-4 rounded-2xl border border-gray-700 font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
               keyboardType="numeric"
             />
           </View>
 
           {/* Return Rate */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Средняя доходность в валюте
             </Text>
             <TextInput
               value={formData.returnRate}
               onChangeText={(text) => setFormData({ ...formData, returnRate: text })}
               placeholder="8,00%"
-              placeholderTextColor="#6B7280"
-              className="bg-gray-800 text-white px-4 py-4 rounded-2xl border border-gray-700 font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
               keyboardType="numeric"
             />
           </View>
 
           {/* Monthly Investment */}
           <View className="mb-6">
-            <Text className="text-white text-base mb-3 font-['SFProDisplayRegular']">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Расчет ежемесячной суммы инвестирования
             </Text>
             <TextInput
               value={formData.monthlyInvestment}
               onChangeText={(text) => setFormData({ ...formData, monthlyInvestment: text })}
               placeholder="5 000 $"
-              placeholderTextColor="#6B7280"
-              className="bg-gray-800 text-white px-4 py-4 rounded-2xl border border-gray-700 font-['SFProDisplayRegular']"
+              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
               keyboardType="numeric"
             />
           </View>
@@ -355,12 +367,12 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
           className={`w-full py-4 rounded-2xl items-center ${
             canSave
               ? 'bg-green-600'
-              : 'bg-gray-700'
+              : cardBgColor
           }`}
           activeOpacity={canSave ? 0.8 : 1}
         >
           <Text className={`text-base font-['SFProDisplaySemiBold'] ${
-            canSave ? 'text-white' : 'text-gray-400'
+            canSave ? 'text-white' : textSecondaryColor
           }`}>
             {editGoalId ? 'Сохранить' : 'Добавить'}
           </Text>

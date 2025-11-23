@@ -49,7 +49,16 @@ interface AnalyzeList {
 
 const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
   
-  const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption, currency} = useFinancialStore();
+  const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption, currency, theme} = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const iconColor = isDark ? '#FFFFFF' : '#11181C';
+  const cardBgColor = isDark ? 'bg-white/10' : 'bg-gray-100';
+  const borderColor = isDark ? 'border-gray-600' : 'border-gray-300';
+  const inactiveBorderColor = isDark ? 'border-gray-600' : 'border-gray-300';
   
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,50 +204,50 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity onPress={handleBack} className="p-2">
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
-        <Text className="text-white text-base font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
           {title}
         </Text>
         
         <View className="flex-row">
           {diagramLink && <TouchableOpacity className="p-2 mr-1" onPress={()=>router.replace(diagramLink)}>
-            <Ionicons name="pie-chart-outline" size={20} color="#FFFFFF" />
+            <Ionicons name="pie-chart-outline" size={20} color={iconColor} />
           </TouchableOpacity>}
           
           <TouchableOpacity className="p-2" onPress={openModal}>
-            <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
+            <Ionicons name="information-circle-outline" size={24} color={iconColor} />
           </TouchableOpacity>
         </View>
       </View>
 
       {tab1 && <View className="mx-4 mb-2">
-        <View className="bg-[#7676803D] rounded-lg p-0.5 flex-row">
+        <View className={`${isDark ? 'bg-[#7676803D]' : 'bg-gray-200'} rounded-lg p-0.5 flex-row`}>
           <TouchableOpacity
             className={`flex-1 py-1 px-4 rounded-lg ${
-              currentRegOption === 'regular' ? 'bg-[#636366]' : ''
+              currentRegOption === 'regular' ? (isDark ? 'bg-[#636366]' : 'bg-gray-300') : ''
             }`}
             onPress={() => setRegOption('regular')}
           >
-            <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
+            <Text className={`text-center text-xs font-['SFProDisplayRegular'] ${textColor}`}>
               {tab1}
             </Text>
           </TouchableOpacity>
           
           <TouchableOpacity
             className={`flex-1 py-1 px-4 rounded-lg ${
-              currentRegOption === 'irregular' ? 'bg-[#636366]' : ''
+              currentRegOption === 'irregular' ? (isDark ? 'bg-[#636366]' : 'bg-gray-300') : ''
             }`}
             onPress={() => setRegOption('irregular')}
           >
-            <Text className={`text-center text-xs font-['SFProDisplayRegular'] text-white`}>
+            <Text className={`text-center text-xs font-['SFProDisplayRegular'] ${textColor}`}>
               {tab2}
             </Text>
           </TouchableOpacity>
@@ -255,11 +264,13 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 className={`px-2 py-1 rounded-full border ${
                   currentCategoryOption === category.id
                     ? 'bg-[#2AA651] border-[#2AA651]'
-                    : 'border-gray-600 bg-transparent'
+                    : `${inactiveBorderColor} bg-transparent`
                 }`}
                 onPress={()=> handleCategory(category.id)}
               >
-                <Text className={`text-xs font-['SFProDisplayRegular'] text-white`}>
+                <Text className={`text-xs font-['SFProDisplayRegular'] ${
+                  currentCategoryOption === category.id ? 'text-white' : textColor
+                }`}>
                   {category.label}
                 </Text>
               </TouchableOpacity>
@@ -270,13 +281,13 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 text-white font-['SFProDisplayRegular'] `}>
+                <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 
                   name="chevron-down" 
                   size={14} 
-                  color="#FFF" 
+                  color={iconColor} 
                 />
               </TouchableOpacity>
             }
@@ -289,7 +300,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         <ScrollView  className="flex-1 " showsVerticalScrollIndicator={false}>
           <View className="flex-row w-full justify-between items-center">
            
-            <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             {assetName}
           </Text>
             
@@ -297,13 +308,13 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 text-white font-['SFProDisplayRegular'] `}>
+                <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 
                   name="filter-outline" 
                   size={14} 
-                  color="#FFF" 
+                  color={iconColor} 
                 />
               </TouchableOpacity>
        
@@ -318,7 +329,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         currentAssets.length>0 ? <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Total Assets */}
         <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             {assetName}
           </Text>
           {currentCategoryOption !== "effect" && <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
@@ -327,23 +338,23 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           
         </View>
 
-        <View className="bg-white/10 rounded-xl px-3 mb-2">
+        <View className={`${cardBgColor} rounded-xl px-3 mb-2`}>
           {currentAssets.map((asset, index) => ( 
             <View key={asset.id}>
               <View className="flex-row items-center justify-between py-3">
                 <View className="flex-1">
-                  <Text className="text-white text-sm mb-1 font-['SFProDisplayRegular']">
+                  <Text className={`${textColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
                     {asset.name}
                   </Text>
 
-                  {asset.yield && !isPassive && <Text className="text-gray-400 text-xs font-['SFProDisplayRegular']">
+                  {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
                     Доходность {asset.yield}%
                   </Text>}
                  
                 </View>
                 
                 <View className="flex-row items-center">
-                  <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                  <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
                     {formatAmount(asset.amount, asset.yield)}
                   </Text>
                   
@@ -351,14 +362,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                     onPress={() => handleAssetInfo(asset)}
                     className=" mr-2"
                   >
-                    <Ionicons name="add-circle-outline" size={20} color="#FFF" />
+                    <Ionicons name="add-circle-outline" size={20} color={iconColor} />
                   </TouchableOpacity>
                   
                   <TouchableOpacity 
                     onPress={() => handleEditAsset(asset)}
                     className=""
                   >
-                    <Ionicons name="create-outline" size={20} color="#FFF" />
+                    <Ionicons name="create-outline" size={20} color={iconColor} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -373,19 +384,19 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           {currentAnalyzeList.map((asset, index) => ( 
             <View key={index}>
               <View className="mb-3 flex-row items-center justify-between">
-                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   {asset.name}
                 </Text>
                 <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
                   {getTotal(asset.item)}
                 </Text>
               </View>
-                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
                   {asset.item.map((el, index) => ( 
                   <View key={el.id} >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
                           {el.name}
                         </Text>
 
@@ -394,7 +405,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
                           {formatAmount(el.amount)}
                         </Text>
                         
@@ -413,19 +424,19 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
            <View >
               <View className="mb-3 flex-row items-center justify-between">
-                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Дельта
                 </Text>
                 <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
                   {delta}
                 </Text>
               </View>
-                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
                  
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
                           Доход-расходы
                         </Text>
 
@@ -434,7 +445,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
                         {delta}
                         </Text>
                         
@@ -451,19 +462,19 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
             <View >
               <View className="mb-3 flex-row items-center justify-between">
-                <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+                <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Расчет чистого капитала
                 </Text>
                 <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
                   {defActPass}
                 </Text>
               </View>
-                <View className="bg-white/10 rounded-xl px-3 mb-3">
+                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
                  
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className="text-white text-sm font-medium mb-1 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
                           Активы-пассивы
                         </Text>
 
@@ -472,7 +483,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className="text-white text-sm font-medium mr-3 font-['SFProDisplayRegular']">
+                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
                         {defActPass}
                         </Text>
                         
@@ -489,22 +500,22 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
        
         
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
-        <Text className="text-white text-base font-['SFProDisplayRegular'] mb-3 text-center">
+        <Text className={`${textColor} text-base font-['SFProDisplayRegular'] mb-3 text-center`}>
          {emptyTitle }
         </Text>
         
-        <Text className="text-white/60 text-xs text-center font-['SFProDisplayRegular'] mb-8 leading-5">
+        <Text className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-xs text-center font-['SFProDisplayRegular'] mb-8 leading-5`}>
           {emptyDesc}
         </Text>
         {isAnalyze === true ? "" : <TouchableOpacity
-          className="border-2 border-white rounded-2xl px-8 py-1 flex-row items-center"
+          className={`border-2 ${isDark ? 'border-white' : 'border-gray-900'} rounded-2xl px-8 py-1 flex-row items-center`}
           onPress={handleAddExpense}
           activeOpacity={0.8}
         >
-          <Text className="text-white text-sm font-medium mr-2 font-['SFProDisplayRegular']">
+          <Text className={`${textColor} text-sm font-medium mr-2 font-['SFProDisplayRegular']`}>
             Добавить
           </Text>
-          <Ionicons name="add-circle-outline" size={18} color="#FFFFFF" />
+          <Ionicons name="add-circle-outline" size={18} color={iconColor} />
         </TouchableOpacity>}
         
         

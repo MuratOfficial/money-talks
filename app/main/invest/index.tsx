@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import TestComponent from '@/app/components/TestComponent';
 import { fetchQuestions, fetchTips, Question, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
+import useFinancialStore from '@/hooks/useStore';
 
 interface AccordionItem {
   id: string;
@@ -13,6 +14,14 @@ interface AccordionItem {
 }
 
 const InvestmentsPage: React.FC = () => {
+  const { theme } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-300' : 'text-gray-700';
+  const cardBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const iconColor = isDark ? '#9CA3AF' : '#6B7280';
 
     const [showTest, setShowTest] = useState(false);
     useEffect(() => {
@@ -115,14 +124,14 @@ const InvestmentsPage: React.FC = () => {
   }
 
   return (
-  <View className="flex-1 bg-black">
+  <View className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-start justify-between px-4 py-3 pb-6">
-        <Text className="text-white text-xl font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold']`}>
           Инвестиции
         </Text>
         <TouchableOpacity className="p-1" onPress={openModal}>
-          <MaterialIcons name="info-outline" size={24} color="#9CA3AF" />
+          <MaterialIcons name="info-outline" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
 
@@ -132,25 +141,25 @@ const InvestmentsPage: React.FC = () => {
           <View key={item.id} className="mb-3">
             <TouchableOpacity
               onPress={() => toggleExpanded(item.id)}
-              className="bg-[#333333] rounded-xl p-4 flex-row items-center justify-between"
+              className={`${cardBgColor} rounded-xl p-4 flex-row items-center justify-between`}
               activeOpacity={0.7}
             >
-              <Text className="text-white text-base font-medium flex-1 mr-3 font-['SFProDisplayRegular']">
+              <Text className={`${textColor} text-base font-medium flex-1 mr-3 font-['SFProDisplayRegular']`}>
                 {item.title}
               </Text>
               <View className="ml-2">
                 <MaterialIcons 
                   name={isExpanded(item.id) ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
                   size={24} 
-                  color="#9CA3AF" 
+                  color={iconColor} 
                 />
               </View>
             </TouchableOpacity>
             
             {isExpanded(item.id) && (
-              <View className="bg-[#333333] rounded-b-lg px-4 pb-4 -mt-2">
+              <View className={`${cardBgColor} rounded-b-lg px-4 pb-4 -mt-2`}>
                
-                <Text className="text-gray-300 text-sm leading-6 font-['SFProDisplayRegular']">
+                <Text className={`${textSecondaryColor} text-sm leading-6 font-['SFProDisplayRegular']`}>
                   {item.content}
                 </Text>
               </View>

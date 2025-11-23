@@ -11,7 +11,8 @@ export default function ForgottenScreen() {
   const [emailSent, setEmailSent] = useState(false);
 
   const router = useRouter();
-  const { resetPassword } = useFinancialStore();
+  const { resetPassword, theme } = useFinancialStore();
+
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,8 +82,17 @@ export default function ForgottenScreen() {
     }
   };
 
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const labelColor = isDark ? 'text-[#BDBDBD]' : 'text-gray-700';
+  const iconColor = isDark ? 'white' : '#11181C';
+
   return (
-    <View className="flex-1 bg-black px-6">
+    <View className={`flex-1 ${bgColor} px-6`}>
       {/* Header */}
       <View className="flex-row items-center pt-12 pb-8">
         <TouchableOpacity 
@@ -90,17 +100,17 @@ export default function ForgottenScreen() {
           onPress={() => router.replace('/(auth)/login')}
           disabled={loading}
         >
-          <MaterialIcons name="arrow-back" size={24} color="white" />
+          <MaterialIcons name="arrow-back" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
       
       {/* Title */}
-      <Text className="font-['SFProDisplayRegular'] text-white text-2xl font-bold mb-4 text-left">
+      <Text className={`font-['SFProDisplayRegular'] ${textColor} text-2xl font-bold mb-4 text-left`}>
         Забыли пароль?
       </Text>
       
       {/* Description */}
-      <Text className="font-['SFProDisplayRegular'] text-gray-400 text-base mb-8">
+      <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} text-base mb-8`}>
         {emailSent 
           ? `Код восстановления отправлен на ${email}. Проверьте вашу почту, включая папку "Спам".`
           : 'Введите email, связанный с вашим аккаунтом, и мы отправим код для восстановления пароля'
@@ -111,11 +121,11 @@ export default function ForgottenScreen() {
         <>
           {/* Email Input */}
           <View className="mb-6">
-            <Text className="font-['SFProDisplayRegular'] text-[#BDBDBD] text-sm mb-2">
+            <Text className={`font-['SFProDisplayRegular'] ${labelColor} text-sm mb-2`}>
               Email
             </Text>
             <TextInput
-              className="font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 text-base bg-[#333333] text-white"
+              className={`font-['SFProDisplayRegular'] h-[50px] rounded-[20px] px-4 text-base ${inputBgColor} ${inputTextColor}`}
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
@@ -124,7 +134,7 @@ export default function ForgottenScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               placeholder="Введите ваш email"
-              placeholderTextColor="#666"
+              placeholderTextColor={isDark ? "#666" : "#999"}
               editable={!loading}
             />
             {error ? (
@@ -137,7 +147,7 @@ export default function ForgottenScreen() {
           {/* Submit Button */}
           <TouchableOpacity 
             className={`h-[50px] rounded-[16px] justify-center items-center mt-4 ${
-              loading ? 'bg-gray-600' : 'bg-[#4CAF50]'
+              loading ? (isDark ? 'bg-gray-600' : 'bg-gray-400') : 'bg-[#4CAF50]'
             }`}
             onPress={handleResetPassword}
             disabled={loading || !email.trim()}
@@ -156,7 +166,7 @@ export default function ForgottenScreen() {
           {/* Success State - показываем после отправки */}
           <View className="items-center mb-8">
             <MaterialIcons name="mail-outline" size={64} color="#4CAF50" />
-            <Text className="font-['SFProDisplayRegular'] text-white text-lg font-medium mt-4 text-center">
+            <Text className={`font-['SFProDisplayRegular'] ${textColor} text-lg font-medium mt-4 text-center`}>
               Код отправлен!
             </Text>
           </View>
@@ -199,7 +209,7 @@ export default function ForgottenScreen() {
         onPress={() => router.replace('/(auth)/login')}
         disabled={loading}
       >
-        <Text className="font-['SFProDisplayRegular'] text-green-500 text-base">
+        <Text className="font-['SFProDisplayRegular'] text-[#4CAF50] text-base">
           Вернуться к входу
         </Text>
       </TouchableOpacity>

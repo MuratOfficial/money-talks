@@ -14,8 +14,19 @@ const AddWalletScreen = () => {
 
   const { 
     addWallet,
-    getWalletBalance
+    getWalletBalance,
+    theme
   } = useFinancialStore();
+  
+  const isDark = theme === 'dark';
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const inputBgColor = isDark ? 'bg-white/20' : 'bg-gray-100';
+  const inputTextColor = isDark ? 'text-white' : 'text-gray-900';
+  const cardBgColor = isDark ? 'bg-white/20' : 'bg-gray-100';
+  const iconColor = isDark ? 'white' : '#11181C';
+  const borderColor = isDark ? 'border-gray-500' : 'border-gray-400';
 
   const handleAddItem = () => {
     addWallet({
@@ -49,33 +60,33 @@ const AddWalletScreen = () => {
   const RadioButton = ({ selected, onPress, label }:any) => (
     <TouchableOpacity
       onPress={onPress}
-      className="bg-white/20 rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between"
+      className={`${cardBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
       activeOpacity={0.7}
     >
-      <Text className="text-white text-base font-['SFProDisplayRegular'] line-clamp-1">
+      <Text className={`${textColor} text-base font-['SFProDisplayRegular'] line-clamp-1`}>
         {label}
       </Text>
       
-      <View className="w-6 h-6 rounded-full border-2 border-gray-500 items-center justify-center">
+      <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
         {selected && (
-          <View className="w-3 h-3 rounded-full bg-white" />
+          <View className={`w-3 h-3 rounded-full ${isDark ? 'bg-white' : 'bg-gray-900'}`} />
         )}
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity 
           onPress={() => router.replace('/main')}
           className="p-2"
         >
-          <Ionicons name="chevron-back" size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
-        <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
           Добавить кошелек
         </Text>
         
@@ -88,21 +99,21 @@ const AddWalletScreen = () => {
       >
         {/* Card Name */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Название карты
           </Text>
           <TextInput
             value={cardName}
             onChangeText={setCardName}
-            className="bg-white/20 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-4 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите название"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
           />
         </View>
 
         {/* Wallet Type */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Выберите тип кошелька
           </Text>
           <View className="flex-row flex-wrap justify-between">
@@ -120,22 +131,22 @@ const AddWalletScreen = () => {
 
         {/* Amount */}
         <View className="mb-6">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Сумма
           </Text>
           <TextInput
             value={amount}
             onChangeText={setAmount}
-            className="bg-white/20 rounded-xl px-4 py-4 text-white text-base font-['SFProDisplayRegular']"
+            className={`${inputBgColor} rounded-xl px-4 py-4 ${inputTextColor} text-base font-['SFProDisplayRegular']`}
             placeholder="Введите сумму"
-            placeholderTextColor="#666"
+            placeholderTextColor={isDark ? "#666" : "#999"}
             keyboardType="numeric"
           />
         </View>
 
         {/* Currency */}
         <View className="mb-8">
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular'] mb-3">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Валюта
           </Text>
           <View className="flex-row flex-wrap justify-between">
