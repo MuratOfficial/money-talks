@@ -1,4 +1,4 @@
-// components/PDFLoadingModal.tsx
+
 import React, { useEffect, useRef } from 'react';
 import { 
   View, 
@@ -10,6 +10,7 @@ import {
   ActivityIndicator 
 } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import useFinancialStore from '@/hooks/useStore';
 
 interface PDFLoadingModalProps {
   visible: boolean;
@@ -28,6 +29,14 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
   progress = 0,
   allowClose = false
 }) => {
+  const { theme } = useFinancialStore();
+  const isDark = theme === 'dark';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-300' : 'text-gray-700';
+  const textTertiaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const progressBarBgColor = isDark ? 'bg-gray-700' : 'bg-gray-300';
+  const iconColor = isDark ? 'white' : '#11181C';
+  
   // Анимации
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -213,7 +222,7 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
             }}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="close" size={24} color="white" />
+            <MaterialIcons name="close" size={24} color={iconColor} />
           </TouchableOpacity>
         )}
 
@@ -262,7 +271,7 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
 
             {/* Прогресс бар если есть прогресс */}
             {progress > 0 && progress < 100 && (
-              <View className="mt-4 w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+              <View className={`mt-4 w-32 h-2 ${progressBarBgColor} rounded-full overflow-hidden`}>
                 <Animated.View 
                   className="h-full rounded-full"
                   style={{
@@ -282,16 +291,16 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
             className="mt-6 items-center px-8"
             style={{ opacity: fadeAnim }}
           >
-            <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold'] text-center">
+            <Text className={`${textColor} text-xl font-semibold font-['SFProDisplaySemiBold'] text-center`}>
               {config.title}
             </Text>
-            <Text className="text-gray-300 text-base text-center mt-2 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-base text-center mt-2 font-['SFProDisplayRegular']`}>
               {config.subtitle}
             </Text>
 
             {/* Показываем прогресс в процентах */}
             {progress > 0 && progress < 100 && (
-              <Text className="text-gray-400 text-sm mt-2">
+              <Text className={`${textTertiaryColor} text-sm mt-2`}>
                 {Math.round(progress)}%
               </Text>
             )}

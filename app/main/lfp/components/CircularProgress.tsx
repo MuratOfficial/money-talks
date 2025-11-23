@@ -1,12 +1,17 @@
 import React from "react";
 import { Text, View } from "react-native";
 import Svg, { Circle } from 'react-native-svg';
+import useFinancialStore from '@/hooks/useStore';
 
 interface CircularProgressProps {
   progress: number;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
+  const { theme } = useFinancialStore();
+  const isDark = theme === 'dark';
+  const circleStrokeColor = isDark ? '#374151' : '#E5E7EB';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
   const radius = 35;
   const strokeWidth = 6;
   const normalizedRadius = radius - strokeWidth * 2;
@@ -22,7 +27,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
         style={{ transform: [{ rotate: '-90deg' }] }}
       >
         <Circle
-          stroke="#374151"
+          stroke={circleStrokeColor}
           fill="transparent"
           strokeWidth={strokeWidth}
           r={normalizedRadius}
@@ -42,7 +47,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
         />
       </Svg>
       <View className="absolute inset-0 items-center justify-center">
-        <Text className="text-white text-sm font-['SFProDisplayBold']">
+        <Text className={`${textColor} text-sm font-['SFProDisplayBold']`}>
           {progress.toFixed(1)}%
         </Text>
       </View>
