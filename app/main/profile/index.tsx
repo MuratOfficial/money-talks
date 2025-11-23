@@ -13,7 +13,7 @@ const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-    const { signOut, user } = useFinancialStore();
+    const { signOut, user, setTheme, theme } = useFinancialStore();
   const router = useRouter();
 
 
@@ -74,14 +74,20 @@ const ProfileScreen = () => {
 
 
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
-  const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
+  const [selectedSortTheme, setSelectedSortTheme] = useState(theme==="dark"? 'Темная':'Яркая');
 
 
   const profileName = user?.name || "Unknown";
 
   const handleSortSelectTheme = (value:any) => {
     setSelectedSortTheme(value);
-    console.log('Selected sort:', value);
+    if(value==="Темная"){
+      setTheme("dark")
+    }
+    if(value==="Светлая"){
+      setTheme("light")
+    }
+    
   };
 
   const [showDrawerCurrency, setShowDrawerCurrency] = useState(false);

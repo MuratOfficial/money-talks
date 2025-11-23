@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
@@ -23,18 +23,18 @@ export default function RootLayout(): ReactElement {
   ];
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       {/* Основной контент с padding снизу для навигации */}
-      <View style={styles.content}>
+      <View className="flex-1 pb-[70px]">
         <Slot />
       </View>
 
       {/* Нижняя навигация */}
-      <View style={styles.bottomNav}>
+      <View className="absolute bottom-0 left-0 right-0 flex-row bg-[#1D1F24] py-[15px] px-5 justify-around h-[70px]">
         {navButtons.map((button) => (
           <TouchableOpacity
             key={button.route}
-            style={styles.navItem}
+            className="items-center flex-1"
             onPress={() => router.navigate(button.route)}
           >
             <Ionicons
@@ -42,10 +42,9 @@ export default function RootLayout(): ReactElement {
               size={24}
               color={button.route.includes(activeRoute) ? '#66BB6A' : '#666'}
             />
-            <Text style={[
-              styles.navLabel,
-              button.route.includes(activeRoute) && { color: '#66BB6A' }
-            ]}>
+            <Text className={`text-[10px] mt-[5px] ${
+              button.route.includes(activeRoute) ? 'text-[#66BB6A]' : 'text-[#666]'
+            }`}>
               {button.label}
             </Text>
           </TouchableOpacity>
@@ -54,34 +53,3 @@ export default function RootLayout(): ReactElement {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingBottom: 70, // Добавляем отступ равный высоте навигации
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    backgroundColor: '#1D1F24',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    justifyContent: 'space-around',
-    height: 70, // Фиксированная высота навигации
-  },
-  navItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  navLabel: {
-    color: '#666',
-    fontSize: 10,
-    marginTop: 5,
-  },
-});
