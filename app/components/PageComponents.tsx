@@ -76,7 +76,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const tutorialSteps = [
     {
-      text: 'Нажмите здесь, чтобы добавить новую запись',
+      text: 'Не знаете, что делать? Нажмите, здесь есть подсказки!',
       position: { x: 20, y: 10, width: 150, height: 50 },
       arrowDirection: 'top' as const,
       duration: 4000,

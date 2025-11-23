@@ -122,6 +122,11 @@ const GoalsScreen = () => {
     }
   };
 
+const handleAdd = () => {
+  pickEditGoal("");
+  router.replace("/main/goals/add-goal")
+}
+
 // Использование в компоненте с useEffect
 const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
 
@@ -376,9 +381,7 @@ return (
       <TouchableOpacity 
         className="absolute bottom-6 right-6 w-14 h-14 bg-[#4CAF50] rounded-full items-center justify-center shadow-lg"
         activeOpacity={0.8}
-        onPress={() => {
-          router.replace("/main/goals/add-goal")
-        }}
+        onPress={handleAdd}
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>

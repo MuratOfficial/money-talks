@@ -617,19 +617,19 @@ const totalPassives = passives?.reduce((sum, passive) => sum + passive.amount, 0
                 </thead>
                 <tbody>
                     <!-- Здесь будет цикл по долгосрочным целям -->
-                    <tr style="background: #f0fdf4;">
-                        <td style="padding: 12px 8px; text-align: center; font-weight: bold;">1</td>
-                        <td style="padding: 12px; font-weight: 600; color: #166534;">Образование сына Асана</td>
-                        <td style="padding: 12px; text-align: center;">45 000 $</td>
-                        <td style="padding: 12px; text-align: center;">USD</td>
-                        <td style="padding: 12px; text-align: center; font-size: 11px;">01.09.2029</td>
-                        <td style="padding: 12px; text-align: center;">10%</td>
-                        <td style="padding: 12px; text-align: center;">3,00%</td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold;">9</td>
-                        <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">500 $</td>
-                        <td style="padding: 12px; text-align: center;">270 765 ₸</td>
-                        <td style="padding: 12px; text-align: center;">500 $</td>
-                    </tr>
+                    // <tr style="background: #f0fdf4;">
+                    //     <td style="padding: 12px 8px; text-align: center; font-weight: bold;">1</td>
+                    //     <td style="padding: 12px; font-weight: 600; color: #166534;">Образование сына Асана</td>
+                    //     <td style="padding: 12px; text-align: center;">45 000 $</td>
+                    //     <td style="padding: 12px; text-align: center;">USD</td>
+                    //     <td style="padding: 12px; text-align: center; font-size: 11px;">01.09.2029</td>
+                    //     <td style="padding: 12px; text-align: center;">10%</td>
+                    //     <td style="padding: 12px; text-align: center;">3,00%</td>
+                    //     <td style="padding: 12px; text-align: center; font-weight: bold;">9</td>
+                    //     <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">500 $</td>
+                    //     <td style="padding: 12px; text-align: center;">270 765 ₸</td>
+                    //     <td style="padding: 12px; text-align: center;">500 $</td>
+                    // </tr>
                     <!-- Дополнительные строки для других долгосрочных целей -->
                 </tbody>
             </table>
@@ -666,30 +666,30 @@ const totalPassives = passives?.reduce((sum, passive) => sum + passive.amount, 0
                 <tbody>
                     <!-- Здесь будет цикл по среднесрочным целям -->
                     <tr style="background: #fefce8;">
-                        <td style="padding: 12px 8px; text-align: center; font-weight: bold;">1</td>
-                        <td style="padding: 12px; font-weight: 600; color: #c2410c;">Образование Адели</td>
-                        <td style="padding: 12px; text-align: center;">35 000 $</td>
-                        <td style="padding: 12px; text-align: center;">USD</td>
-                        <td style="padding: 12px; text-align: center; font-size: 11px;">01.09.2026</td>
-                        <td style="padding: 12px; text-align: center;">10,00%</td>
-                        <td style="padding: 12px; text-align: center;">3,00%</td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold;">5</td>
-                        <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">488 $</td>
-                        <td style="padding: 12px; text-align: center;">264 004 ₸</td>
-                        <td style="padding: 12px; text-align: center;">488 $</td>
+                        // <td style="padding: 12px 8px; text-align: center; font-weight: bold;">1</td>
+                        // <td style="padding: 12px; font-weight: 600; color: #c2410c;">Образование Адели</td>
+                        // <td style="padding: 12px; text-align: center;">35 000 $</td>
+                        // <td style="padding: 12px; text-align: center;">USD</td>
+                        // <td style="padding: 12px; text-align: center; font-size: 11px;">01.09.2026</td>
+                        // <td style="padding: 12px; text-align: center;">10,00%</td>
+                        // <td style="padding: 12px; text-align: center;">3,00%</td>
+                        // <td style="padding: 12px; text-align: center; font-weight: bold;">5</td>
+                        // <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">488 $</td>
+                        // <td style="padding: 12px; text-align: center;">264 004 ₸</td>
+                        // <td style="padding: 12px; text-align: center;">488 $</td>
                     </tr>
                     <tr style="background: #fef3c7;">
-                        <td style="padding: 12px 8px; text-align: center; font-weight: bold;">2</td>
-                        <td style="padding: 12px; font-weight: 600; color: #c2410c;">Образование Адия</td>
-                        <td style="padding: 12px; text-align: center;">10 000 $</td>
-                        <td style="padding: 12px; text-align: center;">USD</td>
-                        <td style="padding: 12px; text-align: center; font-size: 11px;">01.01.2026</td>
-                        <td style="padding: 12px; text-align: center;">10,00%</td>
-                        <td style="padding: 12px; text-align: center;">3,00%</td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold;">2</td>
-                        <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">493 $</td>
-                        <td style="padding: 12px; text-align: center;">267 169 ₸</td>
-                        <td style="padding: 12px; text-align: center;">493 $</td>
+                        // <td style="padding: 12px 8px; text-align: center; font-weight: bold;">2</td>
+                        // <td style="padding: 12px; font-weight: 600; color: #c2410c;">Образование Адия</td>
+                        // <td style="padding: 12px; text-align: center;">10 000 $</td>
+                        // <td style="padding: 12px; text-align: center;">USD</td>
+                        // <td style="padding: 12px; text-align: center; font-size: 11px;">01.01.2026</td>
+                        // <td style="padding: 12px; text-align: center;">10,00%</td>
+                        // <td style="padding: 12px; text-align: center;">3,00%</td>
+                        // <td style="padding: 12px; text-align: center; font-weight: bold;">2</td>
+                        // <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">493 $</td>
+                        // <td style="padding: 12px; text-align: center;">267 169 ₸</td>
+                        // <td style="padding: 12px; text-align: center;">493 $</td>
                     </tr>
                 </tbody>
             </table>
@@ -724,7 +724,6 @@ const totalPassives = passives?.reduce((sum, passive) => sum + passive.amount, 0
             </div>
         </div>
 
-// Блок для долгосрочных целей (показывается только если есть долгосрочные цели)
 ${longTermGoals.length > 0 ? `
 <div style="margin-bottom: 40px;">
     <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 12px 20px; margin-bottom: 15px; border-radius: 8px; font-weight: bold;">
@@ -1160,15 +1159,15 @@ ${goals.length > 0 || actives.length > 0 ? `
     ` : ''}
 </div>
 ` : ''}
-                <thead>
-                    <tr style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); color: white; font-size: 12px;">
-                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
-                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
-                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Целевой капитал</th>
-                        <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
-                        <th style="padding: 8px; text-align: center;">Требуемая доходность, %</th>
-                    </tr>
-                </thead>
+                // <thead>
+                //     <tr style="background: linear-gradient(135deg, #166534 0%, #22c55e 100%); color: white; font-size: 12px;">
+                //         <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Единоразовое вложение с капитализацией</th>
+                //         <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Стартовый капитал</th>
+                //         <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Целевой капитал</th>
+                //         <th style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2);">Срок, лет</th>
+                //         <th style="padding: 8px; text-align: center;">Требуемая доходность, %</th>
+                //     </tr>
+                // </thead>
                 <tbody>
                     ${longTermGoals.map((goal, index) => {
                         const yearsLeft = calculateYearsLeft(goal.timeframe);

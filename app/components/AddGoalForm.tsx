@@ -66,6 +66,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
   const [showDrawerYear, setShowDrawerYear] = useState(false);
   const [selectedSortYear, setSelectedSortYear] = useState('Год');
+  const [yearsDifference, setYearsDifference] = useState<number>(0);
 
   const goalTypes = [
     { key: 'short', label: 'Краткосрочный' },
@@ -85,34 +86,91 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   ];
 
   const currentYear: number = new Date().getFullYear();
-  const years: string[] = Array.from({ length: 50 }, (_, i) => (currentYear + i).toString());
-
-  useEffect(() => {
-    if (editGoalId) {
-      const existingGoal = getGoalById(editGoalId);
-      if (existingGoal) {
-        setFormData({
-          name: existingGoal.name,
-          type: existingGoal.type,
-          timeframe: { period: 'day', value: '' }, // Адаптируйте под вашу структуру
-          currency: existingGoal.currency,
-          amount: existingGoal.amount,
-          inflationRate: existingGoal.inflationRate,
-          returnRate: existingGoal.returnRate,
-          monthlyInvestment: existingGoal.monthlyInvestment,
-        });
-        setSelectedSortDay(existingGoal.timeframe.day);
-        setSelectedSortMonth(existingGoal.timeframe.month);
-        setSelectedSortYear(existingGoal.timeframe.year);
-      }
+  
+  // Динамическое формирование массива годов в зависимости от типа цели
+  const getYearsForGoalType = (goalType: 'short' | 'medium' | 'long'): string[] => {
+    let startOffset = 0;
+    let endOffset = 0;
+    
+    switch (goalType) {
+      case 'short':
+        startOffset = 0;
+        endOffset = 3;
+        break;
+      case 'medium':
+        startOffset = 4;
+        endOffset = 7;
+        break;
+      case 'long':
+        startOffset = 7;
+        endOffset = 50;
+        break;
     }
-  }, [editGoalId]);
+    
+    const yearsCount = endOffset - startOffset + 1;
+    return Array.from({ length: yearsCount }, (_, i) => (currentYear + startOffset + i).toString());
+  };
+
+  const years: string[] = getYearsForGoalType(formData.type);
+
+  // Функция для расчета monthlyInvestment
+const calculateMonthlyInvestment = () => {
+  const amount = parseFloat(formData.amount.replace(/\s/g, ''));
+  const inflationRate = parseFloat(formData.inflationRate) / 100;
+  
+  if (isNaN(amount) || isNaN(inflationRate) || yearsDifference === 0) {
+    return '';
+  }
+  
+  // Формула: amount * ((inflationRate + 1) ^ yearsDifference)
+  const result = amount * Math.pow(inflationRate + 1, yearsDifference)/12;
+  
+  // Форматируем результат с разделением тысяч
+  return result.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
+// Эффект для автоматического пересчета monthlyInvestment
+useEffect(() => {
+  const calculatedValue = calculateMonthlyInvestment();
+  if (calculatedValue !== formData.monthlyInvestment) {
+    setFormData(prev => ({ ...prev, monthlyInvestment: calculatedValue }));
+  }
+  console.log(calculatedValue)
+}, [formData.amount, formData.inflationRate, yearsDifference]);
+
+useEffect(() => {
+  if (editGoalId) {
+    const existingGoal = getGoalById(editGoalId);
+    if (existingGoal) {
+      setFormData({
+        name: existingGoal.name,
+        type: existingGoal.type,
+        timeframe: { period: 'day', value: '' },
+        currency: existingGoal.currency,
+        amount: existingGoal.amount,
+        inflationRate: existingGoal.inflationRate,
+        returnRate: existingGoal.returnRate,
+        monthlyInvestment: existingGoal.monthlyInvestment,
+      });
+      setSelectedSortDay(existingGoal.timeframe.day);
+      setSelectedSortMonth(existingGoal.timeframe.month);
+      setSelectedSortYear(existingGoal.timeframe.year);
+      
+      // Вычисляем разницу годов при редактировании
+      const selectedYearNum = parseInt(existingGoal.timeframe.year, 10);
+      const difference = selectedYearNum - currentYear;
+      setYearsDifference(difference);
+    }
+  }
+}, [editGoalId]);
 
   const handleSave = () => {
     if (!canSave) return;
 
     try {
-      // Конвертируем данные формы в формат store
+      // Здесь yearsDifference доступен для использования
+      console.log('Разница годов:', yearsDifference);
+      
       const goalData = convertFormDataToGoal(
         formData,
         selectedSortDay,
@@ -123,7 +181,6 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
       let goalId: string;
 
       if (editGoalId) {
-        // Обновление существующей цели
         const success = updateGoal(editGoalId, goalData);
         if (success) {
           goalId = editGoalId;
@@ -132,18 +189,15 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
         }
         goalId = editGoalId; 
       } else {
-        // Создание новой цели
         goalId = addGoal(goalData);
-        goalId = 'temp-id'; // Временно для примера
+        goalId = 'temp-id';
       }
 
-      // Вызываем callback с ID цели
       onSave?.(goalId);
       onClose?.();
 
     } catch (error) {
       console.error('Ошибка при сохранении цели:', error);
-      
     }
   };
 
@@ -155,9 +209,13 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
     setSelectedSortMonth(value);
   };
   
-  const handleSortSelectYear = (value: string) => {
-    setSelectedSortYear(value);
-  };
+const handleSortSelectYear = (value: string) => {
+  setSelectedSortYear(value);
+  const selectedYearNum = parseInt(value, 10);
+  const difference = selectedYearNum - currentYear;
+  setYearsDifference(difference);
+  console.log('Выбран год:', value, 'Разница:', difference);
+};
 
   const canSave = formData.name.trim() !== '' && 
                   formData.amount.trim() !== '' &&
@@ -218,7 +276,12 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
               {goalTypes.map((type) => (
                 <TouchableOpacity
                   key={type.key}
-                  onPress={() => setFormData({ ...formData, type: type.key as any })}
+                  onPress={() => {
+                    setFormData({ ...formData, type: type.key as any });
+                      // Сброс выбранного года и разницы при смене типа цели
+                      setSelectedSortYear('Год');
+                      setYearsDifference(0);
+                  }}
                   className={`px-4 py-3 rounded-2xl border ${
                     formData.type === type.key
                       ? `${cardBgColor} ${borderColor}`
@@ -257,6 +320,12 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
               <DropdownButton value={selectedSortMonth} onPress={() => setShowDrawerMonth(true)} />
               <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
             </View>
+            {/* Показываем разницу годов для проверки */}
+            {yearsDifference > 0 && (
+              <Text className={`${textSecondaryColor} text-sm mt-2 font-['SFProDisplayRegular']`}>
+                Срок: {yearsDifference} {yearsDifference === 1 ? 'год' : yearsDifference < 5 ? 'года' : 'лет'}
+              </Text>
+            )}
           </View>
 
           {/* Currency */}
@@ -318,7 +387,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
               Средняя инфляция в валюте
             </Text>
             <TextInput
-              value={formData.currency==="USD"?'3':formData.inflationRate}
+              value={formData.inflationRate}
               onChangeText={(text) => setFormData({ ...formData, inflationRate: text })}
               placeholder="3,00%"
               placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
@@ -347,14 +416,13 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
             <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
               Расчет ежемесячной суммы инвестирования
             </Text>
-            <TextInput
-              value={formData.monthlyInvestment}
-              onChangeText={(text) => setFormData({ ...formData, monthlyInvestment: text })}
-              placeholder="5 000 $"
-              placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+            <Text
               className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
-              keyboardType="numeric"
-            />
+            >
+              {formData.monthlyInvestment 
+                ? `${formData.monthlyInvestment} ${formData.currency === 'USD' ? '$' : '₸'}` 
+                : "Н/о"}
+            </Text>
           </View>
         </View>
       </ScrollView>
