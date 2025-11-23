@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, StatusBar, SafeAreaView } from 'react-native';
 import useFinancialStore from '@/hooks/useStore';
 
 export default function LoginScreen() {
@@ -77,10 +77,12 @@ export default function LoginScreen() {
 
 
   return (
-    <View className={`flex-1 ${bgColor} justify-center p-6`}>
-      <Text className={`font-['SFProDisplayRegular'] text-3xl font-bold ${textColor} mb-8 text-left`}>
-        Вход
-      </Text>
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
+      <View className="flex-1 justify-center p-6">
+        <Text className={`font-['SFProDisplayRegular'] text-3xl font-bold ${textColor} mb-8 text-left`}>
+          Вход
+        </Text>
 
       <View className='mb-5'>
         <Text className={`font-['SFProDisplayRegular'] ${textSecondaryColor} mb-2`}>
@@ -145,7 +147,8 @@ export default function LoginScreen() {
           Зарегистрироваться
         </Text>
       </TouchableOpacity>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 

@@ -82,7 +82,7 @@ const ProfileScreen = () => {
 
 
   const [showDrawerTheme, setShowDrawerTheme] = useState(false);
-  const [selectedSortTheme, setSelectedSortTheme] = useState('Темная');
+  const [selectedSortTheme, setSelectedSortTheme] = useState(isDark ?'Темная':'Светлая');
 
 
   const profileName = user?.name || "Unknown";

@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator, StatusBar, SafeAreaView } from 'react-native';
 import useFinancialStore from '@/hooks/useStore';
 
 export default function ForgottenScreen() {
@@ -92,9 +92,11 @@ export default function ForgottenScreen() {
   const iconColor = isDark ? 'white' : '#11181C';
 
   return (
-    <View className={`flex-1 ${bgColor} px-6`}>
-      {/* Header */}
-      <View className="flex-row items-center pt-12 pb-8">
+    <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
+      <View className="flex-1 px-6">
+        {/* Header */}
+        <View className="flex-row items-center pt-12 pb-8">
         <TouchableOpacity 
           className="mr-4" 
           onPress={() => router.replace('/(auth)/login')}
@@ -213,6 +215,7 @@ export default function ForgottenScreen() {
           Вернуться к входу
         </Text>
       </TouchableOpacity>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
