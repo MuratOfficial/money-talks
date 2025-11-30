@@ -27,8 +27,52 @@ const TestComponent: React.FC<TestComponentProps> = ({
   onComplete 
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<number[]>(new Array(questions.length).fill(-1));
+  const [selectedAnswers, setSelectedAnswers] = useState<number[]>(
+    questions?.length ? new Array(questions.length).fill(-1) : []
+  );
   const [showResult, setShowResult] = useState(false);
+
+  // Проверка на наличие вопросов
+  if (!questions || questions.length === 0) {
+    return (
+      <SafeAreaView className="flex-1 bg-black">
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-4 py-3 pt-4">
+          <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+            <Ionicons name="chevron-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
+            {testTitle}
+          </Text>
+          <View className="w-6" />
+        </View>
+
+        {/* Error Message */}
+        <View className="flex-1 items-center justify-center px-8">
+          <View className="items-center">
+            <View className="w-20 h-20 bg-gray-800 rounded-full items-center justify-center mb-6">
+              <Ionicons name="cloud-offline-outline" size={40} color="#9CA3AF" />
+            </View>
+            <Text className="text-white text-2xl font-semibold mb-3 text-center font-['SFProDisplaySemiBold']">
+              Нет данных
+            </Text>
+            <Text className="text-gray-400 text-base text-center mb-8 font-['SFProDisplayRegular']">
+              Не удалось загрузить вопросы с сервера. Пожалуйста, проверьте подключение к интернету и попробуйте снова.
+            </Text>
+            <TouchableOpacity
+              onPress={onClose}
+              className="bg-green-600 px-8 py-4 rounded-2xl"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white text-base font-semibold font-['SFProDisplaySemiBold']">
+                Вернуться назад
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;

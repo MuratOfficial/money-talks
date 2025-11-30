@@ -59,10 +59,11 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
 
     useEffect(()=>{
       if(assets){
+        // Вычисляем общую сумму сначала
+        const total = assets.reduce((sum, item) => sum + item.amount, 0);
+        setTotalAmount(total);
 
-        setTotalAmount(assets.reduce((sum, item) => sum + item.amount, 0))
-        console.log(totalAmount)
-
+        // Используем вычисленное значение total для процентов
         setExpenseData(
           assets.map(x=>(
             {
@@ -70,7 +71,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
               name:x.name || "",
               amount:x.amount || 0,
               color:x.color || "",
-              percentage:getPercentage(totalAmount, x.amount)|| 0
+              percentage:getPercentage(total, x.amount)|| 0
             }
           ))
         )

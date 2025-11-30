@@ -47,7 +47,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             }
             if(segments.find(x=>x==="passives")){
                 updatePassives(currentAsset?.id, {
-                    amount: currentAsset.amount + (Number(value) || 0)
+                    amount: currentAsset.amount - (Number(value) || 0)
                 })
             }
 

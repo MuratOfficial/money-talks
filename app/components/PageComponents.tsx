@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -6,6 +7,8 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
@@ -65,14 +68,14 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const [showTooltip, setShowTooltip] = useState(false);
 
-   useEffect(() => {
-
+useEffect(() => {
+  if (!assets || assets.length === 0 ) {
     const timer = setTimeout(() => {
       setShowTooltip(true);
-    }, 500); // небольшая задержка после загрузки экрана
-
+    }, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }
+}, [assets]);
 
   const tutorialSteps = [
     {
@@ -204,7 +207,8 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+     <TouchableWithoutFeedback onPress={() => showTooltip && handleTooltipClose()}>
+          <SafeAreaView className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}
@@ -571,6 +575,8 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
       />
       
     </SafeAreaView>
+     </TouchableWithoutFeedback>
+
   );
 };
 
