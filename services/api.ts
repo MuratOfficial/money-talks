@@ -1,9 +1,12 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 
-const API_BASE_URL = __DEV__ 
-  ? process.env.EXPO_PUBLIC_API_BASE_LOCAL 
-  : process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
+// const API_BASE_URL = __DEV__ 
+//   ? process.env.EXPO_PUBLIC_API_BASE_LOCAL 
+//   : process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
+
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
