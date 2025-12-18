@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import TestComponent from '@/app/components/TestComponent';
@@ -99,6 +99,11 @@ const InvestmentsPage: React.FC = () => {
       id: '3',
       title: 'Почему это важно?',
       content: 'Определение риск-профиля помогает подобрать инвестиционную стратегию, которая соответствует вашим целям, временному горизонту и психологической готовности к рискам. Это основа для построения эффективного инвестиционного портфеля.'
+    },
+    {
+      id: '4',
+      title: 'Остерегайтесь мошенников',
+      content: 'Примеры финпирамид: обещания "100% прибыли за неделю", выплаты за счёт привлечения новых участников.\n\nПризнаки мошенничества:\n• Отсутствие лицензии\n• "Гарантии дохода"\n• Нет реального продукта или услуги\n• Давление на быстрое принятие решения\n• Требование привлечения новых участников\n\nВсегда проверяйте брокеров и финансовые компании в официальных реестрах!'
     }
   ];
 
@@ -111,6 +116,20 @@ const InvestmentsPage: React.FC = () => {
   };
 
   const isExpanded = (itemId: string) => expandedItems.includes(itemId);
+
+  const handleOpenBrokerCheck = async () => {
+    const url = 'https://data.egov.kz/';
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        console.error("Don't know how to open this URL: " + url);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+    }
+  };
 
     if (showTest) {
     return (
@@ -162,6 +181,20 @@ const InvestmentsPage: React.FC = () => {
                 <Text className={`${textSecondaryColor} text-sm leading-6 font-['SFProDisplayRegular']`}>
                   {item.content}
                 </Text>
+                
+                {/* Кнопка для проверки брокеров (только для 4-го элемента) */}
+                {item.id === '4' && (
+                  <TouchableOpacity
+                    onPress={handleOpenBrokerCheck}
+                    className="bg-blue-600 rounded-lg py-3 px-4 mt-4 flex-row items-center justify-center"
+                    activeOpacity={0.8}
+                  >
+                    <MaterialIcons name="open-in-new" size={20} color="white" style={{ marginRight: 8 }} />
+                    <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
+                      Проверить брокера в реестре РК
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
           </View>

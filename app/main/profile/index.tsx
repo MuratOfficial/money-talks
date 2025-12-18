@@ -8,6 +8,7 @@ import Drawer from '@/app/components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
 import FaceIDModal from '@/app/components/FaceIDModal';
+import InvestmentNotificationManager from '@/app/components/InvestmentNotificationManager';
 
 const ProfileScreen = () => {
 
@@ -244,6 +245,9 @@ const ProfileScreen = () => {
             <Ionicons name="pencil" size={16} color="#4CAF50" />
           </TouchableOpacity>
         </View>
+
+        {/* Investment Notification Manager */}
+        <InvestmentNotificationManager />
 
         {/* Menu Items */}
         <View className="mb-8">
