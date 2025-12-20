@@ -6,6 +6,7 @@ import TestComponent from '@/app/components/TestComponent';
 import { fetchQuestions, fetchTips, Question, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
 import useFinancialStore from '@/hooks/useStore';
+import LoadingAnimation from '@/app/components/LoadingAnimation';
 
 interface AccordionItem {
   id: string;
@@ -130,6 +131,18 @@ const InvestmentsPage: React.FC = () => {
       console.error('Error opening URL:', error);
     }
   };
+
+  // Показываем загрузку при первой загрузке
+  if (loading) {
+    return (
+      <View className={`flex-1 ${bgColor}`}>
+        <LoadingAnimation 
+          fullScreen 
+          message="Загрузка вопросов теста..." 
+        />
+      </View>
+    );
+  }
 
     if (showTest) {
     return (

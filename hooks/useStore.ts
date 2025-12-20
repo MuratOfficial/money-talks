@@ -16,7 +16,7 @@ export interface Goal {
   currency: 'KZT' | 'USD';
   amount: string;
   collected?: string;
-  progress?:number;
+  progress?: number;
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
@@ -50,7 +50,7 @@ export interface GoalFormData {
     year: string;
   };
   collected?: string;
-  progress?:number;
+  progress?: number;
   currency: 'KZT' | 'USD';
   amount: string;
   inflationRate: string;
@@ -64,15 +64,15 @@ export interface FinancialItem {
   amount: string;
   color: string;
   icon: string;
-  iconType?:string;
+  iconType?: string;
 }
 
 export interface FinancialCategory {
   id: string;
   title: string;
   balance: string;
-  balanceUSD?:string;
-  balanceEUR?:string;
+  balanceUSD?: string;
+  balanceEUR?: string;
   items: FinancialItem[];
 }
 
@@ -91,7 +91,7 @@ export interface Wallet {
   type: string;
   summ: number;
   summUSD?: number;
-  summEUR?:number;
+  summEUR?: number;
   currency: string;
   icon?: string;
   color?: string;
@@ -102,13 +102,13 @@ export interface Asset {
   name: string;
   amount: number;
   yield?: number;
-  additional?:number;
+  additional?: number;
   icon?: string;
-  iconType?:string;
+  iconType?: string;
   color?: string;
-  regularity?:string;
-  categoryTab?:string;
-
+  regularity?: string;
+  categoryTab?: string;
+  createdAt?: Date;
 }
 
 export interface PersonalFinancialPlan {
@@ -138,7 +138,7 @@ export interface AppState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  
+
   // Финансовые данные
   categories: FinancialCategory[];
   expences: Asset[];
@@ -153,7 +153,7 @@ export interface AppState {
 
   // Редактирование ассет
   currentAsset: Asset | null;
- 
+
   totalBalance: string;
   walletBalance: string;
   walletBalanceUSD: string;
@@ -171,10 +171,10 @@ export interface AppState {
   // Выборы в фильтрах
   currentCategoryOption: string;
   currentRegOption: string;
-  setRegOption:(opt:string)=>void;
+  setRegOption: (opt: string) => void;
 
-  setCategoryOption: (opt:string)=>void;
-  
+  setCategoryOption: (opt: string) => void;
+
   // Действия с пользователем
   setUser: (user: User) => void;
   logout: () => void;
@@ -185,11 +185,11 @@ export interface AppState {
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   verifyResetCode: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
- 
+
   resetPassword: (email: string) => Promise<AuthResponse>;
   verifyOtp: (params: VerifyOtpParams) => Promise<AuthResponse>;
   updatePassword: (params: UpdatePasswordParams) => Promise<AuthResponse>;
-  
+
   // Действия с финансами
   setCategories: (categories: FinancialCategory[]) => void;
   addCategory: (category: Omit<FinancialCategory, 'id'>) => void;
@@ -201,16 +201,16 @@ export interface AppState {
   setWallets: (wallets: Wallet[]) => void;
   addWallet: (wallet: Omit<Wallet, 'id'>) => void;
   updateWallet: (walletId: string, updates: Partial<Wallet>) => void;
-  
+
   addFinancialItem: (categoryId: string, item: Omit<FinancialItem, 'id'>) => void;
   updateFinancialItem: (categoryId: string, itemId: string, updates: Partial<FinancialItem>) => void;
   deleteFinancialItem: (categoryId: string, itemId: string) => void;
-  
+
   // Вычисляемые значения
   getTotalBalance: () => number;
   getCategoryBalance: (categoryId: string) => number;
   getWalletBalance: () => void;
-  
+
   // Расходы Доходы
   addExpences: (expence: Omit<Asset, 'id'>) => void;
   addIncomes: (income: Omit<Asset, 'id'>) => void;
@@ -218,13 +218,13 @@ export interface AppState {
 
   // Активы
   addActives: (active: Omit<Asset, 'id'>) => void;
-  
+
 
   // Пассивы
   addPassives: (active: Omit<Asset, 'id'>) => void;
 
   // Функции для обновления
-    updateExpences: (id: string, expence: Partial<Omit<Asset, 'id'>>) => void;
+  updateExpences: (id: string, expence: Partial<Omit<Asset, 'id'>>) => void;
   updateIncomes: (id: string, income: Partial<Omit<Asset, 'id'>>) => void;
   updateActives: (id: string, active: Partial<Omit<Asset, 'id'>>) => void;
   updatePassives: (id: string, passive: Partial<Omit<Asset, 'id'>>) => void;
@@ -236,14 +236,14 @@ export interface AppState {
 
   // Редактирование ассета
   setCurrentAsset: (asset: Asset | null) => void;
-  
+
   // Утилиты
   formatAmount: (amount: number) => string;
   generateId: () => string;
 
   // Цели
   setGoalFilter: (type: string) => void;
-  pickEditGoal: (id:string) => void;
+  pickEditGoal: (id: string) => void;
   addGoal: (goalData: GoalFormData) => string;
   updateGoal: (id: string, goalData: Partial<GoalFormData>) => boolean;
   deleteGoal: (id: string) => boolean;
@@ -264,33 +264,33 @@ const initialCategories: FinancialCategory[] = [
     title: 'Доходы',
     balance: '1 050 000 ₸',
     items: [
-      { 
-        id: 'salary', 
-        name: 'Зарплата', 
-        amount: '600 000 ₸', 
-        color: '#4FC3F7', 
-        icon: 'wallet' 
+      {
+        id: 'salary',
+        name: 'Зарплата',
+        amount: '600 000 ₸',
+        color: '#4FC3F7',
+        icon: 'wallet'
       },
-      { 
-        id: 'bank-income', 
-        name: 'Банк', 
-        amount: '50 000 ₸', 
-        color: '#66BB6A', 
-        icon: 'business' 
+      {
+        id: 'bank-income',
+        name: 'Банк',
+        amount: '50 000 ₸',
+        color: '#66BB6A',
+        icon: 'business'
       },
-      { 
-        id: 'crypto', 
-        name: 'Криптовалюта', 
-        amount: '200 000 ₸', 
-        color: '#7986CB', 
-        icon: 'logo-bitcoin' 
+      {
+        id: 'crypto',
+        name: 'Криптовалюта',
+        amount: '200 000 ₸',
+        color: '#7986CB',
+        icon: 'logo-bitcoin'
       },
-      { 
-        id: 'pension-income', 
-        name: 'Пенсия', 
-        amount: '200 000 ₸', 
-        color: '#FFB74D', 
-        icon: 'card' 
+      {
+        id: 'pension-income',
+        name: 'Пенсия',
+        amount: '200 000 ₸',
+        color: '#FFB74D',
+        icon: 'card'
       }
     ]
   },
@@ -337,16 +337,16 @@ export const useFinancialStore = create<AppState>()(
       // Начальное состояние
       user: null,
       isAuthenticated: false,
-      currentGoalType:"Краткосрочные",
-      currentCategoryOption:"",
-      currentRegOption:"regular",
+      currentGoalType: "Краткосрочные",
+      currentCategoryOption: "",
+      currentRegOption: "regular",
       isLoading: false,
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
-      currentGoalChangeId:"",
+      currentGoalChangeId: "",
       walletBalance: '0 ₸',
-      walletBalanceEUR:'0 $',
-      walletBalanceUSD:'0 €',
+      walletBalanceEUR: '0 $',
+      walletBalanceUSD: '0 €',
       theme: 'dark',
       language: 'ru',
       currency: '₸',
@@ -354,28 +354,28 @@ export const useFinancialStore = create<AppState>()(
       expences: [],
       incomes: [],
       actives: [],
-      passives:[],
-      currentAsset:null,
+      passives: [],
+      currentAsset: null,
       goals: [],
-      personalFinancialPlan: null, 
-      
+      personalFinancialPlan: null,
+
       // Утилиты
       generateId: () => Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      
+
       formatAmount: (amount: number) => {
         const { currency } = get();
         return new Intl.NumberFormat('ru-RU').format(amount) + ' ' + currency;
       },
 
       // Фильтры
-      setCategoryOption:(opt)=>{
+      setCategoryOption: (opt) => {
         set((prevState) => ({
           currentCategoryOption: opt,
         }));
 
       },
 
-      setRegOption:(opt)=>{
+      setRegOption: (opt) => {
         set((prevState) => ({
           currentRegOption: opt,
         }));
@@ -383,15 +383,15 @@ export const useFinancialStore = create<AppState>()(
       },
 
       // Пользователь
-      setUser: (user) => set({ 
-        user, 
-        isAuthenticated: true, 
-        isLoading: false 
+      setUser: (user) => set({
+        user,
+        isAuthenticated: true,
+        isLoading: false
       }),
 
-      logout: () => set({ 
-        user: null, 
-        isAuthenticated: false 
+      logout: () => set({
+        user: null,
+        isAuthenticated: false
       }),
 
       setLoading: (isLoading) => set({ isLoading }),
@@ -415,7 +415,7 @@ export const useFinancialStore = create<AppState>()(
               id: data.user.id,
               email: data.user.email!,
               name: name,
-              password: '', 
+              password: '',
               avatar: null,
             };
 
@@ -467,8 +467,8 @@ export const useFinancialStore = create<AppState>()(
       signOut: async () => {
         try {
           await supabase.auth.signOut();
-          set({ 
-            user: null, 
+          set({
+            user: null,
             isAuthenticated: false,
             goals: [],
             categories: [],
@@ -480,28 +480,28 @@ export const useFinancialStore = create<AppState>()(
         }
       },
 
-        resetPassword: async (email: string): Promise<AuthResponse> => {
+      resetPassword: async (email: string): Promise<AuthResponse> => {
         try {
           // Отправляем код восстановления без redirect_to
           const { data, error } = await supabase.auth.resetPasswordForEmail(email);
 
           if (error) {
             console.error('Ошибка отправки кода:', error);
-            return { 
-              success: false, 
-              error: error.message 
+            return {
+              success: false,
+              error: error.message
             };
           }
 
-          return { 
-            success: true, 
-            data 
+          return {
+            success: true,
+            data
           };
         } catch (error: any) {
           console.error('Ошибка resetPassword:', error);
-          return { 
-            success: false, 
-            error: error.message || 'Произошла неизвестная ошибка' 
+          return {
+            success: false,
+            error: error.message || 'Произошла неизвестная ошибка'
           };
         }
       },
@@ -516,26 +516,26 @@ export const useFinancialStore = create<AppState>()(
 
           if (error) {
             console.error('Ошибка проверки OTP:', error);
-            return { 
-              success: false, 
-              error: error.message 
+            return {
+              success: false,
+              error: error.message
             };
           }
 
-          return { 
-            success: true, 
-            data 
+          return {
+            success: true,
+            data
           };
         } catch (error: any) {
           console.error('Ошибка verifyOtp:', error);
-          return { 
-            success: false, 
-            error: error.message || 'Произошла неизвестная ошибка' 
+          return {
+            success: false,
+            error: error.message || 'Произошла неизвестная ошибка'
           };
         }
       },
 
-      updatePassword: async ({  newPassword }: UpdatePasswordParams): Promise<AuthResponse> => {
+      updatePassword: async ({ newPassword }: UpdatePasswordParams): Promise<AuthResponse> => {
         try {
 
 
@@ -546,28 +546,28 @@ export const useFinancialStore = create<AppState>()(
 
           if (error) {
             console.error('Ошибка обновления пароля:', error);
-            return { 
-              success: false, 
-              error: error.message 
+            return {
+              success: false,
+              error: error.message
             };
           }
 
-          return { 
-            success: true, 
-            data 
+          return {
+            success: true,
+            data
           };
         } catch (error: any) {
           console.error('Ошибка updatePassword:', error);
-          return { 
-            success: false, 
-            error: error.message || 'Произошла неизвестная ошибка' 
+          return {
+            success: false,
+            error: error.message || 'Произошла неизвестная ошибка'
           };
         }
       },
 
       verifyResetCode: async (email: string, code: string) => {
         try {
-    
+
           return { success: true };
         } catch (error: any) {
           return { success: false, error: error.message };
@@ -603,11 +603,11 @@ export const useFinancialStore = create<AppState>()(
       },
 
       // Цели
-      setGoalFilter:(type) => set((state)=> { 
+      setGoalFilter: (type) => set((state) => {
         return {
           currentGoalType: type
         }
-       }),
+      }),
 
       // Новые функции для работы с целями
       addGoal: (goalData: GoalFormData): string => {
@@ -615,7 +615,7 @@ export const useFinancialStore = create<AppState>()(
         const newGoal: Goal = {
           id: state.generateId(),
           ...goalData,
-          progress:0,
+          progress: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -627,7 +627,7 @@ export const useFinancialStore = create<AppState>()(
         return newGoal.id;
       },
 
-      pickEditGoal: (id:string)=>{
+      pickEditGoal: (id: string) => {
         set((prevState) => ({
           currentGoalChangeId: id,
         }));
@@ -636,7 +636,7 @@ export const useFinancialStore = create<AppState>()(
       updateGoal: (id: string, goalData: Partial<GoalFormData>): boolean => {
         const { goals } = get();
         const goalIndex = goals.findIndex((goal: Goal) => goal.id === id);
-        
+
         if (goalIndex === -1) {
           return false;
         }
@@ -659,7 +659,7 @@ export const useFinancialStore = create<AppState>()(
       deleteGoal: (id: string): boolean => {
         const { goals } = get();
         const goalExists = goals.some((goal: Goal) => goal.id === id);
-        
+
         if (!goalExists) {
           return false;
         }
@@ -697,18 +697,18 @@ export const useFinancialStore = create<AppState>()(
 
       updatePersonalFinancialPlan: (updates: Partial<PersonalFinancialPlan>): boolean => {
         const { personalFinancialPlan, generateId } = get();
-        
+
         // Если ЛФП не существует, создаем новый
         if (!personalFinancialPlan) {
           const newPFP = createDefaultPFP(generateId, {
             ...updates,
             updatedAt: new Date()
           });
-          
+
           set({
             personalFinancialPlan: newPFP
           });
-          
+
           return true;
         }
 
@@ -762,8 +762,8 @@ export const useFinancialStore = create<AppState>()(
       }),
 
       updateCategory: (categoryId, updates) => set((state) => ({
-        categories: state.categories.map(category => 
-          category.id === categoryId 
+        categories: state.categories.map(category =>
+          category.id === categoryId
             ? { ...category, ...updates }
             : category
         )
@@ -773,7 +773,7 @@ export const useFinancialStore = create<AppState>()(
         categories: state.categories.filter(category => category.id !== categoryId)
       })),
 
-      resetCategory:()=>set((state)=>({
+      resetCategory: () => set((state) => ({
         categories: initialCategories
       })),
 
@@ -781,45 +781,46 @@ export const useFinancialStore = create<AppState>()(
       addExpences: (expence) => set((state) => {
         const newExpence: Asset = {
           ...expence,
-          id: state.generateId()
+          id: state.generateId(),
+          createdAt: new Date()
         };
 
         const newExpences = [...state.expences, newExpence];
         const totalAmount = newExpences.reduce((sum, asset) => sum + asset.amount, 0);
 
-        const updatedCategories = state.categories.map(category => 
-          category.id === 'expence' 
+        const updatedCategories = state.categories.map(category =>
+          category.id === 'expence'
             ? {
-                ...category,
-                title: 'Расходы',
-                balance: `${totalAmount} ₸`,
-                items: newExpences.map(x => ({
-                  id: x.id,
-                  icon: x.icon || "bag",
-                  name: x.name, 
-                  amount: `${x.amount} ₸`, 
-                  color: x?.color || "#E91E63"
-                }))
-              }
+              ...category,
+              title: 'Расходы',
+              balance: `${totalAmount} ₸`,
+              items: newExpences.map(x => ({
+                id: x.id,
+                icon: x.icon || "bag",
+                name: x.name,
+                amount: `${x.amount} ₸`,
+                color: x?.color || "#E91E63"
+              }))
+            }
             : category
         );
-        
+
         return {
           expences: newExpences,
           categories: updatedCategories
         };
       }),
 
-      setCurrentAsset:(asset)=>set((state) => {
-        let changed:Asset | null
-        if(asset!==null){
+      setCurrentAsset: (asset) => set((state) => {
+        let changed: Asset | null
+        if (asset !== null) {
           changed = {
-          ...asset
-        };
-        }else{
+            ...asset
+          };
+        } else {
           changed = null
         }
-        
+
 
         return {
           currentAsset: changed
@@ -832,24 +833,26 @@ export const useFinancialStore = create<AppState>()(
       addActives: (active) => set((state) => {
         const newActive: Asset = {
           ...active,
-          id: state.generateId()
+          id: state.generateId(),
+          createdAt: new Date()
         };
 
         const newActives = [...state.actives, newActive];
-        
+
         return {
           actives: newActives
         };
       }),
 
-      addPassives: (passive)=>set((state)=>{
+      addPassives: (passive) => set((state) => {
         const newPassive: Asset = {
           ...passive,
-          id: state.generateId()
+          id: state.generateId(),
+          createdAt: new Date()
         };
 
         const newPassives = [...state.passives, newPassive];
-        
+
         return {
           passives: newPassives
         };
@@ -859,29 +862,30 @@ export const useFinancialStore = create<AppState>()(
       addIncomes: (income) => set((state) => {
         const newIncome: Asset = {
           ...income,
-          id: state.generateId()
+          id: state.generateId(),
+          createdAt: new Date()
         };
 
         const newIncomes = [...state.incomes, newIncome];
         const totalAmount = newIncomes.reduce((sum, asset) => sum + asset.amount, 0);
 
-        const updatedCategories = state.categories.map(category => 
-          category.id === 'income' 
+        const updatedCategories = state.categories.map(category =>
+          category.id === 'income'
             ? {
-                ...category,
-                title: 'Доходы',
-                balance: `${totalAmount} ₸`,
-                items: newIncomes.map(x => ({
-                  id: x.id,
-                  icon: x.icon || "bag",
-                  name: x.name, 
-                  amount: `${x.amount} ₸`, 
-                  color: x?.color || "#E91E63"
-                }))
-              }
+              ...category,
+              title: 'Доходы',
+              balance: `${totalAmount} ₸`,
+              items: newIncomes.map(x => ({
+                id: x.id,
+                icon: x.icon || "bag",
+                name: x.name,
+                amount: `${x.amount} ₸`,
+                color: x?.color || "#E91E63"
+              }))
+            }
             : category
         );
-        
+
         return {
           incomes: newIncomes,
           categories: updatedCategories
@@ -893,26 +897,26 @@ export const useFinancialStore = create<AppState>()(
         const updatedExpences = state.expences.map(item =>
           item.id === id ? { ...item, ...expence } : item
         );
-        
+
         const totalAmount = updatedExpences.reduce((sum, asset) => sum + asset.amount, 0);
-        
+
         const updatedCategories = state.categories.map(category =>
           category.id === 'expense'
             ? {
-                ...category,
-                title: 'Расходы',
-                balance: `${totalAmount} ₸`,
-                items: updatedExpences.map(x => ({
-                  id: x.id,
-                  icon: x.icon || "bag",
-                  name: x.name,
-                  amount: `${x.amount} ₸`,
-                  color: x?.color || "#F44336"
-                }))
-              }
+              ...category,
+              title: 'Расходы',
+              balance: `${totalAmount} ₸`,
+              items: updatedExpences.map(x => ({
+                id: x.id,
+                icon: x.icon || "bag",
+                name: x.name,
+                amount: `${x.amount} ₸`,
+                color: x?.color || "#F44336"
+              }))
+            }
             : category
         );
-        
+
         return {
           expences: updatedExpences,
           categories: updatedCategories
@@ -923,26 +927,26 @@ export const useFinancialStore = create<AppState>()(
         const updatedIncomes = state.incomes.map(item =>
           item.id === id ? { ...item, ...income } : item
         );
-        
+
         const totalAmount = updatedIncomes.reduce((sum, asset) => sum + asset.amount, 0);
-        
+
         const updatedCategories = state.categories.map(category =>
           category.id === 'income'
             ? {
-                ...category,
-                title: 'Доходы',
-                balance: `${totalAmount} ₸`,
-                items: updatedIncomes.map(x => ({
-                  id: x.id,
-                  icon: x.icon || "bag",
-                  name: x.name,
-                  amount: `${x.amount} ₸`,
-                  color: x?.color || "#E91E63"
-                }))
-              }
+              ...category,
+              title: 'Доходы',
+              balance: `${totalAmount} ₸`,
+              items: updatedIncomes.map(x => ({
+                id: x.id,
+                icon: x.icon || "bag",
+                name: x.name,
+                amount: `${x.amount} ₸`,
+                color: x?.color || "#E91E63"
+              }))
+            }
             : category
         );
-        
+
         return {
           incomes: updatedIncomes,
           categories: updatedCategories
@@ -953,7 +957,7 @@ export const useFinancialStore = create<AppState>()(
         const updatedActives = state.actives.map(item =>
           item.id === id ? { ...item, ...active } : item
         );
-        
+
         return {
           actives: updatedActives
         };
@@ -963,7 +967,7 @@ export const useFinancialStore = create<AppState>()(
         const updatedPassives = state.passives.map(item =>
           item.id === id ? { ...item, ...passive } : item
         );
-        
+
         return {
           passives: updatedPassives
         };
@@ -977,15 +981,15 @@ export const useFinancialStore = create<AppState>()(
           ...walletData,
           id: state.generateId()
         };
-        
+
         return {
           wallets: [...state.wallets, newWallet]
         };
       }),
 
       updateWallet: (walletId, updates) => set((state) => ({
-        wallets: state.wallets.map(wallet => 
-          wallet.id === walletId 
+        wallets: state.wallets.map(wallet =>
+          wallet.id === walletId
             ? { ...wallet, ...updates }
             : wallet
         )
@@ -997,10 +1001,10 @@ export const useFinancialStore = create<AppState>()(
           ...itemData,
           id: state.generateId()
         };
-        
+
         return {
-          categories: state.categories.map(category => 
-            category.id === categoryId 
+          categories: state.categories.map(category =>
+            category.id === categoryId
               ? { ...category, items: [...category.items, newItem] }
               : category
           )
@@ -1008,25 +1012,25 @@ export const useFinancialStore = create<AppState>()(
       }),
 
       updateFinancialItem: (categoryId, itemId, updates) => set((state) => ({
-        categories: state.categories.map(category => 
-          category.id === categoryId 
+        categories: state.categories.map(category =>
+          category.id === categoryId
             ? {
-                ...category,
-                items: category.items.map(item => 
-                  item.id === itemId ? { ...item, ...updates } : item
-                )
-              }
+              ...category,
+              items: category.items.map(item =>
+                item.id === itemId ? { ...item, ...updates } : item
+              )
+            }
             : category
         )
       })),
 
       deleteFinancialItem: (categoryId, itemId) => set((state) => ({
-        categories: state.categories.map(category => 
-          category.id === categoryId 
+        categories: state.categories.map(category =>
+          category.id === categoryId
             ? {
-                ...category,
-                items: category.items.filter(item => item.id !== itemId)
-              }
+              ...category,
+              items: category.items.filter(item => item.id !== itemId)
+            }
             : category
         )
       })),
@@ -1047,7 +1051,7 @@ export const useFinancialStore = create<AppState>()(
         const { categories } = get();
         const category = categories.find(cat => cat.id === categoryId);
         if (!category) return 0;
-        
+
         return category.items.reduce((sum, item) => {
           const amount = parseInt(item.amount.replace(/[^\d]/g, ''));
           return sum + (isNaN(amount) ? 0 : amount);
@@ -1059,12 +1063,12 @@ export const useFinancialStore = create<AppState>()(
         const filtered = wallets.filter(x => x.currency.includes('₸'));
         const filteredUSD = wallets.filter(x => x.currency.includes('$'));
         const filteredEUR = wallets.filter(x => x.currency.includes('€'));
-        
-        if (!filtered || filtered.length === 0 ) {
+
+        if (!filtered || filtered.length === 0) {
           set({ walletBalance: "0 ₸" });
           return;
         }
-        
+
         const allSumm = filtered.reduce((sum, item) => {
           return sum + item.summ;
         }, 0);
@@ -1133,15 +1137,15 @@ export const appStore = useFinancialStore;
 
 // Селекторы для удобства
 export const useUser = () => useFinancialStore((state) => state.user);
-export const useAuth = () => useFinancialStore((state) => ({ 
-  isAuthenticated: state.isAuthenticated, 
-  isLoading: state.isLoading 
+export const useAuth = () => useFinancialStore((state) => ({
+  isAuthenticated: state.isAuthenticated,
+  isLoading: state.isLoading
 }));
 export const useCategories = () => useFinancialStore((state) => state.categories);
-export const useSettings = () => useFinancialStore((state) => ({ 
-  theme: state.theme, 
-  language: state.language, 
-  currency: state.currency 
+export const useSettings = () => useFinancialStore((state) => ({
+  theme: state.theme,
+  language: state.language,
+  currency: state.currency
 }));
 
 // Селекторы для целей

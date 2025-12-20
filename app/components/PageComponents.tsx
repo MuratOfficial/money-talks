@@ -18,6 +18,8 @@ import PaymentModal from './PaymentModal';
 import { fetchTips, Tip } from '@/services/api';
 import InfoModal from './HintWithChat';
 import TutorialTooltip from './TutorialTooltip';
+import LoadingAnimation from './LoadingAnimation';
+import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
 
 interface PageComponentProps {
   title: string;
@@ -140,8 +142,14 @@ useEffect(() => {
 
   const illiquidAssets: Asset[] = assets?.filter(x=>x.regularity==="irregular") || [];
 
-  const filteredAssets = currentRegOption === 'regular' ? liquidAssets : currentRegOption === 'irregular' ? illiquidAssets : (assets || []);
-  const currentAssets = (categories && categories[0].id !== "effect") ? filteredAssets.filter(x=>x.categoryTab===currentCategoryOption) :filteredAssets
+  // Применяем фильтр по регулярности
+  const filteredByRegularity = currentRegOption === 'regular' ? liquidAssets : currentRegOption === 'irregular' ? illiquidAssets : (assets || []);
+  
+  // Применяем фильтр по категории
+  const filteredByCategory = (categories && categories[0].id !== "effect") ? filteredByRegularity.filter(x=>x.categoryTab===currentCategoryOption) : filteredByRegularity;
+  
+  // Применяем фильтр по дате
+  const currentAssets = filterAssetsByDate(filteredByCategory, selectedSortFilter as DateFilterType);
 
   const totalAmount = currentAssets?.reduce((sum, asset) => sum + asset.amount, 0);
 
@@ -205,6 +213,18 @@ useEffect(() => {
     
     router.replace("/main/finance")
   };
+
+  // Показываем загрузку при первой загрузке
+  if (loading) {
+    return (
+      <SafeAreaView className={`flex-1 ${bgColor}`}>
+        <LoadingAnimation 
+          fullScreen 
+          message="Загрузка..." 
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
      <TouchableWithoutFeedback onPress={() => showTooltip && handleTooltipClose()}>
@@ -543,7 +563,7 @@ useEffect(() => {
           onClose={() => setShowDrawerFilter(false)}
           onSelect={handleSortSelectFilter}
           selectedValue={selectedSortFilter}
-          options={ ['Сегодня', 'За месяц', 'За год']}
+          options={ ['Сегодня', 'За месяц', 'За год', 'Все время']}
           animationType='fade'
           
           />

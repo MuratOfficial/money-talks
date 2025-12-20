@@ -8,6 +8,7 @@ import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
 import { fetchTips, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
+import LoadingAnimation from '@/app/components/LoadingAnimation';
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -307,7 +308,19 @@ useEffect(() => {
     </View>
   );
 
-return (
+// Показываем загрузку при первой загрузке
+  if (loading) {
+    return (
+      <SafeAreaView className={`flex-1 ${bgColor}`}>
+        <LoadingAnimation 
+          fullScreen 
+          message="Загрузка..." 
+        />
+      </SafeAreaView>
+    );
+  }
+
+  return (
     <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
