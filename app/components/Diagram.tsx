@@ -12,6 +12,8 @@ import CustomPieChart from './CustomChart';
 import { Href, useRouter } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 
+import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+
 interface ExpenseCategory {
   id: string;
   name: string;
@@ -32,7 +34,7 @@ interface ChartScreenProps {
 }
 
 const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
+  const [selectedPeriod, setSelectedPeriod] = useState<DateFilterType>('За месяц');
   const {currency, theme} = useFinancialStore();  
   const router = useRouter();
   
@@ -59,24 +61,27 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
 
     useEffect(()=>{
       if(assets){
-        // Вычисляем общую сумму сначала
-        const total = assets.reduce((sum, item) => sum + item.amount, 0);
+        // Фильтруем активы по выбранному периоду
+        const filteredAssets = filterAssetsByDate(assets, selectedPeriod);
+
+        // Вычисляем общую сумму сначала для отфильтрованных данных
+        const total = filteredAssets.reduce((sum, item) => sum + item.amount, 0);
         setTotalAmount(total);
 
         // Используем вычисленное значение total для процентов
         setExpenseData(
-          assets.map(x=>(
+          filteredAssets.map(x=>(
             {
               id:x.id|| "",
               name:x.name || "",
               amount:x.amount || 0,
               color:x.color || "",
-              percentage:getPercentage(total, x.amount)|| 0
+              percentage: total > 0 ? getPercentage(total, x.amount) : 0
             }
           ))
         )
       }
-    }, [assets])
+    }, [assets, selectedPeriod])
 
   const chartData: PieSegment[]|undefined = expenseData?.map(item => ({
     value: item.amount,
@@ -128,21 +133,22 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row space-x-3">
               {[
-                { key: 'today', label: 'Сегодня' },
-                { key: 'week', label: 'За неделю' },
-                { key: 'month', label: 'За месяц' },
+                { label: 'Сегодня', value: 'Сегодня' },
+                { label: 'За месяц', value: 'За месяц' },
+                { label: 'За год', value: 'За год' },
+                { label: 'Все время', value: 'Все время' },
               ].map((period) => (
                 <TouchableOpacity
-                  key={period.key}
+                  key={period.value}
                   className={`px-2 py-1 rounded-full border ${
-                    selectedPeriod === period.key
+                    selectedPeriod === period.value
                       ? 'bg-[#2AA651] border-[#2AA651]'
                     : `${borderColor} bg-transparent`
                   }`}
-                  onPress={() => setSelectedPeriod(period.key as any)}
+                  onPress={() => setSelectedPeriod(period.value as DateFilterType)}
                 >
                   <Text className={`text-xs font-['SFProDisplayRegular'] ${
-                    selectedPeriod === period.key ? 'text-white font-medium' : textColor
+                    selectedPeriod === period.value ? 'text-white font-medium' : textColor
                   }`}>
                     {period.label}
                   </Text>

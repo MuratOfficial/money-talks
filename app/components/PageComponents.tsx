@@ -127,10 +127,16 @@ useEffect(() => {
   const closeModal = () => setModalVisible(false);
 
 
-  const currentAnalyzeList = analyzeList || [];
+  // Фильтруем analyzeList по выбранной дате
+  const filteredAnalyzeList = analyzeList?.map(category => ({
+    ...category,
+    item: filterAssetsByDate(category.item, selectedSortFilter as DateFilterType)
+  })) || [];
+
+  const currentAnalyzeList = filteredAnalyzeList;
 
   
-
+  
 
    const handleSortSelectFilter = (value:any) => {
     setSelectedSortFilter(value);
@@ -171,13 +177,13 @@ useEffect(() => {
   };
 
 
-  const inc = analyzeList?.find(x=>x.id==="income")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
-  const exp = analyzeList?.find(x=>x.id==="expences")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const inc = filteredAnalyzeList.find(x=>x.id==="income")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const exp = filteredAnalyzeList.find(x=>x.id==="expences")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   
   const delta = new Intl.NumberFormat('ru-RU').format(inc - exp) + ` ${currency}`;
 
-  const act = analyzeList?.find(x=>x.id==="actives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
-  const pass = analyzeList?.find(x=>x.id==="passives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const act = filteredAnalyzeList.find(x=>x.id==="actives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
+  const pass = filteredAnalyzeList.find(x=>x.id==="passives")?.item.reduce((sum, asset) => sum + asset.amount, 0) || 0;
   
   const defActPass = new Intl.NumberFormat('ru-RU').format(act - pass) + ` ${currency}`;
 

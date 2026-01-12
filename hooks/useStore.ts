@@ -612,10 +612,26 @@ export const useFinancialStore = create<AppState>()(
       // Новые функции для работы с целями
       addGoal: (goalData: GoalFormData): string => {
         const state = get();
+
+        // Расчет начального прогресса
+        const parseAmount = (str: string) => {
+          if (!str) return 0;
+          const cleanStr = str.toString().replace(/[^\d]/g, '');
+          return parseInt(cleanStr, 10) || 0;
+        };
+
+        const amount = parseAmount(goalData.amount);
+        const collected = parseAmount(goalData.collected || "0");
+
+        let progress = 0;
+        if (amount > 0) {
+          progress = (collected / amount) * 100;
+        }
+
         const newGoal: Goal = {
           id: state.generateId(),
           ...goalData,
-          progress: 0,
+          progress: progress,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -641,9 +657,32 @@ export const useFinancialStore = create<AppState>()(
           return false;
         }
 
+        // Вычисляем новый progress при изменении сумм
+        const currentGoal = goals[goalIndex];
+
+        // Получаем актуальные значения (новые или старые)
+        const amountStr = goalData.amount !== undefined ? goalData.amount : currentGoal.amount;
+        const collectedStr = goalData.collected !== undefined ? goalData.collected : (currentGoal.collected || "0");
+
+        // Парсим значения (удаляем все нецифровые символы)
+        const parseAmount = (str: string) => {
+          if (!str) return 0;
+          const cleanStr = str.toString().replace(/[^\d]/g, '');
+          return parseInt(cleanStr, 10) || 0;
+        };
+
+        const amount = parseAmount(amountStr);
+        const collected = parseAmount(collectedStr);
+
+        let progress = 0;
+        if (amount > 0) {
+          progress = (collected / amount) * 100;
+        }
+
         const updatedGoal: Goal = {
-          ...goals[goalIndex],
+          ...currentGoal,
           ...goalData,
+          progress: progress,
           updatedAt: new Date(),
         };
 

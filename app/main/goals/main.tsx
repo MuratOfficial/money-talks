@@ -256,57 +256,123 @@ useEffect(() => {
     </Modal>
   );
 
-  const GoalCard = ( goal:Goal ) => (
-    <View className={`${cardBgColor} rounded-2xl p-4 mb-4`}>
-      <View className="flex-row items-start justify-between mb-4">
-        <View className="flex-1">
-          <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] mb-2`}>
-            {goal.name}
-          </Text>
-          
-            {goal.timeframe ? 
-            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
-              Срок достижения цели {goal.timeframe.day} {goal.timeframe.month} {goal.timeframe.year}
-            </Text>:<Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
-              Выберите срок
-              </Text>}
+  // Функция для определения цвета карточки на основе прогресса
+  const getCardColorByProgress = (progress: number) => {
+    if (progress < 30) {
+      return {
+        bg: isDark ? '#374151' : '#E5E7EB', // gray-700 / gray-200
+        border: isDark ? '#4B5563' : '#D1D5DB', // gray-600 / gray-300
+        accent: isDark ? '#9CA3AF' : '#6B7280',
+      };
+    } else if (progress >= 30 && progress <= 70) {
+      return {
+        bg: isDark ? 'rgba(22, 78, 99, 0.3)' : '#ECFEFF', // cyan-900/30 / cyan-50
+        border: isDark ? '#0E7490' : '#67E8F9', // cyan-700 / cyan-300
+        accent: isDark ? '#22D3EE' : '#06B6D4',
+      };
+    } else {
+      return {
+        bg: isDark ? 'rgba(20, 83, 45, 0.3)' : '#F0FDF4', // green-900/30 / green-50
+        border: isDark ? '#15803D' : '#86EFAC', // green-700 / green-300
+        accent: isDark ? '#4ADE80' : '#22C55E',
+      };
+    }
+  };
+
+  const GoalCard = ( goal:Goal ) => {
+    const progress = Number(goal.progress ?? 0);
+    const colors = getCardColorByProgress(progress);
+    
+    return (
+      <View 
+        className={`rounded-2xl p-4 mb-4 shadow-sm relative overflow-hidden`}
+        style={{ 
+          backgroundColor: colors.bg,
+          borderWidth: 2,
+          borderColor: colors.border
+        }}
+      >
+        {/* Индикатор прогресса сверху */}
+        <View className="absolute top-0 left-0 right-0 h-1">
+          <View 
+            className="h-full"
+            style={{ 
+              width: `${Math.min(progress, 100)}%`,
+              backgroundColor: colors.accent
+            }}
+          />
+        </View>
+
+        <View className="flex-row items-start justify-between mb-4 mt-1">
+          <View className="flex-1">
+            <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] mb-2`}>
+              {goal.name}
+            </Text>
             
+            {goal.timeframe ? 
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
+                Срок достижения цели {goal.timeframe.day} {goal.timeframe.month} {goal.timeframe.year}
+              </Text> : 
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
+                Выберите срок
+              </Text>
+            }
+            
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
+              Собрано {goal.collected ?? 0} из {goal.amount}
+            </Text>
+
+            {/* Бейдж с процентом прогресса */}
+            <View className="mt-2">
+              <View 
+                className="self-start px-3 py-1 rounded-full"
+                style={{ backgroundColor: colors.accent + '20' }}
+              >
+                <Text 
+                  className="text-xs font-['SFProDisplaySemibold']"
+                  style={{ color: colors.accent }}
+                >
+                  {progress.toFixed(0)}% выполнено
+                </Text>
+              </View>
+            </View>
+          </View>
           
-          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
-            Собрано {goal.collected ?? 0} из {goal.amount}
-          </Text>
+          <CircularProgress progress={progress} />
         </View>
         
-        <CircularProgress progress={goal.progress ?? 0} />
-      </View>
-      
-      <View className="flex-row space-x-3">
-        <TouchableOpacity onPress={()=>handleTopUp(goal.id, goal.name)} className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}>
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
-            Пополнить
-          </Text>
-          <Ionicons name="add-circle-outline" size={16} color={iconColor} />
-        </TouchableOpacity>
+        <View className="flex-row space-x-3">
+          <TouchableOpacity 
+            onPress={() => handleTopUp(goal.id, goal.name)} 
+            className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}
+          >
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
+              Пополнить
+            </Text>
+            <Ionicons name="add-circle-outline" size={16} color={iconColor} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={() => handleEdit(goal.id)} 
+            className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}
+          >
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
+              Редактировать
+            </Text>
+            <Ionicons name="pencil" size={16} color={iconColor} />
+          </TouchableOpacity>
+        </View>
         
-        <TouchableOpacity onPress={()=>handleEdit(goal.id)} className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}>
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
-            Редактировать
-          </Text>
-          <Ionicons name="pencil" size={16} color={iconColor} />
-        </TouchableOpacity>
-      </View>
-      
         <TopUpModal
           visible={showTopUpModal}
           onClose={() => setShowTopUpModal(false)}
-         
           goalId={currentGoalChangeId}
           title={goalTitle}
           currency={currency}
         />
-
-    </View>
-  );
+      </View>
+    );
+  };
 
 // Показываем загрузку при первой загрузке
   if (loading) {
