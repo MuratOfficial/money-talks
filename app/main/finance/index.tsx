@@ -1,7 +1,8 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useFinancialStore from '@/hooks/useStore';
+import AnimatedAssistant from '@/app/components/AnimatedAssistant';
 import {
   View,
   Text,
@@ -57,13 +58,28 @@ const FinanceCard: React.FC<FinanceCardProps & { isDark: boolean }> = ({ title, 
 
 const FinanceApp: React.FC = () => {
   const router = useRouter();
-  const { theme } = useFinancialStore();
+  const { theme, incomes, expences, actives, passives } = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const cardBgColor = isDark ? 'bg-white/15' : 'bg-gray-100';
   const cardTextColor = isDark ? 'text-gray-50' : 'text-gray-900';
+
+  const [showAssistant, setShowAssistant] = useState(false);
+
+  useEffect(() => {
+    // Проверяем, есть ли пустые категории
+    const hasEmptyData = !incomes.length || !expences.length || !actives.length || !passives.length;
+    
+    if (hasEmptyData) {
+        // Показываем ассистента с небольшой задержкой для плавности
+        const timer = setTimeout(() => setShowAssistant(true), 1500);
+        return () => clearTimeout(timer);
+    } else {
+        setShowAssistant(false);
+    }
+  }, [incomes, expences, actives, passives]);
 
   const financeItems:FinanceCardProps[] = [
     {
@@ -117,6 +133,12 @@ const FinanceApp: React.FC = () => {
           ))}
         </View>
       </View>
+
+      <AnimatedAssistant
+        visible={showAssistant}
+        onClose={() => setShowAssistant(false)}
+        message="Твои финансы — как система координат. Введи доходы, расходы, активы и пассивы — и мы покажем тебе, где ты находишься, и куда идти дальше."
+      />
     </SafeAreaView>
   );
 };
