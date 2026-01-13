@@ -8,6 +8,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "environment": "development",
+      "env": {
+        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
+      },
       "ios": {
         "simulator": true
       }
@@ -15,13 +18,19 @@
     "preview": {
       "distribution": "internal",
       "environment": "preview",
+      "env": {
+        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
+      },
       "ios": {
         "simulator": true
       }
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "env": {
+        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
+      }
     }
   },
   "submit": {
