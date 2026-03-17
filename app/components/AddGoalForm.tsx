@@ -32,7 +32,7 @@ interface GoalData {
 }
 
 const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }) => {
-  const { addGoal, updateGoal, getGoalById, theme } = useFinancialStore();
+  const { addGoal, updateGoal, getGoalById, theme, currentGoalType } = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -46,9 +46,19 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   const inactiveBorderColor = isDark ? 'border-gray-700' : 'border-gray-300';
   const iconColor = isDark ? 'white' : '#11181C'; 
   
+  // Конвертация типа фильтра в ключ типа цели
+  const getDefaultType = (): 'short' | 'medium' | 'long' => {
+    switch (currentGoalType) {
+      case 'Краткосрочные': return 'short';
+      case 'Среднесрочные': return 'medium';
+      case 'Долгосрочные': return 'long';
+      default: return 'medium';
+    }
+  };
+
   const [formData, setFormData] = useState<GoalData>({
     name: '',
-    type: 'medium',
+    type: getDefaultType(),
     timeframe: {
       period: 'month',
       value: '',
@@ -190,7 +200,6 @@ useEffect(() => {
         goalId = editGoalId; 
       } else {
         goalId = addGoal(goalData);
-        goalId = 'temp-id';
       }
 
       onSave?.(goalId);

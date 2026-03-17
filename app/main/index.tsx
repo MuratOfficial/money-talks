@@ -8,7 +8,7 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 
 const MainScreen = () => {
-  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme } = useFinancialStore();
+  const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
   
   const isDark = theme === 'dark';
   const gradientColors = isDark ? ['#1B5E20', '#000000'] : ['#4CAF50', '#FFFFFF'];
@@ -20,7 +20,12 @@ const MainScreen = () => {
   const router = useRouter();
 
   // Используем useCallback для стабильной ссылки на функцию
-  const handleGoal = useCallback((title: string, type?: string) => {
+  const handleGoal = useCallback((title: string, type?: string, itemId?: string) => {
+    if (title === "Кошелек" && itemId) {
+      pickEditWallet(itemId);
+      router.replace('/main/wallet/add-wallet');
+      return;
+    }
     if (title === "Цели") {
       if (type === "Краткосрочные") {
         setGoalFilter("Краткосрочные");
@@ -39,7 +44,7 @@ const MainScreen = () => {
     if (title === "Расходы") {
       router.replace('/main/finance/expences/main');
     }
-  }, [setGoalFilter, router]);
+  }, [setGoalFilter, router, pickEditWallet]);
 
   const handleSortSelectFilter = useCallback((value: string) => {
     setSelectedSortFilter(value);
@@ -78,7 +83,7 @@ const MainScreen = () => {
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
       activeOpacity={0.8}
-      onPress={() => handleGoal(title, item.name)}
+      onPress={() => handleGoal(title, item.name, item.id)}
     >
       <View 
         className="w-14 h-14 rounded-full items-center justify-center mb-2"
@@ -118,7 +123,7 @@ const MainScreen = () => {
         
         {category.title === 'Кошелек' ? (
           <TouchableOpacity 
-            onPress={() => router.replace('/main/wallet/add-wallet')} 
+            onPress={() => { pickEditWallet(''); router.replace('/main/wallet/add-wallet'); }} 
             className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
           >
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">

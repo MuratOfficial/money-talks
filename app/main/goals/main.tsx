@@ -12,7 +12,7 @@ import LoadingAnimation from '@/app/components/LoadingAnimation';
 
 const GoalsScreen = () => {
   const router = useRouter();
-  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId, currency, theme} = useFinancialStore();
+  const {currentGoalType, goals, pickEditGoal, currentGoalChangeId, currency, theme, setGoalFilter} = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -125,6 +125,7 @@ const GoalsScreen = () => {
 
 const handleAdd = () => {
   pickEditGoal("");
+  setGoalFilter(selectedTerm);
   router.replace("/main/goals/add-goal")
 }
 

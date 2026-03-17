@@ -150,6 +150,7 @@ export interface AppState {
   // Цели
   goals: Goal[];
   currentGoalChangeId: string;
+  currentEditWalletId: string;
 
   // Редактирование ассет
   currentAsset: Asset | null;
@@ -201,6 +202,9 @@ export interface AppState {
   setWallets: (wallets: Wallet[]) => void;
   addWallet: (wallet: Omit<Wallet, 'id'>) => void;
   updateWallet: (walletId: string, updates: Partial<Wallet>) => void;
+  deleteWallet: (id: string) => void;
+  pickEditWallet: (id: string) => void;
+  getWalletById: (id: string) => Wallet | undefined;
 
   addFinancialItem: (categoryId: string, item: Omit<FinancialItem, 'id'>) => void;
   updateFinancialItem: (categoryId: string, itemId: string, updates: Partial<FinancialItem>) => void;
@@ -344,6 +348,7 @@ export const useFinancialStore = create<AppState>()(
       categories: initialCategories,
       totalBalance: '1 990 000 ₸',
       currentGoalChangeId: "",
+      currentEditWalletId: "",
       walletBalance: '0 ₸',
       walletBalanceEUR: '0 $',
       walletBalanceUSD: '0 €',
@@ -1034,6 +1039,19 @@ export const useFinancialStore = create<AppState>()(
         )
       })),
 
+      deleteWallet: (id: string) => set((state) => ({
+        wallets: state.wallets.filter(wallet => wallet.id !== id)
+      })),
+
+      pickEditWallet: (id: string) => {
+        set({ currentEditWalletId: id });
+      },
+
+      getWalletById: (id: string): Wallet | undefined => {
+        const { wallets } = get();
+        return wallets.find(wallet => wallet.id === id);
+      },
+
       // Финансы - Элементы
       addFinancialItem: (categoryId, itemData) => set((state) => {
         const newItem: FinancialItem = {
@@ -1103,19 +1121,14 @@ export const useFinancialStore = create<AppState>()(
         const filteredUSD = wallets.filter(x => x.currency.includes('$'));
         const filteredEUR = wallets.filter(x => x.currency.includes('€'));
 
-        if (!filtered || filtered.length === 0) {
-          set({ walletBalance: "0 ₸" });
-          return;
-        }
-
         const allSumm = filtered.reduce((sum, item) => {
           return sum + item.summ;
         }, 0);
 
-        const allSummUSD = filteredUSD?.reduce((sum, item) => {
+        const allSummUSD = filteredUSD.reduce((sum, item) => {
           return sum + item.summ;
         }, 0);
-        const allSummEUR = filteredEUR?.reduce((sum, item) => {
+        const allSummEUR = filteredEUR.reduce((sum, item) => {
           return sum + item.summ;
         }, 0);
 
