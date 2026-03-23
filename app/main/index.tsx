@@ -11,7 +11,7 @@ const MainScreen = () => {
   const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
   
   const isDark = theme === 'dark';
-  const gradientColors = isDark ? ['#1B5E20', '#000000'] : ['#4CAF50', '#FFFFFF'];
+  const gradientColors: readonly [string, string, ...string[]] = isDark ? ['#1B5E20', '#000000'] : ['#4CAF50', '#FFFFFF'];
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   
 
