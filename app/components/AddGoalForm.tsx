@@ -76,7 +76,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   const [selectedSortMonth, setSelectedSortMonth] = useState('Месяц');
   const [showDrawerYear, setShowDrawerYear] = useState(false);
   const [selectedSortYear, setSelectedSortYear] = useState('Год');
-  const [yearsDifference, setYearsDifference] = useState<number>(0);
+  const [totalMonthsLeft, setTotalMonthsLeft] = useState<number>(0);
 
   const goalTypes = [
     { key: 'short', label: 'Краткосрочный' },
@@ -90,10 +90,25 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   ];
 
   const days: string[] = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-  const months: string[] = [
+  const monthNames: string[] = [
     'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
   ];
+
+  const monthNameToIndex = (name: string): number => {
+    const idx = monthNames.indexOf(name);
+    return idx >= 0 ? idx : 0;
+  };
+
+  // Пересчёт totalMonthsLeft на основе выбранных месяца и года
+  const recalcTotalMonths = (month: string, year: string): number => {
+    if (year === 'Год' || month === 'Месяц') return 0;
+    const now = new Date();
+    const targetYear = parseInt(year, 10);
+    const targetMonthIdx = monthNameToIndex(month);
+    const total = (targetYear - now.getFullYear()) * 12 + (targetMonthIdx - now.getMonth());
+    return Math.max(1, total);
+  };
 
   const currentYear: number = new Date().getFullYear();
   
@@ -128,12 +143,16 @@ const calculateMonthlyInvestment = () => {
   const amount = parseFloat(formData.amount.replace(/\s/g, ''));
   const inflationRate = parseFloat(formData.inflationRate) / 100;
   
-  if (isNaN(amount) || isNaN(inflationRate) || yearsDifference === 0) {
+  if (isNaN(amount) || isNaN(inflationRate) || totalMonthsLeft <= 0) {
     return '';
   }
   
-  // Формула: amount * ((inflationRate + 1) ^ yearsDifference)
-  const result = amount * Math.pow(inflationRate + 1, yearsDifference)/12;
+  // Кол-во лет (дробное) для расчёта инфляции
+  const years = totalMonthsLeft / 12;
+  // Итоговая сумма с учётом инфляции
+  const adjustedAmount = amount * Math.pow(1 + inflationRate, years);
+  // Ежемесячная сумма = итого / кол-во месяцев
+  const result = adjustedAmount / totalMonthsLeft;
   
   // Форматируем результат с разделением тысяч
   return result.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -146,7 +165,7 @@ useEffect(() => {
     setFormData(prev => ({ ...prev, monthlyInvestment: calculatedValue }));
   }
   console.log(calculatedValue)
-}, [formData.amount, formData.inflationRate, yearsDifference]);
+}, [formData.amount, formData.inflationRate, totalMonthsLeft]);
 
 useEffect(() => {
   if (editGoalId) {
@@ -166,10 +185,9 @@ useEffect(() => {
       setSelectedSortMonth(existingGoal.timeframe.month);
       setSelectedSortYear(existingGoal.timeframe.year);
       
-      // Вычисляем разницу годов при редактировании
-      const selectedYearNum = parseInt(existingGoal.timeframe.year, 10);
-      const difference = selectedYearNum - currentYear;
-      setYearsDifference(difference);
+      // Вычисляем полное число месяцев при редактировании
+      const months = recalcTotalMonths(existingGoal.timeframe.month, existingGoal.timeframe.year);
+      setTotalMonthsLeft(months);
     }
   }
 }, [editGoalId]);
@@ -178,8 +196,8 @@ useEffect(() => {
     if (!canSave) return;
 
     try {
-      // Здесь yearsDifference доступен для использования
-      console.log('Разница годов:', yearsDifference);
+      // Здесь totalMonthsLeft доступен для использования
+      console.log('Месяцев осталось:', totalMonthsLeft);
       
       const goalData = convertFormDataToGoal(
         formData,
@@ -216,14 +234,15 @@ useEffect(() => {
   
   const handleSortSelectMonth = (value: string) => {
     setSelectedSortMonth(value);
+    const months = recalcTotalMonths(value, selectedSortYear);
+    setTotalMonthsLeft(months);
   };
   
 const handleSortSelectYear = (value: string) => {
   setSelectedSortYear(value);
-  const selectedYearNum = parseInt(value, 10);
-  const difference = selectedYearNum - currentYear;
-  setYearsDifference(difference);
-  console.log('Выбран год:', value, 'Разница:', difference);
+  const months = recalcTotalMonths(selectedSortMonth, value);
+  setTotalMonthsLeft(months);
+  console.log('Выбран год:', value, 'Месяцев осталось:', months);
 };
 
   const canSave = formData.name.trim() !== '' && 
@@ -289,7 +308,7 @@ const handleSortSelectYear = (value: string) => {
                     setFormData({ ...formData, type: type.key as any });
                       // Сброс выбранного года и разницы при смене типа цели
                       setSelectedSortYear('Год');
-                      setYearsDifference(0);
+                      setTotalMonthsLeft(0);
                   }}
                   className={`px-4 py-3 rounded-2xl border ${
                     formData.type === type.key
@@ -330,9 +349,9 @@ const handleSortSelectYear = (value: string) => {
               <DropdownButton value={selectedSortYear} onPress={() => setShowDrawerYear(true)} isLast />
             </View>
             {/* Показываем разницу годов для проверки */}
-            {yearsDifference > 0 && (
+            {totalMonthsLeft > 0 && (
               <Text className={`${textSecondaryColor} text-sm mt-2 font-['SFProDisplayRegular']`}>
-                Срок: {yearsDifference} {yearsDifference === 1 ? 'год' : yearsDifference < 5 ? 'года' : 'лет'}
+                Срок: {Math.floor(totalMonthsLeft / 12)} {Math.floor(totalMonthsLeft / 12) === 1 ? 'год' : Math.floor(totalMonthsLeft / 12) < 5 ? 'года' : 'лет'}{totalMonthsLeft % 12 > 0 ? ` ${totalMonthsLeft % 12} мес.` : ''}
               </Text>
             )}
           </View>
@@ -472,7 +491,7 @@ const handleSortSelectYear = (value: string) => {
         onClose={() => setShowDrawerMonth(false)}
         onSelect={handleSortSelectMonth}
         selectedValue={selectedSortMonth}
-        options={months}
+        options={monthNames}
         animationType='fade'
       />
       

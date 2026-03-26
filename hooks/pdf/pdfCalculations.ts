@@ -74,15 +74,55 @@ export const calculateMonthlyInvestment = (
     return Math.round(monthlyPayment);
 };
 
+// Конвертация русского названия месяца в индекс (0-11)
+export const monthNameToIndex = (monthName: string): number => {
+    const months: Record<string, number> = {
+        'Январь': 0, 'Февраль': 1, 'Март': 2, 'Апрель': 3,
+        'Май': 4, 'Июнь': 5, 'Июль': 6, 'Август': 7,
+        'Сентябрь': 8, 'Октябрь': 9, 'Ноябрь': 10, 'Декабрь': 11,
+    };
+    return months[monthName] ?? 0;
+};
+
+// Расчёт полного числа месяцев от текущей даты до target
+export const calculateTotalMonthsLeft = (timeframe: {
+    day: string;
+    month: string;
+    year: string;
+}): number => {
+    const now = new Date();
+    const targetYear = parseInt(timeframe.year, 10);
+    const targetMonthIdx = monthNameToIndex(timeframe.month);
+
+    const totalMonths =
+        (targetYear - now.getFullYear()) * 12 + (targetMonthIdx - now.getMonth());
+
+    return Math.max(1, totalMonths);
+};
+
 // Вспомогательные функции
 export const calculateYearsLeft = (timeframe: {
     day: string;
     month: string;
     year: string;
 }): number => {
-    const targetDate = new Date(parseInt(timeframe.year), parseInt(timeframe.month) - 1);
-    const currentDate = new Date();
-    return Math.max(1, targetDate.getFullYear() - currentDate.getFullYear());
+    const totalMonths = calculateTotalMonthsLeft(timeframe);
+    // Возвращаем дробное кол-во лет, но минимум 1
+    return Math.max(1, Math.round((totalMonths / 12) * 10) / 10);
+};
+
+// Динамический пересчёт ежемесячной суммы инвестирования для PDF
+export const recalculateMonthlyInvestment = (
+    amount: number,
+    inflationRate: number,
+    totalMonths: number,
+): number => {
+    if (isNaN(amount) || totalMonths <= 0) return 0;
+    // Итоговая сумма с учётом инфляции: amount * (1 + inflation)^(totalMonths/12)
+    const years = totalMonths / 12;
+    const adjustedAmount = amount * Math.pow(1 + inflationRate / 100, years);
+    // Делим на число месяцев
+    return adjustedAmount / totalMonths;
 };
 
 export const getCurrencySymbol = (currency: string): string => {

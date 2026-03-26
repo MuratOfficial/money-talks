@@ -4,6 +4,8 @@ import {
     formatAmount,
     formatDate,
     calculateYearsLeft,
+    calculateTotalMonthsLeft,
+    recalculateMonthlyInvestment,
     getCurrencyRatio,
 } from './pdfCalculations';
 
@@ -251,12 +253,12 @@ export const generateGoalsTable = (
 
     const totalKZT = goals.reduce((sum, goal) => {
         const ratios = getCurrencyRatio(goal.currency);
-        return sum + (parseFloat(goal.monthlyInvestment) || 0) * ratios.kzt;
+        return sum + (parseFloat(goal.amount) || 0) * ratios.kzt;
     }, 0);
 
     const totalUSD = goals.reduce((sum, goal) => {
         const ratios = getCurrencyRatio(goal.currency);
-        return sum + (parseFloat(goal.monthlyInvestment) || 0) * ratios.usd;
+        return sum + (parseFloat(goal.amount) || 0) * ratios.usd;
     }, 0);
 
     return `
@@ -286,7 +288,10 @@ export const generateGoalsTable = (
             ${goals
             .map((goal, index) => {
                 const yearsLeft = calculateYearsLeft(goal.timeframe);
-                const monthlyInvestment = parseFloat(goal.monthlyInvestment) || 0;
+                const totalMonths = calculateTotalMonthsLeft(goal.timeframe);
+                const goalAmount = parseFloat(goal.amount) || 0;
+                const inflationRate = parseFloat(goal.inflationRate) || 0;
+                const monthlyInvestment = recalculateMonthlyInvestment(goalAmount, inflationRate, totalMonths);
                 const ratios = getCurrencyRatio(goal.currency);
 
                 return `
