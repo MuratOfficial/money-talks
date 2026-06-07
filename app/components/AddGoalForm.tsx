@@ -10,6 +10,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from './Drawer';
 import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore';
+import { goalFormSchema, firstError } from '@/validation/forms';
+import { Alert } from 'react-native';
 
 interface AddGoalFormProps {
   onClose?: () => void;
@@ -193,7 +195,20 @@ useEffect(() => {
 }, [editGoalId]);
 
   const handleSave = () => {
-    if (!canSave) return;
+    const validation = goalFormSchema.safeParse({
+      name: formData.name,
+      amount: formData.amount,
+      day: selectedSortDay,
+      month: selectedSortMonth,
+      year: selectedSortYear,
+      inflationRate: formData.inflationRate,
+      returnRate: formData.returnRate,
+    });
+    const error = firstError(validation);
+    if (error) {
+      Alert.alert('Ошибка', error);
+      return;
+    }
 
     try {
       // Здесь totalMonthsLeft доступен для использования

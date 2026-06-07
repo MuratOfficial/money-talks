@@ -27,19 +27,17 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           setUser({
             id: session.user.id,
               email: session.user.email!,
-              name: session.user.user_metadata?.full_name, 
-              password: '',
+              name: session.user.user_metadata?.full_name || session.user.email!,
           })
           setShouldRedirect({ to: '/main', replace: true });
         }
 
-   
+
         if(session?.user && !user){
           setUser({
             id: session.user.id,
               email: session.user.email!,
-              name: session.user.user_metadata?.full_name, 
-              password: '',
+              name: session.user.user_metadata?.full_name || session.user.email!,
           })
         }
       } catch (error) {

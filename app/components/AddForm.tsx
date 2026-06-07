@@ -13,6 +13,7 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
+import { assetFormSchema, firstError, parseAmountInput } from '@/validation/forms';
 
 interface CategoryItem {
   id: string;
@@ -114,19 +115,26 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
   };
 
   const handleAdd = () => {
-    if (!title.trim() || !amount.trim() ) {
-      Alert.alert('Ошибка', 'Заполните все поля');
+    const validation = assetFormSchema.safeParse({
+      title,
+      amount,
+      category: selectedCategory,
+    });
+    const error = firstError(validation);
+    if (error) {
+      Alert.alert('Ошибка', error);
       return;
     }
 
     try {
+      const parsedAmount = parseAmountInput(amount);
       const selectedCat = categories.find(x => x.id === selectedCategory);
 
       if(formItem){
         if(type === "income"){
         updateIncomes(formItem.id, {
           name: title,
-          amount: parseFloat(amount),
+          amount: parsedAmount,
           icon: selectedCat?.icon,
           iconType: selectedCat?.iconLibrary,
           color: selectedCat?.color,
@@ -138,7 +146,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
       if(type === "expence"){
         updateExpences(formItem.id,{
           name: title,
-          amount: parseFloat(amount),
+          amount: parsedAmount,
           icon: selectedCat?.icon,
           iconType:selectedCat?.iconLibrary,
           color: selectedCat?.color,
@@ -150,7 +158,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         if(type === "income"){
         addIncomes({
           name: title,
-          amount: parseFloat(amount),
+          amount: parsedAmount,
           icon: selectedCat?.icon,
           color: selectedCat?.color,
           categoryTab: currentCategoryOption || "",
@@ -161,7 +169,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
       if(type === "expence"){
         addExpences({
           name: title,
-          amount: parseFloat(amount),
+          amount: parsedAmount,
           icon: selectedCat?.icon,
           color: selectedCat?.color,
           categoryTab: currentCategoryOption || "",

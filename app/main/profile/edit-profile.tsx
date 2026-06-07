@@ -22,15 +22,11 @@ const EditProfilePage: React.FC = () => {
 
   const initialName = user?.name || "Unknown";
   const initialEmail = user?.email || "unknown@gmail.com";
-  const initialPassword = user?.password || "password";
-  const initialAvatar = user?.avatar || null; 
+  const initialAvatar = user?.avatar || null;
 
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
-  const [password, setPassword] = useState(initialPassword);
   const [avatarUri, setAvatarUri] = useState<string | null>(initialAvatar);
-
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [showDeleteDrawer, setShowDeleteDrawer] = useState(false);
 
@@ -103,9 +99,8 @@ const EditProfilePage: React.FC = () => {
   const handleSave = () => {
     // Логика сохранения профиля с аватаром
     updateUserProfile({
-      name: name, 
-      email: email, 
-      password: password,
+      name: name,
+      email: email,
       avatar: avatarUri // добавляем аватар в обновление профиля
     });
     router.push("/main/profile");
