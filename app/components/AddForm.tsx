@@ -98,6 +98,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
     { id: 'play', name: 'Развлечения', icon: 'play', iconLibrary: 'ionicons', color: '#A78BFA' },
     { id: 'fitness', name: 'Спорт', icon: 'fitness', iconLibrary: 'ionicons', color: '#84CC16' },
     { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#EC4899' },
+    { id: 'education', name: 'Образование', icon: 'school', iconLibrary: 'ionicons', color: '#6366F1' },
   ];
 
   const handleGoBack = () => {

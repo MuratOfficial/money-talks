@@ -1,18 +1,11 @@
-import { Asset, Goal, PersonalFinancialPlan } from '../useStore';
-import { Translations, FinancialSummary } from './pdfTypes';
-import {
-    formatAmount,
-    formatDate,
-    calculateYearsLeft,
-    calculateTotalMonthsLeft,
-    recalculateMonthlyInvestment,
-    getCurrencyRatio,
-} from './pdfCalculations';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateFooter = exports.generateSummary = exports.generateGoalsTable = exports.generateFinancialTable = exports.generateInsuranceSection = exports.generateClientInfo = exports.generateHeader = exports.getBaseStyles = void 0;
+const pdfCalculations_1 = require("./pdfCalculations");
 /**
  * Базовые стили для PDF документа
  */
-export const getBaseStyles = (): string => `
+const getBaseStyles = () => `
   * {
     margin: 0;
     padding: 0;
@@ -112,24 +105,20 @@ export const getBaseStyles = (): string => `
     font-size: 12px;
   }
 `;
-
+exports.getBaseStyles = getBaseStyles;
 /**
  * Шаблон заголовка документа
  */
-export const generateHeader = (t: Translations): string => `
+const generateHeader = (t) => `
   <div class="header">
     <div class="title">${t.title}</div>
   </div>
 `;
-
+exports.generateHeader = generateHeader;
 /**
  * Шаблон информации о клиенте
  */
-export const generateClientInfo = (
-    plan: PersonalFinancialPlan,
-    t: Translations,
-    userName?: string
-): string => `
+const generateClientInfo = (plan, t, userName) => `
   <div class="profile-section">
     <table class="info-table">
       <tr>
@@ -138,7 +127,7 @@ export const generateClientInfo = (
       </tr>
       <tr>
         <th>${t.birthDate}</th>
-        <td>${formatDate(plan.birthDate)}</td>
+        <td>${(0, pdfCalculations_1.formatDate)(plan.birthDate)}</td>
       </tr>
       <tr>
         <th>${t.activity}</th>
@@ -155,11 +144,11 @@ export const generateClientInfo = (
     </table>
   </div>
 `;
-
+exports.generateClientInfo = generateClientInfo;
 /**
  * Шаблон секции страхования
  */
-export const generateInsuranceSection = (plan: PersonalFinancialPlan, t: Translations): string => `
+const generateInsuranceSection = (plan, t) => `
   <div class="section-title">${t.securityPillow}</div>
   <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2196F3;">
     <p style="font-size: 16px; color: #1976D2; font-weight: 600;">${plan.securityPillow}</p>
@@ -181,27 +170,19 @@ export const generateInsuranceSection = (plan: PersonalFinancialPlan, t: Transla
     </div>
   </div>
 `;
-
+exports.generateInsuranceSection = generateInsuranceSection;
 /**
  * Шаблон таблицы финансовых данных
  */
-export const generateFinancialTable = (
-    items: Asset[],
-    title: string,
-    total: number,
-    currency: string,
-    color: string,
-    // Пассивы (кредиты, рассрочки, долги) не бывают регулярными/нерегулярными
-    // и не имеют доходности — для них скрываем эти колонки
-    showExtraColumns: boolean = true
-): string => {
+const generateFinancialTable = (items, title, total, currency, color, 
+// Пассивы (кредиты, рассрочки, долги) не бывают регулярными/нерегулярными
+// и не имеют доходности — для них скрываем эти колонки
+showExtraColumns = true) => {
     if (!items || items.length === 0) {
         return '';
     }
-
     const showYield = showExtraColumns && items.some((i) => i.yield);
     const showRegularity = showExtraColumns && items.some((i) => i.regularity);
-
     return `
     <div style="margin-bottom: 30px;">
       <div style="background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%); color: white; padding: 12px 20px; margin-bottom: 15px; border-radius: 8px; font-weight: bold;">
@@ -220,53 +201,43 @@ export const generateFinancialTable = (
           </thead>
           <tbody>
             ${items
-            .map(
-                (item, index) => `
+        .map((item, index) => `
               <tr style="background: ${index % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                 <td style="padding: 15px; font-weight: 600; border-right: 1px solid #e5e7eb;">${item.name}</td>
                 <td style="padding: 15px; text-align: center; border-right: 1px solid #e5e7eb;">
-                  ${formatAmount(item.amount, currency)}
+                  ${(0, pdfCalculations_1.formatAmount)(item.amount, currency)}
                 </td>
                 ${showYield ? `<td style="padding: 15px; text-align: center; border-right: 1px solid #e5e7eb;">${item.yield ? `${item.yield}%` : '—'}</td>` : ''}
                 ${showRegularity ? `<td style="padding: 15px; text-align: center;">${item.regularity || '—'}</td>` : ''}
               </tr>
-            `
-            )
-            .join('')}
+            `)
+        .join('')}
           </tbody>
         </table>
         
         <div style="background: #fbbf24; padding: 12px; text-align: center; font-weight: bold; color: #92400e;">
-          ИТОГО: ${formatAmount(total, currency)}
+          ИТОГО: ${(0, pdfCalculations_1.formatAmount)(total, currency)}
         </div>
       </div>
     </div>
   `;
 };
-
+exports.generateFinancialTable = generateFinancialTable;
 /**
  * Шаблон таблицы целей
  */
-export const generateGoalsTable = (
-    goals: Goal[],
-    title: string,
-    color: string,
-    currency: string
-): string => {
+const generateGoalsTable = (goals, title, color, currency) => {
     if (!goals || goals.length === 0) {
         return '';
     }
-
     const totalKZT = goals.reduce((sum, goal) => {
-        const ratios = getCurrencyRatio(goal.currency);
+        const ratios = (0, pdfCalculations_1.getCurrencyRatio)(goal.currency);
         return sum + (parseFloat(goal.amount) || 0) * ratios.kzt;
     }, 0);
-
     const totalUSD = goals.reduce((sum, goal) => {
-        const ratios = getCurrencyRatio(goal.currency);
+        const ratios = (0, pdfCalculations_1.getCurrencyRatio)(goal.currency);
         return sum + (parseFloat(goal.amount) || 0) * ratios.usd;
     }, 0);
-
     return `
     <div style="margin-bottom: 40px;">
       <div style="background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%); color: white; padding: 12px 20px; margin-bottom: 15px; border-radius: 8px; font-weight: bold;">
@@ -292,85 +263,85 @@ export const generateGoalsTable = (
           </thead>
           <tbody>
             ${goals
-            .map((goal, index) => {
-                const yearsLeft = calculateYearsLeft(goal.timeframe);
-                const totalMonths = calculateTotalMonthsLeft(goal.timeframe);
-                const goalAmount = parseFloat(goal.amount) || 0;
-                const inflationRate = parseFloat(goal.inflationRate) || 0;
-                const returnRate = parseFloat(goal.returnRate) || 0;
-                const collected = parseFloat(goal.collected || '0') || 0;
-                const monthlyInvestment = recalculateMonthlyInvestment(goalAmount, inflationRate, returnRate, totalMonths, collected);
-                const ratios = getCurrencyRatio(goal.currency);
-
-                return `
+        .map((goal, index) => {
+        const yearsLeft = (0, pdfCalculations_1.calculateYearsLeft)(goal.timeframe);
+        const totalMonths = (0, pdfCalculations_1.calculateTotalMonthsLeft)(goal.timeframe);
+        const goalAmount = parseFloat(goal.amount) || 0;
+        const inflationRate = parseFloat(goal.inflationRate) || 0;
+        const returnRate = parseFloat(goal.returnRate) || 0;
+        const collected = parseFloat(goal.collected || '0') || 0;
+        const monthlyInvestment = (0, pdfCalculations_1.recalculateMonthlyInvestment)(goalAmount, inflationRate, returnRate, totalMonths, collected);
+        const ratios = (0, pdfCalculations_1.getCurrencyRatio)(goal.currency);
+        return `
                 <tr style="background: ${index % 2 === 0 ? '#f0fdf4' : '#dcfce7'};">
                   <td style="padding: 12px 8px; text-align: center; font-weight: bold;">${index + 1}</td>
                   <td style="padding: 12px; font-weight: 600; color: #166534;">${goal.name}</td>
-                  <td style="padding: 12px; text-align: center;">${formatAmount(parseFloat(goal.amount), goal.currency === 'USD' ? '$' : '₸')}</td>
+                  <td style="padding: 12px; text-align: center;">${(0, pdfCalculations_1.formatAmount)(parseFloat(goal.amount), goal.currency === 'USD' ? '$' : '₸')}</td>
                   <td style="padding: 12px; text-align: center;">${goal.currency === 'USD' ? '$' : '₸'}</td>
                   <td style="padding: 12px; text-align: center; font-size: 11px;">${goal.timeframe.day}.${goal.timeframe.month}.${goal.timeframe.year}</td>
                   <td style="padding: 12px; text-align: center;">${goal.returnRate}%</td>
                   <td style="padding: 12px; text-align: center;">${goal.inflationRate}%</td>
                   <td style="padding: 12px; text-align: center; font-weight: bold;">${yearsLeft}</td>
-                  <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${formatAmount(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
-                  <td style="padding: 12px; text-align: center;">${formatAmount(monthlyInvestment * ratios.kzt, '₸')}</td>
-                  <td style="padding: 12px; text-align: center;">${formatAmount(monthlyInvestment * ratios.usd, '$')}</td>
+                  <td style="padding: 12px; text-align: center; background: #fef3c7; font-weight: bold;">${(0, pdfCalculations_1.formatAmount)(monthlyInvestment, goal.currency === 'USD' ? '$' : '₸')}</td>
+                  <td style="padding: 12px; text-align: center;">${(0, pdfCalculations_1.formatAmount)(monthlyInvestment * ratios.kzt, '₸')}</td>
+                  <td style="padding: 12px; text-align: center;">${(0, pdfCalculations_1.formatAmount)(monthlyInvestment * ratios.usd, '$')}</td>
                 </tr>`;
-            })
-            .join('')}
+    })
+        .join('')}
           </tbody>
         </table>
         
         <div style="background: #fbbf24; padding: 12px; text-align: center; font-weight: bold; color: #92400e;">
-          ИТОГО: ${formatAmount(totalKZT, '₸')} | ${formatAmount(totalUSD, '$')}
+          ИТОГО: ${(0, pdfCalculations_1.formatAmount)(totalKZT, '₸')} | ${(0, pdfCalculations_1.formatAmount)(totalUSD, '$')}
         </div>
       </div>
     </div>
   `;
 };
-
+exports.generateGoalsTable = generateGoalsTable;
 /**
  * Шаблон итоговой сводки
  */
-export const generateSummary = (summary: FinancialSummary, currency: string): string => `
+const generateSummary = (summary, currency) => `
   <div style="margin-top: 30px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 20px; border-radius: 12px;">
     <h3 style="margin: 0 0 15px 0; font-size: 18px; text-align: center;">ФИНАНСОВАЯ СВОДКА</h3>
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; font-size: 14px;">
       <div>
         <div style="opacity: 0.9;">Общий доход:</div>
-        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${formatAmount(summary.totalIncomes, currency)}</div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${(0, pdfCalculations_1.formatAmount)(summary.totalIncomes, currency)}</div>
       </div>
       <div>
         <div style="opacity: 0.9;">Общие расходы:</div>
-        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${formatAmount(summary.totalExpenses, currency)}</div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${(0, pdfCalculations_1.formatAmount)(summary.totalExpenses, currency)}</div>
       </div>
       <div>
         <div style="opacity: 0.9;">Активы:</div>
-        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${formatAmount(summary.totalActives, currency)}</div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${(0, pdfCalculations_1.formatAmount)(summary.totalActives, currency)}</div>
       </div>
       <div>
         <div style="opacity: 0.9;">Пассивы:</div>
-        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${formatAmount(summary.totalPassives, currency)}</div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${(0, pdfCalculations_1.formatAmount)(summary.totalPassives, currency)}</div>
       </div>
       <div style="grid-column: span 2; border-top: 2px solid rgba(255,255,255,0.3); padding-top: 15px; margin-top: 10px;">
         <div style="opacity: 0.9;">Чистый капитал:</div>
-        <div style="font-size: 22px; font-weight: bold; margin-top: 5px;">${formatAmount(summary.netWorth, currency)}</div>
+        <div style="font-size: 22px; font-weight: bold; margin-top: 5px;">${(0, pdfCalculations_1.formatAmount)(summary.netWorth, currency)}</div>
       </div>
       <div style="grid-column: span 2;">
         <div style="opacity: 0.9;">Дельта:</div>
-        <div style="font-size: 22px; font-weight: bold; margin-top: 5px; color: ${summary.monthlyBalance >= 0 ? '#86efac' : '#fca5a5'};">${formatAmount(summary.monthlyBalance, currency)}</div>
+        <div style="font-size: 22px; font-weight: bold; margin-top: 5px; color: ${summary.monthlyBalance >= 0 ? '#86efac' : '#fca5a5'};">${(0, pdfCalculations_1.formatAmount)(summary.monthlyBalance, currency)}</div>
       </div>
     </div>
   </div>
 `;
-
+exports.generateSummary = generateSummary;
 /**
  * Шаблон футера
  */
-export const generateFooter = (plan: PersonalFinancialPlan, t: Translations): string => `
+const generateFooter = (plan, t) => `
   <div class="footer">
     <p><strong>${t.createdDate}:</strong> ${plan.createdAt instanceof Date ? plan.createdAt.toLocaleDateString('ru-RU') : new Date(plan.createdAt).toLocaleDateString('ru-RU')}</p>
     <p><strong>${t.updatedDate}:</strong> ${plan.updatedAt instanceof Date ? plan.updatedAt.toLocaleDateString('ru-RU') : new Date(plan.updatedAt).toLocaleDateString('ru-RU')}</p>
     <p style="margin-top: 10px; font-style: italic;">Создано с помощью приложения Money Talks</p>
   </div>
 `;
+exports.generateFooter = generateFooter;

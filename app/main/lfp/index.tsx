@@ -72,6 +72,22 @@ const PersonalFinancialPlanScreen = () => {
   const totalPassives = passives ? passives.reduce((sum, item) => sum + (Number(item.amount) || 0), 0) : 0;
   const netWorth = totalActives - totalPassives || 0;
 
+  // Подушка безопасности на 3 месяца = постоянные (регулярные) расходы × 3
+  const regularExpenses = expences
+    ? expences
+        .filter((item) => item.regularity === 'regular')
+        .reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
+    : 0;
+  const securityPillowValue = regularExpenses * 3;
+  const securityPillowFormatted = formatAmount(securityPillowValue);
+
+  // Синхронизируем вычисленную подушку в ЛФП, чтобы она попала в PDF
+  React.useEffect(() => {
+    if (personalFinancialPlan && personalFinancialPlan.securityPillow !== securityPillowFormatted) {
+      updatePersonalFinancialPlan({ securityPillow: securityPillowFormatted });
+    }
+  }, [securityPillowFormatted, personalFinancialPlan]);
+
   const handleSortSelect = (value: any) => {
     setSelectedSort(value);
     console.log('Selected sort:', value);
@@ -401,14 +417,10 @@ const PersonalFinancialPlanScreen = () => {
             Подушка безопасности на 3 месяца
           </Text>
           <View className={`flex-row justify-between items-center p-3 rounded-xl ${cardBgColor}`}>
-            <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>По постоянному расходу</Text>
-            <TextInput
-              value={personalFinancialPlan?.securityPillow || ''}
-              onChangeText={(val) => updatePersonalFinancialPlan({ securityPillow: val })}
-              className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
-              placeholder="0 ₸"
-              placeholderTextColor={isDark ? "#666" : "#999"}
-            />
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>По постоянному расходу (×3)</Text>
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] text-right min-w-[100px]`}>
+              {securityPillowFormatted}
+            </Text>
           </View>
         </View>
 

@@ -65,29 +65,6 @@ const InvestmentNotificationManager: React.FC = () => {
     }
   };
 
-  const handleTestNotification = async () => {
-    try {
-      // Тестовое уведомление через 5 секунд
-      await scheduleNotification(
-        '🎓 Не знаешь, с чего начать инвестировать?',
-        'Смотри короткий видеоурок',
-        5,
-        { 
-          screen: '/main/invest',
-          type: 'investment-tip'
-        }
-      );
-
-      Alert.alert(
-        'Тестовое уведомление',
-        'Вы получите уведомление через 5 секунд'
-      );
-    } catch (error) {
-      console.error('Error scheduling test notification:', error);
-      Alert.alert('Ошибка', 'Не удалось запланировать уведомление');
-    }
-  };
-
   const handleCancelNotification = async () => {
     try {
       await cancelAllNotifications();
@@ -156,21 +133,11 @@ const InvestmentNotificationManager: React.FC = () => {
         <View className="space-y-2">
           <TouchableOpacity
             onPress={handleScheduleNotification}
-            className="bg-blue-600 rounded-lg py-3 items-center mb-2"
+            className="bg-blue-600 rounded-lg py-3 items-center"
             activeOpacity={0.8}
           >
             <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
               Запланировать напоминание
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleTestNotification}
-            className="bg-gray-500 rounded-lg py-3 items-center"
-            activeOpacity={0.8}
-          >
-            <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
-              Тест (через 5 сек)
             </Text>
           </TouchableOpacity>
         </View>

@@ -10,11 +10,38 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_PRODUCTION;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, 
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Таймаут по умолчанию для нативных fetch-запросов (мс)
+const FETCH_TIMEOUT_MS = 15000;
+
+/**
+ * Обёртка над fetch с таймаутом через AbortController.
+ * Без неё native fetch может висеть бесконечно на плохой сети.
+ */
+const fetchWithTimeout = async (
+  input: RequestInfo,
+  init: RequestInit = {},
+  timeoutMs: number = FETCH_TIMEOUT_MS
+): Promise<Response> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error: any) {
+    if (error?.name === 'AbortError') {
+      throw new Error('Превышено время ожидания ответа сервера');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
 
 export interface Question {
   id: string;
@@ -90,7 +117,7 @@ export interface SyncResponse {
 
 export const fetchQuestions = async (): Promise<Question[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/public/questions`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/questions`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +138,7 @@ export const fetchQuestions = async (): Promise<Question[]> => {
 
 export const saveTestResult = async (result: TestResult): Promise<void> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/public/results`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/results`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -137,7 +164,7 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
       ? `${API_BASE_URL}/api/public/tips?page=${encodeURIComponent(page)}` 
       : `${API_BASE_URL}/api/public/tips`;
     
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -158,7 +185,7 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
 
 export const sendChatGPTMessage = async (request: ChatGPTRequest): Promise<ChatGPTResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/public/chat/send`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -194,7 +221,7 @@ export const sendChatGPTMessage = async (request: ChatGPTRequest): Promise<ChatG
 
 // Функция для создания новой беседы
 export const createConversation = async (title?: string, context?: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations`, {
+  const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/conversations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -214,7 +241,7 @@ export const createConversation = async (title?: string, context?: string) => {
 
 // Функция для получения истории бесед
 export const getConversations = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations`);
+  const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/conversations`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch conversations');
@@ -225,7 +252,7 @@ export const getConversations = async () => {
 
 // Функция для получения конкретной беседы
 export const getConversation = async (conversationId: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/public/chat/conversations/${conversationId}`);
+  const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/conversations/${conversationId}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch conversation');
@@ -236,7 +263,7 @@ export const getConversation = async (conversationId: string) => {
 
 // Функция для проверки лимитов использования
 export const getUsageStats = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/public/chat/usage`);
+  const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/usage`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch usage stats');

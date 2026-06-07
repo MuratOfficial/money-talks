@@ -17,7 +17,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // Не зависаем на старте, если getSession не отвечает (плохая сеть/сбой)
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise<{ data: { session: null } }>((resolve) =>
+          setTimeout(() => resolve({ data: { session: null } }), 8000)
+        );
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
 
         if (!session && segments[0] === 'new-password') {
           setShouldRedirect({ to: "/(auth)/new-password", replace: false });

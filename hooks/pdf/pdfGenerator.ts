@@ -79,7 +79,7 @@ export const generateLFPHtmlContent = (options: PDFGeneratorOptions): string => 
             
             ${generateFinancialTable(actives || [], t.assets, totalActives, currency, '#059669')}
             
-            ${generateFinancialTable(passives || [], t.liabilities, totalPassives, currency, '#ea580c')}
+            ${generateFinancialTable(passives || [], t.liabilities, totalPassives, currency, '#ea580c', false)}
           </div>
 
           <!-- Цели -->

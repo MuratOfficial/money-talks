@@ -41,9 +41,19 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       if(currentAsset){
         setTitle(currentAsset.name);
         setAmount(currentAsset.amount.toString());
-        setPlanningHorizon(currentAsset.yield?.toString() || "")
+        // Показываем сохранённый годовой расход на содержание
+        setPlanningHorizon(currentAsset.additional?.toString() || "")
       }
     }, [currentAsset])
+
+  // Эффективность пассива (затратность): отрицательная, т.к. это нагрузка, а не доход
+  // = (годовой расход на содержание / текущая стоимость) × 100
+  const calcPassiveEfficiency = (): number => {
+    const value = parseFloat(amount);
+    const annualCost = parseFloat(planningHorizon);
+    if (isNaN(value) || isNaN(annualCost) || value <= 0) return 0;
+    return -((annualCost / value) * 100);
+  };
 
 
   const handleBack = () => {
@@ -56,18 +66,22 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       return;
     }
 
+    const efficiency = calcPassiveEfficiency();
+
     if(currentAsset){
       updatePassives(currentAsset.id, {
         name: title,
         amount: parseFloat(amount),
-        yield: parseFloat(planningHorizon),
+        additional: parseFloat(planningHorizon),
+        yield: parseFloat(efficiency.toFixed(2)),
         regularity: currentRegOption || "regular"
       })
     }else{
        addPassives({
       name: title,
       amount: parseFloat(amount),
-      yield: parseFloat(planningHorizon),
+      additional: parseFloat(planningHorizon),
+      yield: parseFloat(efficiency.toFixed(2)),
       regularity: currentRegOption || "regular"
     })
     }
@@ -140,9 +154,22 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
                     keyboardType="number-pad"
                     autoCapitalize="none"
                   />
-                  
+
                 </View>
-        
+
+                {!!amount && !!planningHorizon && (
+                  <View className="mb-4">
+                    <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
+                      Эффективность (затратность)
+                    </Text>
+                    <View className={`${inputBgColor} rounded-xl px-4 py-3`}>
+                      <Text className={`${inputTextColor} text-base font-['SFProDisplayRegular']`}>
+                        {calcPassiveEfficiency().toFixed(2)} %
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
 
 
       </ScrollView>

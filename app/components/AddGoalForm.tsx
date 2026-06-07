@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Drawer from './Drawer';
 import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore';
 import { goalFormSchema, firstError } from '@/validation/forms';
+import { recalculateMonthlyInvestment } from '@/hooks/pdf/pdfCalculations';
 import { Alert } from 'react-native';
 
 interface AddGoalFormProps {
@@ -143,19 +144,16 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
   // Функция для расчета monthlyInvestment
 const calculateMonthlyInvestment = () => {
   const amount = parseFloat(formData.amount.replace(/\s/g, ''));
-  const inflationRate = parseFloat(formData.inflationRate) / 100;
-  
+  const inflationRate = parseFloat(formData.inflationRate);
+  const returnRate = parseFloat(formData.returnRate);
+
   if (isNaN(amount) || isNaN(inflationRate) || totalMonthsLeft <= 0) {
     return '';
   }
-  
-  // Кол-во лет (дробное) для расчёта инфляции
-  const years = totalMonthsLeft / 12;
-  // Итоговая сумма с учётом инфляции
-  const adjustedAmount = amount * Math.pow(1 + inflationRate, years);
-  // Ежемесячная сумма = итого / кол-во месяцев
-  const result = adjustedAmount / totalMonthsLeft;
-  
+
+  // Аннуитетная формула с учётом инфляции и ожидаемой доходности (единый источник расчёта)
+  const result = recalculateMonthlyInvestment(amount, inflationRate, returnRate, totalMonthsLeft, 0);
+
   // Форматируем результат с разделением тысяч
   return result.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
@@ -166,8 +164,7 @@ useEffect(() => {
   if (calculatedValue !== formData.monthlyInvestment) {
     setFormData(prev => ({ ...prev, monthlyInvestment: calculatedValue }));
   }
-  console.log(calculatedValue)
-}, [formData.amount, formData.inflationRate, totalMonthsLeft]);
+}, [formData.amount, formData.inflationRate, formData.returnRate, totalMonthsLeft]);
 
 useEffect(() => {
   if (editGoalId) {
