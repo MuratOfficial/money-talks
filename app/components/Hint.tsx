@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -7,6 +7,9 @@ import {
   ScrollView,
   Linking,
   Dimensions,
+  Animated,
+  Easing,
+  StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
@@ -23,14 +26,46 @@ interface InfoModalProps {
 const { height: screenHeight } = Dimensions.get('window');
 const height = screenHeight * 0.8;
 
-const InfoModal: React.FC<InfoModalProps> = ({ 
-  visible, 
-  onClose, 
-  title, 
-  content, 
-  linkUrl, 
-  linkText 
+const InfoModal: React.FC<InfoModalProps> = ({
+  visible,
+  onClose,
+  title,
+  content,
+  linkUrl,
+  linkText
 }) => {
+  // Анимация шторки: панель выезжает снизу, затемнение фона жёстко
+  // привязано к её позиции (один источник анимации — без рассинхрона/«мути»)
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const [rendered, setRendered] = useState(visible);
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  useEffect(() => {
+    if (visible) {
+      setRendered(true);
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(translateY, {
+        toValue: screenHeight,
+        duration: 250,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setRendered(false);
+      });
+    }
+  }, [visible]);
+
   const handleLinkPress = async () => {
     if (!linkUrl) return;
     const supported = await Linking.canOpenURL(linkUrl);
@@ -44,19 +79,32 @@ const InfoModal: React.FC<InfoModalProps> = ({
 
   return (
     <Modal
-      visible={visible}
+      visible={rendered}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50 justify-end">
-        <TouchableOpacity 
-          className="flex-1" 
-          activeOpacity={1} 
-          onPress={onClose}
-        />
+      <View className="flex-1 justify-end">
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
+        >
+          <TouchableOpacity
+            className="flex-1"
+            activeOpacity={1}
+            onPress={onClose}
+          />
+        </Animated.View>
 
-        <View className="bg-[#1C1C1E] rounded-t-3xl px-4 pt-6 pb-4">
+        <Animated.View
+          style={{
+            transform: [{ translateY }],
+            backgroundColor: '#1C1C1E',
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            paddingHorizontal: 16,
+            paddingTop: 24,
+            paddingBottom: 16,
+          }}>
           {/* Drag Indicator */}
           <View className="items-center py-2">
             <View className="w-10 h-1 bg-gray-600 rounded-full" />
@@ -184,7 +232,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
               )}
             </View>
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

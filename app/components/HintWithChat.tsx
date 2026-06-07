@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -8,6 +8,8 @@ import {
   Linking,
   Dimensions,
   Animated,
+  Easing,
+  StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
@@ -39,9 +41,40 @@ const InfoModal: React.FC<InfoModalProps> = ({
   const { theme } = useFinancialStore();
   const [showChat, setShowChat] = useState(false);
   const chatButtonAnim = useRef(new Animated.Value(1)).current;
-  
+
+  // Анимация шторки: панель выезжает снизу, затемнение фона жёстко
+  // привязано к её позиции (один источник анимации — без рассинхрона/«мути»)
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const [rendered, setRendered] = useState(visible);
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  useEffect(() => {
+    if (visible) {
+      setRendered(true);
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(translateY, {
+        toValue: screenHeight,
+        duration: 250,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setRendered(false);
+      });
+    }
+  }, [visible]);
+
   const isDark = theme === 'dark';
-  const modalBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const textSecondaryColor = isDark ? '#D1D5DB' : '#374151';
   const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
@@ -79,19 +112,32 @@ const InfoModal: React.FC<InfoModalProps> = ({
 
   return (
     <Modal
-      visible={visible}
+      visible={rendered}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50 justify-end">
-        <TouchableOpacity 
-          className="flex-1" 
-          activeOpacity={1} 
-          onPress={onClose}
-        />
+      <View className="flex-1 justify-end">
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
+        >
+          <TouchableOpacity
+            className="flex-1"
+            activeOpacity={1}
+            onPress={onClose}
+          />
+        </Animated.View>
 
-        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}>
+        <Animated.View
+          style={{
+            transform: [{ translateY }],
+            backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            paddingHorizontal: 16,
+            paddingTop: 24,
+            paddingBottom: 16,
+          }}>
           {/* Drag Indicator */}
           <View className="items-center py-2">
             <View className={`w-10 h-1 ${handleBarColor} rounded-full`} />
@@ -234,9 +280,9 @@ const InfoModal: React.FC<InfoModalProps> = ({
               )}
             </View>
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
-      
+
       {/* ChatGPT Feature Modal - передаем контент как контекст */}
       {enableChatGPT && (
         <ChatGPTFeature

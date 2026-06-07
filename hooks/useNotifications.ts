@@ -8,6 +8,12 @@ let Notifications: any = null;
 let isNotificationsAvailable = false;
 
 try {
+    // На вебе модуль грузится, но нативные методы (scheduleNotificationAsync,
+    // getAllScheduledNotificationsAsync и т.д.) бросают исключение. Считаем недоступным.
+    if (Platform.OS === 'web') {
+        throw new Error('Уведомления не поддерживаются на вебе');
+    }
+
     Notifications = require('expo-notifications');
     isNotificationsAvailable = true;
 
