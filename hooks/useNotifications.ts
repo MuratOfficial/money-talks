@@ -1,17 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { router } from 'expo-router';
-import Constants from 'expo-constants';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 // Проверка доступности expo-notifications
 let Notifications: any = null;
 let isNotificationsAvailable = false;
+
+// В Expo Go нативный модуль пуш-уведомлений (ExpoPushTokenManager) отсутствует:
+// JS-модуль грузится, но вызовы вроде getExpoPushTokenAsync() бросают исключение
+// «Cannot find native module». Поэтому в Expo Go сразу считаем модуль недоступным,
+// чтобы не дёргать нативные методы и не засорять логи ошибками.
+const isExpoGo =
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 try {
     // На вебе модуль грузится, но нативные методы (scheduleNotificationAsync,
     // getAllScheduledNotificationsAsync и т.д.) бросают исключение. Считаем недоступным.
     if (Platform.OS === 'web') {
         throw new Error('Уведомления не поддерживаются на вебе');
+    }
+
+    // В Expo Go нативные методы недоступны — нужен Development Build.
+    if (isExpoGo) {
+        throw new Error('Уведомления недоступны в Expo Go. Требуется Development Build.');
     }
 
     Notifications = require('expo-notifications');

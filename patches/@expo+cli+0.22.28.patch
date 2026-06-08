@@ -1,0 +1,13 @@
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/dev-server/createMetroMiddleware.js b/node_modules/@expo/cli/build/src/start/server/metro/dev-server/createMetroMiddleware.js
+index 2d2dfc1..98ceede 100644
+--- a/node_modules/@expo/cli/build/src/start/server/metro/dev-server/createMetroMiddleware.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/dev-server/createMetroMiddleware.js
+@@ -70,7 +70,7 @@ const metroOpenStackFrameMiddleware = (req, res, next)=>{
+ };
+ function createMetroStatusMiddleware(metroConfig) {
+     return (_req, res)=>{
+-        res.setHeader("X-React-Native-Project-Root", metroConfig.projectRoot);
++        res.setHeader("X-React-Native-Project-Root", encodeURIComponent(metroConfig.projectRoot));
+         res.end("packager-status:running");
+     };
+ }
