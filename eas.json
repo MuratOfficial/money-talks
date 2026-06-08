@@ -19,7 +19,8 @@
       "distribution": "internal",
       "environment": "preview",
       "env": {
-        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
+        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1",
+        "EXPO_PUBLIC_API_BASE_PRODUCTION": "https://money-talks-admin.vercel.app"
       },
       "ios": {
         "simulator": true
@@ -29,7 +30,8 @@
       "autoIncrement": true,
       "environment": "production",
       "env": {
-        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
+        "EAS_BUILD_DISABLE_MAVEN_CACHE": "1",
+        "EXPO_PUBLIC_API_BASE_PRODUCTION": "https://money-talks-admin.vercel.app"
       }
     }
   },
