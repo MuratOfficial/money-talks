@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
 import ChatGPTFeature from './ChatGPTFeature';
+import VideoHintPlayer from './VideoHintPlayer';
 import useFinancialStore from '@/hooks/useStore';
 
 interface InfoModalProps {
@@ -23,19 +24,25 @@ interface InfoModalProps {
   content: string;
   linkUrl?: string;
   linkText?: string;
+  /** URL видеоурока (медиафайл). Если задан — показываем встроенный плеер. */
+  videoUrl?: string | null;
+  /** Подпись к видео. */
+  videoTitle?: string | null;
   enableChatGPT?: boolean;
 }
 
 const { height: screenHeight } = Dimensions.get('window');
 const height = screenHeight * 0.8;
 
-const InfoModal: React.FC<InfoModalProps> = ({ 
-  visible, 
-  onClose, 
-  title, 
-  content, 
-  linkUrl, 
+const InfoModal: React.FC<InfoModalProps> = ({
+  visible,
+  onClose,
+  title,
+  content,
+  linkUrl,
   linkText,
+  videoUrl,
+  videoTitle,
   enableChatGPT = true
 }) => {
   const { theme } = useFinancialStore();
@@ -258,13 +265,21 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 </Text>
               )}
 
-              {/* Link Section */}
-              {linkUrl && (
+              {/* Видеоурок: встроенный плеер (приоритетно) или ссылка-фолбэк */}
+              {videoUrl ? (
+                <View className={`mt-6 pt-4 border-t ${borderColor}`}>
+                  <VideoHintPlayer
+                    uri={videoUrl}
+                    title={videoTitle || linkText || 'Видеоурок'}
+                    isDark={isDark}
+                  />
+                </View>
+              ) : linkUrl ? (
                 <View className={`mt-6 pt-4 border-t ${borderColor}`}>
                   <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mb-3`}>
                     Ссылка на видеоурок:
                   </Text>
-                  
+
                   <TouchableOpacity
                     onPress={handleLinkPress}
                     className={`flex-row items-center p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg`}
@@ -277,7 +292,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                     <Ionicons name="chevron-forward" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
                   </TouchableOpacity>
                 </View>
-              )}
+              ) : null}
             </View>
           </ScrollView>
         </Animated.View>

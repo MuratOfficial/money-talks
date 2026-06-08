@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
+import VideoHintPlayer from './VideoHintPlayer';
 
 interface InfoModalProps {
   visible: boolean;
@@ -21,6 +22,8 @@ interface InfoModalProps {
   content: string;
   linkUrl?: string;
   linkText?: string;
+  videoUrl?: string | null;
+  videoTitle?: string | null;
 }
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -32,7 +35,9 @@ const InfoModal: React.FC<InfoModalProps> = ({
   title,
   content,
   linkUrl,
-  linkText
+  linkText,
+  videoUrl,
+  videoTitle
 }) => {
   // Анимация шторки: панель выезжает снизу, затемнение фона жёстко
   // привязано к её позиции (один источник анимации — без рассинхрона/«мути»)
@@ -210,13 +215,21 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 </Text>
               )}
 
-              {/* Link Section */}
-              {linkUrl && (
+              {/* Видеоурок: встроенный плеер (приоритетно) или ссылка-фолбэк */}
+              {videoUrl ? (
+                <View className="mt-6 pt-4 border-t border-gray-700">
+                  <VideoHintPlayer
+                    uri={videoUrl}
+                    title={videoTitle || linkText || 'Видеоурок'}
+                    isDark
+                  />
+                </View>
+              ) : linkUrl ? (
                 <View className="mt-6 pt-4 border-t border-gray-700">
                   <Text className="text-gray-400 text-sm mb-3">
                     Ссылка на видеоурок:
                   </Text>
-                  
+
                   <TouchableOpacity
                     onPress={handleLinkPress}
                     className="flex-row items-center p-3 bg-gray-700 rounded-lg"
@@ -229,7 +242,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                     <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
                   </TouchableOpacity>
                 </View>
-              )}
+              ) : null}
             </View>
           </ScrollView>
         </Animated.View>

@@ -1,12 +1,11 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
+import { API_BASE_URL } from './apiConfig';
+import { getStaticTips } from '@/constants/staticTips';
 
-// const API_BASE_URL = __DEV__ 
-//   ? process.env.EXPO_PUBLIC_API_BASE_LOCAL 
-//   : process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
-
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_PRODUCTION; 
+// Базовый URL вычисляется в ./apiConfig:
+//   - в разработке (__DEV__) — локальный dev-сервер (с авто-определением IP машины);
+//   - в продакшне — EXPO_PUBLIC_API_BASE_PRODUCTION.
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -66,10 +65,14 @@ export interface TestResult {
 export interface Tip {
   id: string;
   title: string;
-  content: string; 
+  content: string;
   page: string;
   order: number;
   isActive: boolean;
+  /** URL видеоурока (готовый: абсолютный S3 или относительный /api/media/...). */
+  videoUrl?: string | null;
+  /** Подпись к видео. */
+  videoTitle?: string | null;
 }
 
 export interface ChatGPTMessage {
@@ -160,10 +163,10 @@ export const saveTestResult = async (result: TestResult): Promise<void> => {
 
 export const fetchTips = async (page?: string): Promise<Tip[]> => {
   try {
-    const url = page 
-      ? `${API_BASE_URL}/api/public/tips?page=${encodeURIComponent(page)}` 
+    const url = page
+      ? `${API_BASE_URL}/api/public/tips?page=${encodeURIComponent(page)}`
       : `${API_BASE_URL}/api/public/tips`;
-    
+
     const response = await fetchWithTimeout(url, {
       method: 'GET',
       headers: {
@@ -176,10 +179,19 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = (await response.json()) as Tip[];
+
+    // Если БД вернула пустой список — используем статичный резерв,
+    // чтобы подсказка в приложении не оставалась пустой.
+    if (!Array.isArray(data) || data.length === 0) {
+      return getStaticTips(page);
+    }
+
+    return data;
   } catch (error) {
-    console.error('Error fetching tips:', error);
-    throw error;
+    // Сеть/сервер недоступны — отдаём статичные подсказки вместо ошибки.
+    console.warn('fetchTips: используем статичные подсказки (fallback):', error);
+    return getStaticTips(page);
   }
 };
 

@@ -228,12 +228,12 @@ const InvestmentsPage: React.FC = () => {
       </View>
 
       <InfoModal
-        visible={modalVisible} 
+        visible={modalVisible}
         onClose={closeModal}
-        title="Подсказки про доходы"
+        title={tips[0]?.title || "Подсказки про инвестиции"}
         content={tips[0]?.content}
-        linkUrl="https://web.telegram.org/a/#-1002352034763_2"
-        linkText="Видеоурок на Telegram"
+        videoUrl={tips[0]?.videoUrl}
+        videoTitle={tips[0]?.videoTitle}
         enableChatGPT={true}
       />
     </View>
