@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { deleteUserDataFromServer } from '@/services/api';
 import {
   AppState,
   AuthResponse,
@@ -20,6 +21,7 @@ type AuthSlice = Pick<
   | 'signUp'
   | 'signIn'
   | 'signOut'
+  | 'deleteAccount'
   | 'resetPassword'
   | 'verifyOtp'
   | 'updatePassword'
@@ -109,6 +111,44 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
       });
     } catch (error) {
       console.error('Ошибка при выходе:', error);
+    }
+  },
+
+  deleteAccount: async () => {
+    const { user } = get();
+    if (!user) return { success: false, error: 'Пользователь не найден' };
+
+    try {
+      // 1. Удаляем данные пользователя с сервера (бюджет, цели, ЛФП и т.д.).
+      try {
+        await deleteUserDataFromServer(user.id);
+      } catch (e) {
+        // Если данных на сервере не было — продолжаем удаление аккаунта.
+        console.warn('deleteAccount: не удалось удалить данные с сервера', e);
+      }
+
+      // 2. Удаляем сам аккаунт через серверный RPC (требует прав admin на бэкенде).
+      //    Функцию delete_user нужно создать в Supabase (SECURITY DEFINER).
+      const { error: rpcError } = await supabase.rpc('delete_user');
+      if (rpcError) {
+        console.warn('deleteAccount: RPC delete_user недоступен', rpcError.message);
+      }
+
+      // 3. Завершаем сессию и очищаем локальное состояние в любом случае.
+      await supabase.auth.signOut();
+      set({
+        user: null,
+        isAuthenticated: false,
+        goals: [],
+        categories: [],
+        wallets: [],
+        personalFinancialPlan: null,
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Ошибка при удалении аккаунта:', error);
+      return { success: false, error: error.message };
     }
   },
 

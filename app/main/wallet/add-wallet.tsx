@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 const walletTypes = [
   { id: 'card', label: 'Карта', icon: 'card', color: '#4FC3F7' },
@@ -110,7 +112,7 @@ const AddWalletScreen = () => {
     <TouchableOpacity
       onPress={onPress}
       className={`${cardBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-      activeOpacity={0.7}
+      activeOpacity={Opacity.press}
     >
       <Text className={`${textColor} text-base font-['SFProDisplayRegular'] line-clamp-1`}>
         {label}
@@ -130,6 +132,7 @@ const AddWalletScreen = () => {
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity
           onPress={() => router.replace('/main')}
+          activeOpacity={Opacity.press}
           className="p-2"
         >
           <Ionicons name="chevron-back" size={24} color={iconColor} />
@@ -142,6 +145,7 @@ const AddWalletScreen = () => {
         <View className="w-8" />
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
@@ -215,12 +219,13 @@ const AddWalletScreen = () => {
           </View>
         </View>
       </ScrollView>
+      </FadeInView>
 
       {/* Buttons */}
       <View className="px-4 pb-4">
         <TouchableOpacity
           onPress={handleSave}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
           className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
         >
           <Text className="text-white text-base font-['SFProDisplaySemiBold']">
@@ -231,7 +236,7 @@ const AddWalletScreen = () => {
         {isEditing && (
           <TouchableOpacity
             onPress={handleDelete}
-            activeOpacity={0.8}
+            activeOpacity={Opacity.press}
             className="w-full bg-red-500 py-4 rounded-xl items-center justify-center mt-3"
           >
             <Text className="text-white text-base font-['SFProDisplaySemiBold']">
@@ -259,6 +264,7 @@ const AddWalletScreen = () => {
             <View className="flex-row space-x-3">
               <TouchableOpacity
                 onPress={() => setShowDeleteModal(false)}
+                activeOpacity={Opacity.press}
                 className={`flex-1 ${inputBgColor} py-3 rounded-xl items-center`}
               >
                 <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
@@ -267,6 +273,7 @@ const AddWalletScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={confirmDelete}
+                activeOpacity={Opacity.press}
                 className="flex-1 bg-red-500 py-3 rounded-xl items-center ml-3"
               >
                 <Text className="text-white text-base font-['SFProDisplaySemiBold']">

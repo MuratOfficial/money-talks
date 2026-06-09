@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 const AchievementsScreen = () => {
   const router = useRouter();
@@ -73,7 +75,7 @@ const AchievementsScreen = () => {
     <TouchableOpacity
       onPress={item.onPress}
       className="  flex flex-col items-center justify-between"
-      activeOpacity={0.7}
+      activeOpacity={Opacity.press}
     >
       <View className="flex aspect-square flex-row justify-center items-center w-full rounded-full">
         <Image 
@@ -93,12 +95,13 @@ const AchievementsScreen = () => {
 
   return (
     <SafeAreaView className={`flex-1 ${bgColor}`}>
-      <ScrollView 
+      <FadeInView style={{ flex: 1 }}>
+      <ScrollView
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
          <View className="flex-row items-center  py-3 pb-6 w-full">
-                <TouchableOpacity  onPress={()=>router.replace('/main/profile')}>
+                <TouchableOpacity activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile')}>
                    <Ionicons name="chevron-back" size={24} color={iconColor} />
                 </TouchableOpacity>
                 <Text className={`${isDark ? 'text-white' : 'text-gray-900'} text-center w-full text-lg font-semibold font-['SFProDisplayRegular']`}>
@@ -115,6 +118,7 @@ const AchievementsScreen = () => {
           ))}
         </View>
       </ScrollView>
+      </FadeInView>
     </SafeAreaView>
   );
 };

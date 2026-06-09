@@ -9,6 +9,8 @@ import useFinancialStore from '@/hooks/useStore';
 import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
 import FaceIDModal from '@/app/components/FaceIDModal';
 import InvestmentNotificationManager from '@/app/components/InvestmentNotificationManager';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity, Motion } from '@/constants/design';
 
 const ProfileScreen = () => {
 
@@ -168,7 +170,7 @@ const ProfileScreen = () => {
     <TouchableOpacity
       onPress={item.onPress}
       className={`${cardBgColor} rounded-xl p-3.5 mb-3 flex-row items-center justify-between`}
-      activeOpacity={0.7}
+      activeOpacity={Opacity.press}
     >
       <View className="flex-row items-center">
         <Ionicons name={item.icon} size={20} color={iconColor} />
@@ -238,7 +240,7 @@ const ProfileScreen = () => {
           </Text>
           
           {/* Edit Button */}
-          <TouchableOpacity className="flex-row items-center" onPress={()=>router.replace('/main/profile/edit-profile')}>
+          <TouchableOpacity className="flex-row items-center" activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile/edit-profile')}>
             <Text className="text-[#4CAF50] text-base font-['SFProDisplayRegular'] mr-1">
               Редактировать
             </Text>
@@ -251,8 +253,10 @@ const ProfileScreen = () => {
 
         {/* Menu Items */}
         <View className="mb-8">
-          {menuItems.map((item) => (
-            <MenuItem key={item.id} item={item} />
+          {menuItems.map((item, index) => (
+            <FadeInView key={item.id} delay={index * Motion.stagger}>
+              <MenuItem item={item} />
+            </FadeInView>
           ))}
         </View>
         <Drawer 

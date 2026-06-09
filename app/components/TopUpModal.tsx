@@ -155,7 +155,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
             placeholder="Введите сумму"
             placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
             className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${borderColor} font-['SFProDisplayRegular'] text-center text-lg mb-4`}
-            selectionColor="#10B981"
+            selectionColor="#4CAF50"
             autoFocus={false}
           />
 
@@ -181,7 +181,7 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
             disabled={!amount || parseFloat(amount) <= 0}
             className={`w-full py-4 rounded-2xl items-center ${
               amount && parseFloat(amount) > 0
-                ? 'bg-green-600'
+                ? 'bg-[#4CAF50]'
                 : buttonBgColor
             }`}
             activeOpacity={amount && parseFloat(amount) > 0 ? 0.8 : 1}

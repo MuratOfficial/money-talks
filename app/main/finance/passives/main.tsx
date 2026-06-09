@@ -5,7 +5,6 @@ import useFinancialStore from '@/hooks/useStore';
 
 const PassivesScreen: React.FC = () => {
 const categories = [
-   { id: 'effect', label: 'Эффективность %' },
     { id: 'current', label: 'Текущая стоимость' },
 ]
 

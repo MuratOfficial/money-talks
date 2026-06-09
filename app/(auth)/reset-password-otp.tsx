@@ -250,7 +250,7 @@ export default function ResetPasswordOtpScreen() {
             {resendLoading ? (
               <ActivityIndicator size="small" color="#4CAF50" />
             ) : (
-              <Text className="font-['SFProDisplayRegular'] text-green-500 text-base font-medium">
+              <Text className="font-['SFProDisplayRegular'] text-[#4CAF50] text-base font-medium">
                 Отправить повторно
               </Text>
             )}
@@ -268,7 +268,7 @@ export default function ResetPasswordOtpScreen() {
         onPress={() => router.replace('/(auth)/login')}
         disabled={loading}
       >
-        <Text className="font-['SFProDisplayRegular'] text-green-500 text-base">
+        <Text className="font-['SFProDisplayRegular'] text-[#4CAF50] text-base">
           Вернуться к входу
         </Text>
       </TouchableOpacity>

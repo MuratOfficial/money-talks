@@ -6,9 +6,11 @@ import { useRouter } from 'expo-router';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
 import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
-import { fetchTips, Tip } from '@/services/api';
+import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity, Motion } from '@/constants/design';
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -30,11 +32,12 @@ const GoalsScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
 
 
-      const [tips, setTips] = useState<Tip[]>([]);
-      const [loading, setLoading] = useState(true);
-    
+      const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
+      const [loading, setLoading] = useState(getCachedTips('incomes') === null);
+
       useEffect(() => {
         loadTips();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
     
       const loadTips = async () => {
@@ -152,7 +155,7 @@ useEffect(() => {
           ? 'bg-[#4CAF50]' 
           : `bg-transparent border ${borderColor}`
       }`}
-      activeOpacity={0.8}
+      activeOpacity={Opacity.press}
     >
       <Text className={`text-sm font-['SFProDisplayRegular'] ${
         isSelected ? 'text-white' : textSecondaryColor
@@ -170,7 +173,7 @@ useEffect(() => {
           ? buttonBgColor
           : `bg-transparent border ${borderColor}`
       }`}
-      activeOpacity={0.8}
+      activeOpacity={Opacity.press}
     >
       <Text className={`text-sm font-['SFProDisplayRegular'] ${
         isSelected ? textColor : textSecondaryColor
@@ -209,7 +212,7 @@ useEffect(() => {
             <TouchableOpacity
               onPress={() => setSelectedSort('По дате')}
               className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={0.7}
+              activeOpacity={Opacity.press}
             >
               <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
                 По дате
@@ -225,7 +228,7 @@ useEffect(() => {
             <TouchableOpacity
               onPress={() => setSelectedSort('По %')}
               className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={0.7}
+              activeOpacity={Opacity.press}
             >
               <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
                 По %
@@ -245,8 +248,8 @@ useEffect(() => {
               setShowSortModal(false);
               console.log('Selected sort:', selectedSort);
             }}
-            activeOpacity={0.8}
-            className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center"
+            activeOpacity={Opacity.press}
+            className="w-full bg-[#4CAF50] py-4 rounded-xl items-center justify-center mt-1"
           >
             <Text className="text-white text-base font-['SFProDisplaySemiBold']">
               Выбрать
@@ -343,8 +346,9 @@ useEffect(() => {
         </View>
         
         <View className="flex-row space-x-3">
-          <TouchableOpacity 
-            onPress={() => handleTopUp(goal.id, goal.name)} 
+          <TouchableOpacity
+            onPress={() => handleTopUp(goal.id, goal.name)}
+            activeOpacity={Opacity.press}
             className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}
           >
             <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
@@ -353,8 +357,9 @@ useEffect(() => {
             <Ionicons name="add-circle-outline" size={16} color={iconColor} />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            onPress={() => handleEdit(goal.id)} 
+          <TouchableOpacity
+            onPress={() => handleEdit(goal.id)}
+            activeOpacity={Opacity.press}
             className={`flex-1 ${buttonBgColor} rounded-xl py-3 items-center justify-center flex-row`}
           >
             <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
@@ -391,8 +396,9 @@ useEffect(() => {
     <SafeAreaView className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => router.replace('/main')}
+          activeOpacity={Opacity.press}
           className="p-2"
         >
           <Ionicons name="chevron-back" size={24} color={iconColor} />
@@ -450,8 +456,10 @@ useEffect(() => {
         </View>
 
         {/* Goals List */}
-        {filteredGoals.map((goal) => (
-          <GoalCard key={goal.id} {...goal} />
+        {filteredGoals.map((goal, index) => (
+          <FadeInView key={goal.id} delay={index * Motion.stagger}>
+            <GoalCard {...goal} />
+          </FadeInView>
         ))}
 
 
@@ -460,7 +468,7 @@ useEffect(() => {
       {/* Add Goal Button */}
       <TouchableOpacity 
         className="absolute bottom-6 right-6 w-14 h-14 bg-[#4CAF50] rounded-full items-center justify-center shadow-lg"
-        activeOpacity={0.8}
+        activeOpacity={Opacity.press}
         onPress={handleAdd}
       >
         <Ionicons name="add" size={28} color="white" />

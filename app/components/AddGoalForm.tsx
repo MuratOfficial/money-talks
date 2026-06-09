@@ -13,6 +13,8 @@ import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore
 import { goalFormSchema, firstError } from '@/validation/forms';
 import { recalculateMonthlyInvestment } from '@/hooks/pdf/pdfCalculations';
 import { Alert } from 'react-native';
+import FadeInView from './FadeInView';
+import { Opacity } from '@/constants/design';
 
 interface AddGoalFormProps {
   onClose?: () => void;
@@ -269,7 +271,7 @@ const handleSortSelectYear = (value: string) => {
       className={`flex-1 px-4 py-3 rounded-2xl border flex-row justify-between ${cardBgColor} ${borderColor} ${
         !isLast ? 'mr-2' : ''
       }`}
-      activeOpacity={0.7}
+      activeOpacity={Opacity.press}
     >
       <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>
         {value}
@@ -291,6 +293,7 @@ const handleSortSelectYear = (value: string) => {
         <View className="w-6" />
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 py-2">
           {/* Goal Name */}
@@ -327,12 +330,12 @@ const handleSortSelectYear = (value: string) => {
                       ? `${cardBgColor} ${borderColor}`
                       : `${inactiveCardBgColor} ${inactiveBorderColor}`
                   }`}
-                  activeOpacity={0.8}
+                  activeOpacity={Opacity.press}
                 >
                   <View className="flex-row items-center">
                     <View className={`w-5 h-5 rounded-full border-2 mr-3 ${
                       formData.type === type.key
-                        ? 'bg-green-500 border-green-500'
+                        ? 'bg-[#4CAF50] border-[#4CAF50]'
                         : borderColor
                     }`}>
                       {formData.type === type.key && (
@@ -383,12 +386,12 @@ const handleSortSelectYear = (value: string) => {
                       ? `${cardBgColor} ${borderColor}`
                       : `${inactiveCardBgColor} ${inactiveBorderColor}`
                   }`}
-                  activeOpacity={0.8}
+                  activeOpacity={Opacity.press}
                 >
                   <View className="flex-row items-center justify-center">
                     <View className={`w-5 h-5 rounded-full border-2 mr-3 ${
                       formData.currency === currency.key
-                        ? 'bg-green-500 border-green-500'
+                        ? 'bg-[#4CAF50] border-[#4CAF50]'
                         : borderColor
                     }`}>
                       {formData.currency === currency.key && (
@@ -466,6 +469,7 @@ const handleSortSelectYear = (value: string) => {
           </View>
         </View>
       </ScrollView>
+      </FadeInView>
 
       {/* Save Button */}
       <View className="px-4 pb-8 pt-4">
@@ -474,10 +478,10 @@ const handleSortSelectYear = (value: string) => {
           disabled={!canSave}
           className={`w-full py-4 rounded-2xl items-center ${
             canSave
-              ? 'bg-green-600'
+              ? 'bg-[#4CAF50]'
               : cardBgColor
           }`}
-          activeOpacity={canSave ? 0.8 : 1}
+          activeOpacity={canSave ? Opacity.press : 1}
         >
           <Text className={`text-base font-['SFProDisplaySemiBold'] ${
             canSave ? 'text-white' : textSecondaryColor
@@ -493,9 +497,7 @@ const handleSortSelectYear = (value: string) => {
         onClose={() => setShowDrawerDay(false)}
         onSelect={handleSortSelectDay}
         selectedValue={selectedSortDay}
-        options={days}
-        animationType='fade'
-      />
+        options={days}      />
       
       <Drawer 
         title='Месяц'
@@ -503,9 +505,7 @@ const handleSortSelectYear = (value: string) => {
         onClose={() => setShowDrawerMonth(false)}
         onSelect={handleSortSelectMonth}
         selectedValue={selectedSortMonth}
-        options={monthNames}
-        animationType='fade'
-      />
+        options={monthNames}      />
       
       <Drawer 
         title='Год'
@@ -513,9 +513,7 @@ const handleSortSelectYear = (value: string) => {
         onClose={() => setShowDrawerYear(false)}
         onSelect={handleSortSelectYear}
         selectedValue={selectedSortYear}
-        options={years}
-        animationType='fade'
-      />
+        options={years}      />
     </SafeAreaView>
   );
 };

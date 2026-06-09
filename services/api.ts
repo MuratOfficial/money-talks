@@ -116,9 +116,42 @@ export interface SyncResponse {
   message?: string;
 }
 
+// ========== Лёгкий in-memory кэш ==========
+// Серверный контент (вопросы теста, подсказки) меняется редко, поэтому держим
+// его в памяти процесса. Это убирает полноэкранную «загрузку» при каждом
+// переходе на экран — данные уже есть, а сеть дёргаем максимум раз в TTL.
+
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 минут
+
+interface CacheEntry<T> {
+  data: T;
+  ts: number;
+}
+
+const questionsCache: { current: CacheEntry<Question[]> | null } = { current: null };
+const tipsCache: Record<string, CacheEntry<Tip[]>> = {};
+
+const isFresh = (entry: CacheEntry<unknown> | null | undefined): boolean =>
+  !!entry && Date.now() - entry.ts < CACHE_TTL_MS;
+
+/** Синхронно вернуть уже загруженные вопросы (или null), чтобы отрисовать экран без ожидания. */
+export const getCachedQuestions = (): Question[] | null =>
+  questionsCache.current ? questionsCache.current.data : null;
+
+/** Синхронно вернуть уже загруженные подсказки для страницы (или null). */
+export const getCachedTips = (page?: string): Tip[] | null => {
+  const entry = tipsCache[page || '__all__'];
+  return entry ? entry.data : null;
+};
+
 // ========== Функции с единым стилем fetch ==========
 
-export const fetchQuestions = async (): Promise<Question[]> => {
+export const fetchQuestions = async (force = false): Promise<Question[]> => {
+  // Свежий кэш — отдаём мгновенно, без сетевого запроса.
+  if (!force && isFresh(questionsCache.current)) {
+    return questionsCache.current!.data;
+  }
+
   try {
     const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/questions`, {
       method: 'GET',
@@ -132,9 +165,13 @@ export const fetchQuestions = async (): Promise<Question[]> => {
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = (await response.json()) as Question[];
+    questionsCache.current = { data, ts: Date.now() };
+    return data;
   } catch (error) {
     console.error('Error fetching questions:', error);
+    // На ошибке отдаём прошлый кэш (даже устаревший), если он есть.
+    if (questionsCache.current) return questionsCache.current.data;
     throw error;
   }
 };
@@ -161,7 +198,14 @@ export const saveTestResult = async (result: TestResult): Promise<void> => {
   }
 };
 
-export const fetchTips = async (page?: string): Promise<Tip[]> => {
+export const fetchTips = async (page?: string, force = false): Promise<Tip[]> => {
+  const cacheKey = page || '__all__';
+
+  // Свежий кэш — отдаём мгновенно.
+  if (!force && isFresh(tipsCache[cacheKey])) {
+    return tipsCache[cacheKey].data;
+  }
+
   try {
     const url = page
       ? `${API_BASE_URL}/api/public/tips?page=${encodeURIComponent(page)}`
@@ -183,14 +227,13 @@ export const fetchTips = async (page?: string): Promise<Tip[]> => {
 
     // Если БД вернула пустой список — используем статичный резерв,
     // чтобы подсказка в приложении не оставалась пустой.
-    if (!Array.isArray(data) || data.length === 0) {
-      return getStaticTips(page);
-    }
-
-    return data;
+    const result = (!Array.isArray(data) || data.length === 0) ? getStaticTips(page) : data;
+    tipsCache[cacheKey] = { data: result, ts: Date.now() };
+    return result;
   } catch (error) {
-    // Сеть/сервер недоступны — отдаём статичные подсказки вместо ошибки.
+    // Сеть/сервер недоступны — отдаём прошлый кэш, иначе статичные подсказки.
     console.warn('fetchTips: используем статичные подсказки (fallback):', error);
+    if (tipsCache[cacheKey]) return tipsCache[cacheKey].data;
     return getStaticTips(page);
   }
 };

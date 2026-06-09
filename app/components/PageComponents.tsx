@@ -15,11 +15,13 @@ import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
-import { fetchTips, Tip } from '@/services/api';
+import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import InfoModal from './HintWithChat';
 import TutorialTooltip from './TutorialTooltip';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import FadeInView from './FadeInView';
+import { Opacity, Motion } from '@/constants/design';
 
 interface PageComponentProps {
   title: string;
@@ -65,8 +67,11 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const borderColor = isDark ? 'border-gray-600' : 'border-gray-300';
   const inactiveBorderColor = isDark ? 'border-gray-600' : 'border-gray-300';
   
-  const [tips, setTips] = useState<Tip[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Подсказки (tips) нужны только для модалки-хинта, поэтому НЕ блокируем ими
+  // весь экран. Если есть кэш — берём сразу; иначе показываем лоадер лишь
+  // при самой первой загрузке.
+  const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
+  const [loading, setLoading] = useState(getCachedTips('incomes') === null);
 
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -152,7 +157,7 @@ useEffect(() => {
   const filteredByRegularity = currentRegOption === 'regular' ? liquidAssets : currentRegOption === 'irregular' ? illiquidAssets : (assets || []);
   
   // Применяем фильтр по категории
-  const filteredByCategory = (categories && categories[0].id !== "effect") ? filteredByRegularity.filter(x=>x.categoryTab===currentCategoryOption) : filteredByRegularity;
+  const filteredByCategory = (categories && categories[0].id !== "effect" && !isPassive) ? filteredByRegularity.filter(x=>x.categoryTab===currentCategoryOption) : filteredByRegularity;
   
   // Применяем фильтр по дате
   const currentAssets = filterAssetsByDate(filteredByCategory, selectedSortFilter as DateFilterType);
@@ -291,9 +296,10 @@ useEffect(() => {
             {categories?.map((category) => (
               <TouchableOpacity
                 key={category.id}
+                activeOpacity={Opacity.press}
                 className={`px-2 py-1 rounded-full border ${
                   currentCategoryOption === category.id
-                    ? 'bg-[#2AA651] border-[#2AA651]'
+                    ? 'bg-[#4CAF50] border-[#4CAF50]'
                     : `${inactiveBorderColor} bg-transparent`
                 }`}
                 onPress={()=> handleCategory(category.id)}
@@ -308,7 +314,8 @@ useEffect(() => {
             
             {categories && 
               <TouchableOpacity
-                className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
+                activeOpacity={Opacity.press}
+                className={`px-2 py-1 rounded-full border flex-row items-center border-[#4CAF50]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
                 <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
@@ -335,7 +342,8 @@ useEffect(() => {
           </Text>
             
               <TouchableOpacity
-                className={`px-2 py-1 rounded-full border flex-row items-center border-[#2AA651]`}
+                activeOpacity={Opacity.press}
+                className={`px-2 py-1 rounded-full border flex-row items-center border-[#4CAF50]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
                 <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
@@ -362,15 +370,15 @@ useEffect(() => {
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             {assetName}
           </Text>
-          {currentCategoryOption !== "effect" && <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+          {currentCategoryOption !== "effect" && <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
             {formatAmount(totalAmount)}
           </Text>}
           
         </View>
 
-        <View className={`${cardBgColor} rounded-xl px-3 mb-2`}>
+        <View className={`${cardBgColor} rounded-2xl px-3 mb-2`}>
           {currentAssets.map((asset, index) => ( 
-            <View key={asset.id}>
+            <FadeInView key={asset.id} delay={index * Motion.stagger} offset={6}>
               <View className="flex-row items-center justify-between py-3">
                 <View className="flex-1">
                   <Text className={`${textColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
@@ -380,32 +388,32 @@ useEffect(() => {
                   {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
                     Доходность {asset.yield}%
                   </Text>}
-                 
+
                 </View>
-                
+
                 <View className="flex-row items-center">
                   <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
                     {formatAmount(asset.amount, asset.yield)}
                   </Text>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     onPress={() => handleAssetInfo(asset)}
+                    activeOpacity={Opacity.press}
                     className=" mr-2"
                   >
                     <Ionicons name="add-circle-outline" size={20} color={iconColor} />
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     onPress={() => handleEditAsset(asset)}
+                    activeOpacity={Opacity.press}
                     className=""
                   >
                     <Ionicons name="create-outline" size={20} color={iconColor} />
                   </TouchableOpacity>
                 </View>
               </View>
-              
-              
-            </View>
+            </FadeInView>
           ))}
         </View>
         
@@ -417,11 +425,11 @@ useEffect(() => {
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   {asset.name}
                 </Text>
-                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
                   {getTotal(asset.item)}
                 </Text>
               </View>
-                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
+                <View className={`${cardBgColor} rounded-2xl px-3 mb-3`}>
                   {asset.item.map((el, index) => ( 
                   <View key={el.id} >
                     <View className="flex-row items-center justify-between py-3">
@@ -457,11 +465,11 @@ useEffect(() => {
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Дельта
                 </Text>
-                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
                   {delta}
                 </Text>
               </View>
-                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
+                <View className={`${cardBgColor} rounded-2xl px-3 mb-3`}>
                  
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
@@ -495,11 +503,11 @@ useEffect(() => {
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Расчет чистого капитала
                 </Text>
-                <Text className="text-emerald-400 text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
                   {defActPass}
                 </Text>
               </View>
-                <View className={`${cardBgColor} rounded-xl px-3 mb-3`}>
+                <View className={`${cardBgColor} rounded-2xl px-3 mb-3`}>
                  
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
@@ -540,7 +548,7 @@ useEffect(() => {
         {isAnalyze === true ? "" : <TouchableOpacity
           className={`border-2 ${isDark ? 'border-white' : 'border-gray-900'} rounded-2xl px-8 py-1 flex-row items-center`}
           onPress={handleAddExpense}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
         >
           <Text className={`${textColor} text-sm font-medium mr-2 font-['SFProDisplayRegular']`}>
             Добавить
@@ -556,9 +564,9 @@ useEffect(() => {
       
       {currentAssets.length>0 && <View className="absolute bottom-6 right-6">
         <TouchableOpacity
-          className="w-14 h-14 bg-[#2AA651] rounded-full justify-center items-center shadow-lg"
+          className="w-14 h-14 bg-[#4CAF50] rounded-full justify-center items-center shadow-lg"
           onPress={handleAddExpense}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
         >
           <Ionicons name="add" size={28} color="#FFFFFF" />
         </TouchableOpacity>
@@ -570,8 +578,6 @@ useEffect(() => {
           onSelect={handleSortSelectFilter}
           selectedValue={selectedSortFilter}
           options={ ['Сегодня', 'За месяц', 'За год', 'Все время']}
-          animationType='fade'
-          
           />
 
           <InfoModal

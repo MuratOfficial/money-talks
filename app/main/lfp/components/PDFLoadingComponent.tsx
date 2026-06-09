@@ -321,7 +321,7 @@ const PDFLoadingModal: React.FC<PDFLoadingModalProps> = ({
             {/* Дополнительные действия для статуса success */}
             {status === 'success' && onClose && (
               <TouchableOpacity
-                className="mt-6 bg-green-500 px-6 py-3 rounded-lg"
+                className="mt-6 bg-[#4CAF50] px-6 py-3 rounded-lg"
                 onPress={onClose}
                 activeOpacity={0.8}
               >

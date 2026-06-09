@@ -176,6 +176,7 @@ export interface AppState {
   signUp: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   verifyResetCode: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
 
   resetPassword: (email: string) => Promise<AuthResponse>;

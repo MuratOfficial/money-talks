@@ -37,9 +37,9 @@ export const createDefaultPFP = (
   financialDependents: '',
   securityPillow: '1 000 000 ₸',
   insurance: {
-    life: '500 000 ₸',
-    disability: '600 000 ₸',
-    medical: '600 000 ₸',
+    life: '0',
+    disability: '0',
+    medical: '0',
   },
   riskProfile: 'Агрессивный',
   createdAt: new Date(),

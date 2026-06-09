@@ -11,8 +11,8 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
-
-
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 interface AddPassivesFormProps{
   backLink?: Href;
@@ -46,16 +46,6 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       }
     }, [currentAsset])
 
-  // Эффективность пассива (затратность): отрицательная, т.к. это нагрузка, а не доход
-  // = (годовой расход на содержание / текущая стоимость) × 100
-  const calcPassiveEfficiency = (): number => {
-    const value = parseFloat(amount);
-    const annualCost = parseFloat(planningHorizon);
-    if (isNaN(value) || isNaN(annualCost) || value <= 0) return 0;
-    return -((annualCost / value) * 100);
-  };
-
-
   const handleBack = () => {
     router.replace(backLink || "/main/finance/passives/main")
   };
@@ -66,14 +56,12 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       return;
     }
 
-    const efficiency = calcPassiveEfficiency();
-
     if(currentAsset){
       updatePassives(currentAsset.id, {
         name: title,
         amount: parseFloat(amount),
         additional: parseFloat(planningHorizon),
-        yield: parseFloat(efficiency.toFixed(2)),
+        yield: 0,
         regularity: currentRegOption || "regular"
       })
     }else{
@@ -81,7 +69,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       name: title,
       amount: parseFloat(amount),
       additional: parseFloat(planningHorizon),
-      yield: parseFloat(efficiency.toFixed(2)),
+      yield: 0,
       regularity: currentRegOption || "regular"
     })
     }
@@ -100,7 +88,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
+        <TouchableOpacity onPress={handleBack} activeOpacity={Opacity.press} className="p-2 -ml-2">
           <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
@@ -109,6 +97,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
         </Text>
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
 
                 <View className="mb-4">
@@ -157,22 +146,8 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
 
                 </View>
 
-                {!!amount && !!planningHorizon && (
-                  <View className="mb-4">
-                    <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
-                      Эффективность (затратность)
-                    </Text>
-                    <View className={`${inputBgColor} rounded-xl px-4 py-3`}>
-                      <Text className={`${inputTextColor} text-base font-['SFProDisplayRegular']`}>
-                        {calcPassiveEfficiency().toFixed(2)} %
-                      </Text>
-                    </View>
-                  </View>
-                )}
-
-
-
       </ScrollView>
+      </FadeInView>
 
       {/* Add Button */}
       <View className='px-2 pb-2'>
@@ -180,7 +155,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
           className={`w-full mb-2 py-4 rounded-xl items-center justify-center bg-[#4CAF50] `}
           onPress={handleAdd}
           disabled={!isFormValid}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
         >
           <Text className={`text-white text-base font-['SFProDisplaySemiBold'] 
             `}>

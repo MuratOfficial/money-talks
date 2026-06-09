@@ -6,6 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
+import FadeInView from '../components/FadeInView';
+import { Opacity, Motion } from '@/constants/design';
 
 const MainScreen = () => {
   const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
@@ -82,7 +84,7 @@ const MainScreen = () => {
   const CategoryCard = useCallback(({ item, title }: any) => (
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
-      activeOpacity={0.8}
+      activeOpacity={Opacity.press}
       onPress={() => handleGoal(title, item.name, item.id)}
     >
       <View 
@@ -122,8 +124,9 @@ const MainScreen = () => {
         </View>
         
         {category.title === 'Кошелек' ? (
-          <TouchableOpacity 
-            onPress={() => { pickEditWallet(''); router.replace('/main/wallet/add-wallet'); }} 
+          <TouchableOpacity
+            onPress={() => { pickEditWallet(''); router.replace('/main/wallet/add-wallet'); }}
+            activeOpacity={Opacity.press}
             className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
           >
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
@@ -132,8 +135,9 @@ const MainScreen = () => {
             <Ionicons name="add" size={16} color="#FFF" />
           </TouchableOpacity>
         ) : category.title !== 'Цели' ? (
-          <TouchableOpacity 
-            onPress={() => setShowDrawerFilter(true)} 
+          <TouchableOpacity
+            onPress={() => setShowDrawerFilter(true)}
+            activeOpacity={Opacity.press}
             className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
           >
             <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
@@ -181,7 +185,6 @@ const MainScreen = () => {
           onSelect={handleSortSelectFilter}
           selectedValue={selectedSortFilter}
           options={['Сегодня', 'Неделя', 'Месяц', 'Год', 'Все']}
-          animationType='fade'
         />
 
         <ScrollView 
@@ -189,7 +192,9 @@ const MainScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           {categoriesWith.map((category, index) => (
-            <CategorySection key={`category-${index}`} category={category} />
+            <FadeInView key={`category-${index}`} delay={index * Motion.stagger}>
+              <CategorySection category={category} />
+            </FadeInView>
           ))}
         </ScrollView>
       </SafeAreaView>

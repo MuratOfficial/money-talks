@@ -14,6 +14,8 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 import { assetFormSchema, firstError, parseAmountInput } from '@/validation/forms';
+import FadeInView from './FadeInView';
+import { Opacity } from '@/constants/design';
 
 interface CategoryItem {
   id: string;
@@ -222,7 +224,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         <TouchableOpacity 
           className="p-2 -ml-2"
           onPress={handleGoBack}
-          activeOpacity={0.7}
+          activeOpacity={Opacity.press}
         >
           <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
@@ -232,9 +234,10 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         </Text>
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-        
-       
+
+
         <View className="mb-4">
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Название
@@ -276,7 +279,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
               <TouchableOpacity
                 key={category.id}
                 onPress={() => handleCategorySelect(category.id)}
-                activeOpacity={0.7}
+                activeOpacity={Opacity.press}
                 style={[
                   {
                     width: 64,
@@ -299,6 +302,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           </View>
         </View>
       </ScrollView>
+      </FadeInView>
 
       {/* Add Button */}
       <View className='px-2 pb-2'>
@@ -308,7 +312,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           }`}
           onPress={handleAdd}
           disabled={!isFormValid}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
         >
           <Text className={`text-white text-base font-['SFProDisplaySemiBold']`}>
             Добавить

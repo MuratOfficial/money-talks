@@ -5,10 +5,12 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import useFinancialStore from '@/hooks/useStore';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 const EditProfilePage: React.FC = () => {
 
-  const {user, updateUserProfile, theme} = useFinancialStore();
+  const {user, updateUserProfile, deleteAccount, theme} = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -96,6 +98,8 @@ const EditProfilePage: React.FC = () => {
     }
   };
 
+  const [deleting, setDeleting] = useState(false);
+
   const handleSave = () => {
     // Логика сохранения профиля с аватаром
     updateUserProfile({
@@ -106,16 +110,35 @@ const EditProfilePage: React.FC = () => {
     router.push("/main/profile");
   };
 
-  const handleDeleteAccount = () => {
-    // Логика удаления аккаунта
+  // Открывает подтверждение удаления (сам диалог).
+  const openDeleteConfirm = () => {
     setShowDeleteDrawer(true);
+  };
+
+  // Реальное удаление аккаунта — вызывается ТОЛЬКО после подтверждения.
+  const performDeleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      const result = await deleteAccount();
+      if (result.success) {
+        Alert.alert('Аккаунт удалён', 'Ваш аккаунт и связанные данные удалены.');
+        router.replace('/(auth)/login');
+      } else {
+        Alert.alert('Ошибка', result.error || 'Не удалось удалить аккаунт. Попробуйте позже.');
+      }
+    } catch (e: any) {
+      Alert.alert('Ошибка', e?.message || 'Не удалось удалить аккаунт.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
     <View className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 pb-6">
-        <TouchableOpacity className="mr-4" onPress={()=>router.replace('/main/profile')}>
+        <TouchableOpacity className="mr-4" activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile')}>
            <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         <Text className={`${textColor} text-lg font-['SFProDisplayRegular']`}>
@@ -123,13 +146,14 @@ const EditProfilePage: React.FC = () => {
         </Text>
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Avatar Section */}
         <View className="items-center mb-2">
           <TouchableOpacity 
             onPress={showImagePickerOptions}
             className={`w-24 h-24 ${avatarBgColor} rounded-full items-center justify-center mb-4 relative`}
-            activeOpacity={0.7}
+            activeOpacity={Opacity.press}
           >
             {avatarUri ? (
               <>
@@ -188,7 +212,7 @@ const EditProfilePage: React.FC = () => {
             <TouchableOpacity 
               onPress={()=>router.push("/(auth)/new-password")}
               className="bg-red-800 rounded-2xl py-3 items-center mb-2"
-              activeOpacity={0.8}
+              activeOpacity={Opacity.press}
             >
               <Text className="text-white text-base  font-['SFProDisplayRegular']">
                 Новый пароль
@@ -199,24 +223,25 @@ const EditProfilePage: React.FC = () => {
         
         <ConfirmationDrawer
           visible={showDeleteDrawer}
-          title="Удалить аккаунт?"
+          title="Удалить аккаунт? Это действие необратимо."
           onClose={() => setShowDeleteDrawer(false)}
-          onConfirm={handleDeleteAccount}
-          onCancel={() => console.log('Отменено')}
-          confirmText="Да"
-          cancelText="Нет"
+          onConfirm={performDeleteAccount}
+          onCancel={() => {}}
+          confirmText="Удалить"
+          cancelText="Отмена"
           confirmButtonColor="#DC2626" // red-600
         />
 
       </ScrollView>
+      </FadeInView>
 
       {/* Bottom Section */}
       <View className="px-4 pb-2">
         {/* Save Button */}
         <TouchableOpacity 
           onPress={handleSave}
-          className="bg-green-600 rounded-2xl py-3 items-center mb-2"
-          activeOpacity={0.8}
+          className="bg-[#4CAF50] rounded-2xl py-3 items-center mb-2"
+          activeOpacity={Opacity.press}
         >
           <Text className="text-white text-base  font-['SFProDisplayRegular']">
             Сохранить
@@ -224,13 +249,14 @@ const EditProfilePage: React.FC = () => {
         </TouchableOpacity>
 
         {/* Delete Account Button */}
-        <TouchableOpacity 
-          onPress={handleDeleteAccount}
+        <TouchableOpacity
+          onPress={openDeleteConfirm}
+          disabled={deleting}
           className="items-center py-2"
-          activeOpacity={0.7}
+          activeOpacity={Opacity.press}
         >
           <Text className="text-red-500 text-base font-['SFProDisplayRegular']">
-            Удалить аккаунт
+            {deleting ? 'Удаление...' : 'Удалить аккаунт'}
           </Text>
         </TouchableOpacity>
       </View>

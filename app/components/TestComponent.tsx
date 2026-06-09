@@ -61,7 +61,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="bg-green-600 px-8 py-4 rounded-2xl"
+              className="bg-[#4CAF50] px-8 py-4 rounded-2xl"
               activeOpacity={0.8}
             >
               <Text className="text-white text-base font-semibold font-['SFProDisplaySemiBold']">
@@ -269,7 +269,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
                   </Text>
                   <View className={`w-6 h-6 rounded-full border-2 ${
                     selectedAnswers[currentQuestionIndex] === index
-                      ? 'bg-green-500 border-green-500'
+                      ? 'bg-[#4CAF50] border-[#4CAF50]'
                       : 'border-gray-500'
                   }`}>
                     {selectedAnswers[currentQuestionIndex] === index && (
@@ -292,7 +292,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
           disabled={!canProceed}
           className={`w-full py-4 rounded-2xl items-center ${
             canProceed
-              ? 'bg-green-600'
+              ? 'bg-[#4CAF50]'
               : 'bg-gray-700'
           }`}
           activeOpacity={canProceed ? 0.8 : 1}

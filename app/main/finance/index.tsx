@@ -3,6 +3,8 @@ import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import useFinancialStore from '@/hooks/useStore';
 import AnimatedAssistant from '@/app/components/AnimatedAssistant';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 import {
   View,
   Text,
@@ -40,10 +42,10 @@ const FinanceCard: React.FC<FinanceCardProps & { isDark: boolean }> = ({ title, 
   };
 
   return (
-    <TouchableOpacity 
-      className={`w-[48%] aspect-[10/8] ${cardBgColor} rounded-2xl mb-4 active:opacity-80`}
+    <TouchableOpacity
+      className={`w-[48%] aspect-[10/8] ${cardBgColor} rounded-2xl mb-4`}
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={Opacity.press}
     >
       <View className="flex-1 justify-between items-start p-4">
           {renderIcon()}
@@ -121,17 +123,19 @@ const FinanceApp: React.FC = () => {
       </View>
 
       <View className="flex-1 px-4">
-        <View className="flex-row flex-wrap justify-between">
-          {financeItems.map((item, index) => (
-            <FinanceCard
-              key={index}
-              title={item.title}
-              iconName={item.iconName}
-              onPress={item.onPress}
-              isDark={isDark}
-            />
-          ))}
-        </View>
+        <FadeInView style={{ flex: 1 }}>
+          <View className="flex-row flex-wrap justify-between">
+            {financeItems.map((item, index) => (
+              <FinanceCard
+                key={index}
+                title={item.title}
+                iconName={item.iconName}
+                onPress={item.onPress}
+                isDark={isDark}
+              />
+            ))}
+          </View>
+        </FadeInView>
       </View>
 
       <AnimatedAssistant

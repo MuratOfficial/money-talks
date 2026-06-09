@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import TestComponent from '@/app/components/TestComponent';
-import { fetchQuestions, fetchTips, Question, Tip } from '@/services/api';
+import { fetchQuestions, fetchTips, getCachedQuestions, getCachedTips, Question, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
 import useFinancialStore from '@/hooks/useStore';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 interface AccordionItem {
   id: string;
@@ -25,20 +27,24 @@ const InvestmentsPage: React.FC = () => {
   const iconColor = isDark ? '#9CA3AF' : '#6B7280';
 
     const [showTest, setShowTest] = useState(false);
-    useEffect(() => {
-      loadQuestions();
-    }, []);
 
-      const [questions, setQuestions] = useState<Question[]>([]);
-      const [loading, setLoading] = useState(true);
+      // Если данные уже в кэше — показываем их сразу, без экрана загрузки.
+      const cachedQuestions = getCachedQuestions();
+      const [questions, setQuestions] = useState<Question[]>(cachedQuestions || []);
+      // Полноэкранный лоадер показываем только при ПЕРВОЙ загрузке (кэш пуст).
+      const [loading, setLoading] = useState(cachedQuestions === null);
       const [error, setError] = useState<string | null>(null);
+
+      useEffect(() => {
+        loadQuestions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
 
       const loadQuestions = async () => {
         try {
-          setLoading(true);
           setError(null);
           const data = await fetchQuestions();
-          
+
           if (data.length === 0) {
             setError('Вопросы не найдены. Добавьте вопросы в админ-панели.');
           } else {
@@ -46,7 +52,10 @@ const InvestmentsPage: React.FC = () => {
           }
         } catch (err) {
           console.error('Failed to load questions:', err);
-          setError('Не удалось загрузить вопросы. Проверьте соединение.');
+          // Ошибку показываем только если показать нечего (кэш пуст).
+          if (questions.length === 0) {
+            setError('Не удалось загрузить вопросы. Проверьте соединение.');
+          }
         } finally {
           setLoading(false);
         }
@@ -67,20 +76,19 @@ const InvestmentsPage: React.FC = () => {
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
-    const [tips, setTips] = useState<Tip[]>([]);
-  
+    const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
+
     useEffect(() => {
       loadTips();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-  
+
     const loadTips = async () => {
       try {
-        const data = await fetchTips('incomes'); 
+        const data = await fetchTips('incomes');
         setTips(data);
       } catch (error) {
         console.error('Failed to load tips:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -168,13 +176,14 @@ const InvestmentsPage: React.FC = () => {
       </View>
 
       {/* Content */}
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {accordionData.map((item) => (
           <View key={item.id} className="mb-3">
             <TouchableOpacity
               onPress={() => toggleExpanded(item.id)}
               className={`${cardBgColor} rounded-xl p-4 flex-row items-center justify-between`}
-              activeOpacity={0.7}
+              activeOpacity={Opacity.press}
             >
               <Text className={`${textColor} text-base font-medium flex-1 mr-3 font-['SFProDisplayRegular']`}>
                 {item.title}
@@ -200,7 +209,7 @@ const InvestmentsPage: React.FC = () => {
                   <TouchableOpacity
                     onPress={handleOpenBrokerCheck}
                     className="bg-blue-600 rounded-lg py-3 px-4 mt-4 flex-row items-center justify-center"
-                    activeOpacity={0.8}
+                    activeOpacity={Opacity.press}
                   >
                     <MaterialIcons name="open-in-new" size={20} color="white" style={{ marginRight: 8 }} />
                     <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
@@ -213,12 +222,13 @@ const InvestmentsPage: React.FC = () => {
           </View>
         ))}
       </ScrollView>
+      </FadeInView>
 
       {/* Bottom Button */}
       <View className="px-4 pb-8 pt-4">
-        <TouchableOpacity 
-          className="bg-green-600 rounded-xl py-4 items-center"
-          activeOpacity={0.8}
+        <TouchableOpacity
+          className="bg-[#4CAF50] rounded-xl py-4 items-center"
+          activeOpacity={Opacity.press}
           onPress={() => setShowTest(true)}
         >
           <Text className="text-white text-base font-semibold font-['SFProDisplayRegular']">

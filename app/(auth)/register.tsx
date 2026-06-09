@@ -360,7 +360,7 @@ const RegistrationScreen: React.FC = () => {
             activeOpacity={0.7}
             disabled={isLoading}
           >
-            <Text className="text-green-500 text-center text-base font-['SFProDisplayRegular']">
+            <Text className="text-[#4CAF50] text-center text-base font-['SFProDisplayRegular']">
               Войти в аккаунт
             </Text>
           </TouchableOpacity>

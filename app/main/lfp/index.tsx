@@ -9,6 +9,7 @@ import DropdownButton from './components/DropdownButton';
 import GoalCard from './components/GoalCard';
 import PDFLoadingModal from './components/PDFLoadingComponent';
 import { useLFPExport } from '@/hooks/useLFPExport';
+import FadeInView from '@/app/components/FadeInView';
 
 const PersonalFinancialPlanScreen = () => {
   const router = useRouter();
@@ -226,6 +227,7 @@ const PersonalFinancialPlanScreen = () => {
         <View className="w-8" />
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
@@ -416,9 +418,8 @@ const PersonalFinancialPlanScreen = () => {
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             Подушка безопасности на 3 месяца
           </Text>
-          <View className={`flex-row justify-between items-center p-3 rounded-xl ${cardBgColor}`}>
-            <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>По постоянному расходу (×3)</Text>
-            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] text-right min-w-[100px]`}>
+          <View className={`p-3 rounded-xl ${cardBgColor}`}>
+            <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
               {securityPillowFormatted}
             </Text>
           </View>
@@ -435,10 +436,11 @@ const PersonalFinancialPlanScreen = () => {
             <View className="flex-row justify-between items-center">
               <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Уход из жизни</Text>
               <TextInput
-                value={personalFinancialPlan?.insurance.life || ''}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { disability: personalFinancialPlan?.insurance?.disability || '', medical: personalFinancialPlan?.insurance?.medical || '', life: val } })}
-                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
-                placeholder="0 ₸"
+                value={personalFinancialPlan?.insurance.life ?? '0'}
+                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { disability: personalFinancialPlan?.insurance?.disability || '0', medical: personalFinancialPlan?.insurance?.medical || '0', life: val } })}
+                keyboardType="number-pad"
+                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
+                placeholder="0"
                 placeholderTextColor={isDark ? "#666" : "#999"}
               />
             </View>
@@ -447,10 +449,11 @@ const PersonalFinancialPlanScreen = () => {
             <View className="flex-row justify-between items-center">
               <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Инвалидность</Text>
               <TextInput
-                value={personalFinancialPlan?.insurance.disability || ''}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '', medical: personalFinancialPlan?.insurance?.medical || '', disability: val } })}
-                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
-                placeholder="0 ₸"
+                value={personalFinancialPlan?.insurance.disability ?? '0'}
+                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '0', medical: personalFinancialPlan?.insurance?.medical || '0', disability: val } })}
+                keyboardType="number-pad"
+                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
+                placeholder="0"
                 placeholderTextColor={isDark ? "#666" : "#999"}
               />
             </View>
@@ -459,10 +462,11 @@ const PersonalFinancialPlanScreen = () => {
             <View className="flex-row justify-between items-center">
               <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Болезненный лист</Text>
               <TextInput
-                value={personalFinancialPlan?.insurance.medical || ''}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '', disability: personalFinancialPlan?.insurance?.disability || '', medical: val } })}
-                className={`${textColor} text-sm font-['SFProDisplayRegular'] bg-transparent text-right min-w-[100px]`}
-                placeholder="0 ₸"
+                value={personalFinancialPlan?.insurance.medical ?? '0'}
+                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '0', disability: personalFinancialPlan?.insurance?.disability || '0', medical: val } })}
+                keyboardType="number-pad"
+                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
+                placeholder="0"
                 placeholderTextColor={isDark ? "#666" : "#999"}
               />
             </View>
@@ -508,9 +512,7 @@ const PersonalFinancialPlanScreen = () => {
           onClose={() => setShowDrawerDay(false)}
           onSelect={handleSortSelectDay}
           selectedValue={personalFinancialPlan?.birthDate.day || 'День'}
-          options={days}
-          animationType='fade'
-        />
+          options={days}        />
 
         {/* Drawer для выбора месяца */}
         <Drawer
@@ -519,9 +521,7 @@ const PersonalFinancialPlanScreen = () => {
           onClose={() => setShowDrawerMonth(false)}
           onSelect={handleSortSelectMonth}
           selectedValue={personalFinancialPlan?.birthDate.month || 'Месяц'}
-          options={months}
-          animationType='fade'
-        />
+          options={months}        />
 
         {/* Drawer для выбора года */}
         <Drawer
@@ -530,9 +530,7 @@ const PersonalFinancialPlanScreen = () => {
           onClose={() => setShowDrawerYear(false)}
           onSelect={handleSortSelectYear}
           selectedValue={personalFinancialPlan?.birthDate.year || 'Год'}
-          options={years}
-          animationType='fade'
-        />
+          options={years}        />
 
         {/* Drawer для выбора риск-профиля */}
         <Drawer
@@ -541,10 +539,9 @@ const PersonalFinancialPlanScreen = () => {
           onClose={() => setShowRiskProfile(false)}
           onSelect={handleRiskProfile}
           selectedValue={personalFinancialPlan?.riskProfile || 'Агрессивный'}
-          options={risks}
-          animationType='fade'
-        />
+          options={risks}        />
       </ScrollView>
+      </FadeInView>
     </SafeAreaView>
   );
 };

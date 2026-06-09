@@ -11,6 +11,8 @@ import {
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
+import FadeInView from '@/app/components/FadeInView';
+import { Opacity } from '@/constants/design';
 
 const AddActivesForm = () => {
 
@@ -87,7 +89,7 @@ const AddActivesForm = () => {
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
+        <TouchableOpacity onPress={handleBack} activeOpacity={Opacity.press} className="p-2 -ml-2">
           <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         
@@ -96,6 +98,7 @@ const AddActivesForm = () => {
         </Text>
       </View>
 
+      <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
 
         <View className="mb-4">
@@ -162,6 +165,7 @@ const AddActivesForm = () => {
         
 
       </ScrollView>
+      </FadeInView>
 
       {/* Add Button */}
       <View className='px-2 pb-2'>
@@ -169,7 +173,7 @@ const AddActivesForm = () => {
           className={`w-full mb-2 py-4 rounded-xl items-center justify-center bg-[#4CAF50] `}
           onPress={handleAddExpense}
           disabled={!isFormValid}
-          activeOpacity={0.8}
+          activeOpacity={Opacity.press}
         >
           <Text className={`text-white text-base font-['SFProDisplaySemiBold'] 
             `}>

@@ -142,7 +142,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
                   key={period.value}
                   className={`px-2 py-1 rounded-full border ${
                     selectedPeriod === period.value
-                      ? 'bg-[#2AA651] border-[#2AA651]'
+                      ? 'bg-[#4CAF50] border-[#4CAF50]'
                     : `${borderColor} bg-transparent`
                   }`}
                   onPress={() => setSelectedPeriod(period.value as DateFilterType)}
@@ -163,7 +163,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             1 янв 2025
           </Text>
-          <Text className="text-emerald-400 text-sm  font-['SFProDisplayRegular']">
+          <Text className="text-[#4CAF50] text-sm  font-['SFProDisplayRegular']">
             Итого: {formatAmount(totalAmount)}
           </Text>
         </View>
