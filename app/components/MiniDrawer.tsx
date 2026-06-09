@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Dimensions, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Dimensions, Animated, Easing, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
-import { Motion, Opacity } from '@/constants/design';
+import { Opacity } from '@/constants/design';
 
 interface ConfirmationDrawerProps {
   visible: boolean;
@@ -36,28 +36,34 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const iconColor = isDark ? '#9CA3AF' : '#6B7280';
 
-  // --- Кастомная анимация: фон fade, лист slide снизу ---
-  const [mounted, setMounted] = useState(visible);
-  const anim = useRef(new Animated.Value(0)).current;
-  const sheetHeight = useRef(screenHeight);
+  // Анимация шторки (как в Hint/HintWithChat): панель выезжает снизу, затемнение
+  // фона жёстко привязано к её позиции — один источник анимации, без рассинхрона.
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const [rendered, setRendered] = useState(visible);
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   useEffect(() => {
     if (visible) {
-      setMounted(true);
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: Motion.duration.base,
+      setRendered(true);
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
-    } else if (mounted) {
-      Animated.timing(anim, {
-        toValue: 0,
-        duration: Motion.duration.fast,
+    } else {
+      Animated.timing(translateY, {
+        toValue: screenHeight,
+        duration: 250,
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }).start(({ finished }) => {
-        if (finished) setMounted(false);
+        if (finished) setRendered(false);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,38 +79,23 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
     onClose();
   };
 
-  const backdropOpacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
-  const translateY = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [sheetHeight.current, 0],
-  });
-
   return (
     <Modal
-      visible={mounted}
+      visible={rendered}
       transparent={true}
       animationType="none"
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end">
-        {/* Backdrop — только fade */}
+        {/* Backdrop — затемнение привязано к позиции листа */}
         <Animated.View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            opacity: backdropOpacity,
-          }}
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
         >
           <TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose} />
         </Animated.View>
 
-        {/* Лист — только slide */}
+        {/* Лист — выезжает снизу */}
         <Animated.View
-          onLayout={(e) => { sheetHeight.current = e.nativeEvent.layout.height || screenHeight; }}
           style={{ transform: [{ translateY }] }}
           className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}
         >

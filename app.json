@@ -39,7 +39,13 @@
         }
       ],
       "expo-font",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Приложение использует Face ID для безопасного входа."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

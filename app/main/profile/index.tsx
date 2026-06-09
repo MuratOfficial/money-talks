@@ -11,12 +11,14 @@ import FaceIDModal from '@/app/components/FaceIDModal';
 import InvestmentNotificationManager from '@/app/components/InvestmentNotificationManager';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
+import { useBiometric } from '@/hooks/useBiometric';
 
 const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-    const { signOut, user, setTheme, theme } = useFinancialStore();
+    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled } = useFinancialStore();
+  const { isAvailable: biometricAvailable, label: biometricLabel } = useBiometric();
   const router = useRouter();
   
   const isDark = theme === 'dark';
@@ -43,16 +45,36 @@ const ProfileScreen = () => {
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
+  // Модалка биометрии открывается только при ВКЛЮЧЕНИИ тумблера — чтобы
+  // подтвердить, что устройство действительно распознаёт пользователя.
   const [showFaceID, setShowFaceID] = useState(false);
+
+  const handleFaceIDToggle = (value: boolean) => {
+    if (value) {
+      // Включаем: сначала проверим доступность, затем подтвердим биометрией.
+      if (!biometricAvailable) {
+        Alert.alert(
+          'Биометрия недоступна',
+          `Чтобы включить вход по ${biometricLabel}, настройте Face ID или отпечаток в настройках устройства.`
+        );
+        return;
+      }
+      setShowFaceID(true);
+    } else {
+      // Выключаем сразу.
+      setBiometricEnabled(false);
+    }
+  };
 
   const handleFaceIDSuccess = () => {
     setShowFaceID(false);
-    Alert.alert('Успешно!', 'Face ID аутентификация прошла успешно');
+    setBiometricEnabled(true);
+    Alert.alert('Готово', `Вход по ${biometricLabel} включён`);
   };
 
   const handleFaceIDError = () => {
     setShowFaceID(false);
-    Alert.alert('Ошибка', 'Face ID не удалось распознать. Попробуйте снова.');
+    setBiometricEnabled(false);
   };
 
   const adviceItems = [
@@ -144,11 +166,11 @@ const ProfileScreen = () => {
     },
     {
       id: 'faceid',
-      title: 'Face ID',
+      title: biometricLabel,
       icon: 'finger-print-outline',
       hasSwitch: true,
-      switchValue: showFaceID,
-      onSwitchChange: setShowFaceID
+      switchValue: biometricEnabled,
+      onSwitchChange: handleFaceIDToggle
     },
     {
       id: 'theme',
@@ -206,6 +228,7 @@ const ProfileScreen = () => {
             onClose={() => setShowFaceID(false)}
             onSuccess={handleFaceIDSuccess}
             onError={handleFaceIDError}
+            promptMessage={`Подтвердите включение входа по ${biometricLabel}`}
           />
         {/* Header */}
         <Text className={`${textColor} text-xl font-['SFProDisplayBold'] mt-3 mb-8`}>

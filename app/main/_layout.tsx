@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
 import useFinancialStore from '@/hooks/useStore';
+import BiometricGate from '@/app/components/BiometricGate';
 
 type NavButton = {
   route: "/main" | '/main/finance' | '/main/lfp' | '/main/invest' | '/main/profile';
@@ -29,6 +30,7 @@ export default function RootLayout(): ReactElement {
   ];
 
   return (
+    <BiometricGate>
     <View className="flex-1">
       {/* Основной контент с padding снизу для навигации */}
       <View className="flex-1 pb-[70px]">
@@ -57,5 +59,6 @@ export default function RootLayout(): ReactElement {
         ))}
       </View>
     </View>
+    </BiometricGate>
   );
 }

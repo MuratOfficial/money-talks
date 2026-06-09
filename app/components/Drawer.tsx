@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView, Animated, Easing, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
-import { Motion, Opacity } from '@/constants/design';
+import { Opacity } from '@/constants/design';
 
 interface DrawerProps {
   visible: boolean;
@@ -33,29 +33,35 @@ const Drawer: React.FC<DrawerProps> = ({
   const { theme } = useFinancialStore();
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 
-  // --- Кастомная анимация: фон плавно затемняется (fade), лист выезжает снизу (slide) ---
-  const [mounted, setMounted] = useState(visible);
-  const anim = useRef(new Animated.Value(0)).current;
-  const sheetHeight = useRef(screenHeight);
+  // Анимация шторки (как в Hint/HintWithChat): панель выезжает снизу, затемнение
+  // фона жёстко привязано к её позиции — один источник анимации, без рассинхрона.
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const [rendered, setRendered] = useState(visible);
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   useEffect(() => {
     if (visible) {
-      setMounted(true);
+      setRendered(true);
       setSelectedOption(selectedValue); // синхронизируем выбор при каждом открытии
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: Motion.duration.base,
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
-    } else if (mounted) {
-      Animated.timing(anim, {
-        toValue: 0,
-        duration: Motion.duration.fast,
+    } else {
+      Animated.timing(translateY, {
+        toValue: screenHeight,
+        duration: 250,
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }).start(({ finished }) => {
-        if (finished) setMounted(false);
+        if (finished) setRendered(false);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +69,8 @@ const Drawer: React.FC<DrawerProps> = ({
 
   const sortOptions = options;
   const isDark = theme === 'dark';
-  const drawerBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  // Фон/паддинги листа задаём инлайн-стилем (className на Animated.View ненадёжен в NativeWind).
+  const sheetBg = isDark ? '#1C1C1E' : '#FFFFFF';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const optionBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
   const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
@@ -96,39 +103,23 @@ const Drawer: React.FC<DrawerProps> = ({
   // Высота для скролла — оставляем место под хедер/кнопку/отступы.
   const maxScrollHeight = screenHeight * 0.6;
 
-  // Фон: прозрачность 0 → 0.5. Лист: смещение снизу вверх на свою высоту → 0.
-  const backdropOpacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
-  const translateY = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [sheetHeight.current, 0],
-  });
-
   return (
     <Modal
-      visible={mounted}
+      visible={rendered}
       transparent={true}
       animationType="none"
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end">
-        {/* Backdrop — отдельный слой, только fade (не двигается) */}
+        {/* Backdrop — затемнение привязано к позиции листа */}
         <Animated.View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            opacity: backdropOpacity,
-          }}
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
         >
           <TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose} />
         </Animated.View>
 
-        {/* Лист — отдельный слой, только slide */}
+        {/* Лист — выезжает снизу */}
         <Animated.View
-          onLayout={(e) => { sheetHeight.current = e.nativeEvent.layout.height || screenHeight; }}
           style={{ transform: [{ translateY }] }}
           className={`${drawerBgColor} rounded-t-3xl px-4 pt-6 pb-4`}
         >

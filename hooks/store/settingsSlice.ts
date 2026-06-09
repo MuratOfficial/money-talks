@@ -8,6 +8,8 @@ type SettingsSlice = Pick<
   | 'setTheme'
   | 'setLanguage'
   | 'setCurrency'
+  | 'biometricEnabled'
+  | 'setBiometricEnabled'
   | 'currentCategoryOption'
   | 'currentRegOption'
   | 'setCategoryOption'
@@ -24,6 +26,9 @@ export const createSettingsSlice: SliceCreator<SettingsSlice> = (set, get) => ({
   setTheme: (theme) => set({ theme }),
   setLanguage: (language) => set({ language }),
   setCurrency: (currency) => set({ currency }),
+
+  biometricEnabled: false,
+  setBiometricEnabled: (enabled) => set({ biometricEnabled: enabled }),
 
   // Фильтры
   currentCategoryOption: '',

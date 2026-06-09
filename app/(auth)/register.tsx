@@ -114,13 +114,13 @@ const RegistrationScreen: React.FC = () => {
         );
         
         console.log('Пользователь зарегистрирован:', data.user.email);
-        
+
         setFullName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
-
-        router.replace("/(auth)/login")
+        // Навигация выполняется кнопкой в Alert выше — здесь принудительный
+        // replace убран, иначе он мгновенно закрывал диалог подтверждения.
       }
     } catch (error: any) {
       console.error('Ошибка регистрации:', error);

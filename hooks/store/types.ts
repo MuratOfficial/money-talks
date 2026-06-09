@@ -161,6 +161,10 @@ export interface AppState {
   language: 'ru' | 'en' | 'kz';
   currency: '₸' | '$' | '€';
 
+  // Биометрия (Face ID / отпечаток) — вход в приложение по биометрии
+  biometricEnabled: boolean;
+  setBiometricEnabled: (enabled: boolean) => void;
+
   // Выборы в фильтрах
   currentCategoryOption: string;
   currentRegOption: string;

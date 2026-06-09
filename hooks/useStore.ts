@@ -78,6 +78,7 @@ export const useFinancialStore = create<AppState>()(
         theme: state.theme,
         language: state.language,
         currency: state.currency,
+        biometricEnabled: state.biometricEnabled,
       }),
     }
   )

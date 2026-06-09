@@ -84,12 +84,12 @@ const InvestmentNotificationManager: React.FC = () => {
   return (
     <View className={`${bgColor} rounded-xl p-4 mb-4`}>
       <View className="flex-row items-center mb-3">
-        <MaterialIcons 
-          name="notifications-active" 
-          size={24} 
-          color={isDark ? '#60A5FA' : '#3B82F6'} 
+        <MaterialIcons
+          name="notifications-active"
+          size={24}
+          color="#4CAF50"
         />
-        <Text className={`${textColor} text-lg font-semibold ml-2 font-['SFProDisplaySemibold']`}>
+        <Text className={`${textColor} text-lg ml-2 font-['SFProDisplaySemiBold']`}>
           Напоминания об инвестициях
         </Text>
       </View>
@@ -133,10 +133,10 @@ const InvestmentNotificationManager: React.FC = () => {
         <View className="space-y-2">
           <TouchableOpacity
             onPress={handleScheduleNotification}
-            className="bg-blue-600 rounded-lg py-3 items-center"
-            activeOpacity={0.8}
+            className="bg-[#4CAF50] rounded-xl py-3 items-center"
+            activeOpacity={0.7}
           >
-            <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
+            <Text className="text-white text-sm font-['SFProDisplaySemiBold']">
               Запланировать напоминание
             </Text>
           </TouchableOpacity>
