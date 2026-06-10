@@ -165,6 +165,11 @@ export interface AppState {
   biometricEnabled: boolean;
   setBiometricEnabled: (enabled: boolean) => void;
 
+  // Подпись данных на момент последней успешной синхронизации (для защиты
+  // локальных правок от затирания серверной версией). null — ещё не синхронизировано.
+  lastSyncHash: string | null;
+  setLastSyncHash: (hash: string | null) => void;
+
   // Выборы в фильтрах
   currentCategoryOption: string;
   currentRegOption: string;

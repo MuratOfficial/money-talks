@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage } from '@/lib/secureStorage';
 
 import { AppState, GoalFormData } from './store/types';
 import { createAuthSlice } from './store/authSlice';
@@ -41,30 +41,9 @@ export const useFinancialStore = create<AppState>()(
     }),
     {
       name: 'financial-app-storage',
-      storage: createJSONStorage(() => ({
-        getItem: async (name) => {
-          try {
-            return await AsyncStorage.getItem(name);
-          } catch (error) {
-            console.error('Error getting item from AsyncStorage:', error);
-            return null;
-          }
-        },
-        setItem: async (name, value) => {
-          try {
-            await AsyncStorage.setItem(name, value);
-          } catch (error) {
-            console.error('Error setting item to AsyncStorage:', error);
-          }
-        },
-        removeItem: async (name) => {
-          try {
-            await AsyncStorage.removeItem(name);
-          } catch (error) {
-            console.error('Error removing item from AsyncStorage:', error);
-          }
-        },
-      })),
+      // Шифрованное хранилище: данные лежат в AsyncStorage в зашифрованном виде,
+      // ключ — в Keychain/Keystore через expo-secure-store. См. lib/secureStorage.
+      storage: createJSONStorage(() => secureStorage),
       partialize: (state) => ({
         user: state.user,
         categories: state.categories,
@@ -79,6 +58,7 @@ export const useFinancialStore = create<AppState>()(
         language: state.language,
         currency: state.currency,
         biometricEnabled: state.biometricEnabled,
+        lastSyncHash: state.lastSyncHash,
       }),
     }
   )

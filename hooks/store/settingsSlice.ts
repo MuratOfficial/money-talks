@@ -10,6 +10,8 @@ type SettingsSlice = Pick<
   | 'setCurrency'
   | 'biometricEnabled'
   | 'setBiometricEnabled'
+  | 'lastSyncHash'
+  | 'setLastSyncHash'
   | 'currentCategoryOption'
   | 'currentRegOption'
   | 'setCategoryOption'
@@ -29,6 +31,9 @@ export const createSettingsSlice: SliceCreator<SettingsSlice> = (set, get) => ({
 
   biometricEnabled: false,
   setBiometricEnabled: (enabled) => set({ biometricEnabled: enabled }),
+
+  lastSyncHash: null,
+  setLastSyncHash: (hash) => set({ lastSyncHash: hash }),
 
   // Фильтры
   currentCategoryOption: '',

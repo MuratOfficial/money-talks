@@ -4,6 +4,7 @@ import {
   fetchUserDataFromServer,
 } from '@/services/api';
 import useFinancialStore from './useStore';
+import type { AppState } from './store/types';
 import { useNetworkStatus } from './useNetworkStatus';
 import {
   SYNC_THROTTLE_MS,
@@ -11,7 +12,24 @@ import {
   coerceTheme,
   coerceLanguage,
   coerceCurrency,
+  syncSignature,
+  hasSyncableData,
 } from '@/constants/sync';
+
+/** Извлекает только синхронизируемые поля из состояния стора. */
+const extractSyncable = (s: AppState) => ({
+  categories: s.categories,
+  wallets: s.wallets,
+  expences: s.expences,
+  incomes: s.incomes,
+  actives: s.actives,
+  passives: s.passives,
+  goals: s.goals,
+  personalFinancialPlan: s.personalFinancialPlan,
+  theme: s.theme,
+  language: s.language,
+  currency: s.currency,
+});
 
 export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 
@@ -43,35 +61,59 @@ export const useSync = () => {
         console.log('Загрузка данных с сервера...');
         const serverData = await fetchUserDataFromServer(store.user.id);
 
-        if (serverData) {
-          // Обновляем store данными с сервера
-          if (serverData.categories) store.setCategories(serverData.categories);
-          if (serverData.wallets) store.setWallets(serverData.wallets);
+        // Оцениваем локальное состояние ДО применения серверных данных.
+        const local = extractSyncable(useFinancialStore.getState());
+        const localSig = syncSignature(local);
+        const lastHash = useFinancialStore.getState().lastSyncHash;
+        // «Грязно» = локальные данные изменились с последней успешной синхры
+        // (или синхры ещё не было). Тогда есть риск затереть несохранённые правки.
+        const localDirty = lastHash === null || localSig !== lastHash;
+        const localHasData = hasSyncableData(local);
 
-          // Обновляем остальные данные через set
-          useFinancialStore.setState({
-            expences: serverData.expences || [],
-            incomes: serverData.incomes || [],
-            actives: serverData.actives || [],
-            passives: serverData.passives || [],
-            goals: serverData.goals || [],
-            personalFinancialPlan: serverData.personalFinancialPlan || null,
-            theme: coerceTheme(serverData.theme),
-            language: coerceLanguage(serverData.language),
-            currency: coerceCurrency(serverData.currency),
-          });
-
-          console.log('Данные успешно загружены с сервера');
-          setSyncError(null);
-          setStatus('success');
-        } else {
+        if (!serverData) {
+          // Данных на сервере нет — отправляем текущие локальные.
           console.log('Данные пользователя не найдены на сервере');
-          // Если данных нет на сервере, отправим текущие данные
           syncInProgress.current = false;
           setIsSyncing(false);
           await syncToServer();
           return;
         }
+
+        if (localDirty && localHasData) {
+          // На устройстве есть несинхронизированные правки — НЕ затираем их
+          // серверной версией, а отправляем локальные данные на сервер.
+          console.log('Обнаружены несинхронизированные локальные изменения — отправляем на сервер');
+          syncInProgress.current = false;
+          setIsSyncing(false);
+          await syncToServer();
+          return;
+        }
+
+        // Локальные данные синхронизированы (или пусты) — принимаем серверные.
+        if (serverData.categories) store.setCategories(serverData.categories);
+        if (serverData.wallets) store.setWallets(serverData.wallets);
+
+        useFinancialStore.setState({
+          expences: serverData.expences || [],
+          incomes: serverData.incomes || [],
+          actives: serverData.actives || [],
+          passives: serverData.passives || [],
+          goals: serverData.goals || [],
+          personalFinancialPlan: serverData.personalFinancialPlan || null,
+          theme: coerceTheme(serverData.theme),
+          language: coerceLanguage(serverData.language),
+          currency: coerceCurrency(serverData.currency),
+        });
+
+        // Фиксируем подпись принятых данных, чтобы дальше корректно определять
+        // локальные изменения и не перезаписывать сервер на каждом запуске.
+        useFinancialStore.getState().setLastSyncHash(
+          syncSignature(extractSyncable(useFinancialStore.getState()))
+        );
+
+        console.log('Данные успешно загружены с сервера');
+        setSyncError(null);
+        setStatus('success');
       } catch (error) {
         console.error('Ошибка загрузки данных с сервера:', error);
         setSyncError('Не удалось загрузить данные с сервера');
@@ -111,19 +153,12 @@ export const useSync = () => {
 
     try {
       console.log('Отправка данных на сервер...');
-      await syncUserDataToServer(store.user.id, {
-        categories: store.categories,
-        wallets: store.wallets,
-        expences: store.expences,
-        incomes: store.incomes,
-        actives: store.actives,
-        passives: store.passives,
-        goals: store.goals,
-        personalFinancialPlan: store.personalFinancialPlan,
-        theme: store.theme,
-        language: store.language,
-        currency: store.currency,
-      });
+      // Берём актуальный снимок из стора (а не из устаревшего замыкания рендера)
+      // и из него же считаем подпись — это гарантирует, что подпись соответствует
+      // ровно тем данным, что ушли на сервер.
+      const snapshot = extractSyncable(useFinancialStore.getState());
+      await syncUserDataToServer(store.user.id, snapshot);
+      useFinancialStore.getState().setLastSyncHash(syncSignature(snapshot));
       console.log('Данные успешно отправлены на сервер');
       setSyncError(null);
       setStatus('success');

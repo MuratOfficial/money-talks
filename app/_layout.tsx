@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, ActivityIndicator, AppState } from 'react-native';
+import { AppState } from 'react-native';
 import { useFonts } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -54,18 +54,11 @@ export default function RootLayout() {
     };
   }, [isAuthenticated, user?.id]);
 
-  // Показываем загрузку только при первичной синхронизации
+  // Ждём только загрузку шрифтов. Первичную синхронизацию НЕ блокируем
+  // полноэкранным спиннером — данные уже есть локально, а статус синхронизации
+  // показываем ненавязчивым баннером (см. SyncStatusBanner ниже).
   if (!loaded) {
     return null;
-  }
-
-  // Если идет первичная синхронизация после авторизации
-  if (isSyncing && isAuthenticated) {
-    return (
-      <View className="flex-1 items-center justify-center bg-[#000000]">
-        <ActivityIndicator size="large" color="#3B82F6" />
-      </View>
-    );
   }
 
   return (
@@ -76,6 +69,13 @@ export default function RootLayout() {
           <Stack.Screen name="main" />
           <Stack.Screen name="+not-found" />
         </Stack>
+        {isSyncing && isAuthenticated && (
+          <SyncStatusBanner
+            message="Синхронизация данных…"
+            onDismiss={() => {}}
+            autoHideMs={0}
+          />
+        )}
         {!isOnline && (
           <SyncStatusBanner
             message="Нет подключения к интернету — изменения сохранены локально"

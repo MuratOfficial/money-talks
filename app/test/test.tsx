@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import TestComponent from '../components/TestComponent';
-import { fetchQuestions, Question, saveTestResult } from '@/services/api';
+import { fetchQuestions, Question } from '@/services/api';
 
 const TestScreen: React.FC = () => {
   const [showTest, setShowTest] = useState(false);
@@ -32,31 +32,14 @@ const TestScreen: React.FC = () => {
     }
   };
 
-  const handleTestComplete = async (result: any) => {
+  const handleTestComplete = (result: any) => {
     console.log('Test completed:', result);
-    
-    try {
-      // Сохраняем результат на сервер
-      await saveTestResult({
-        score: result.score,
-        totalQuestions: result.totalQuestions,
-        percentage: (result.score / result.totalQuestions) * 100,
-        answers: result.answers,
-      });
-      
-      Alert.alert(
-        'Тест завершен!',
-        `Ваш результат: ${result.score} из ${result.totalQuestions}`,
-        [{ text: 'OK', onPress: () => setShowTest(false) }]
-      );
-    } catch (err) {
-      console.error('Failed to save result:', err);
-      Alert.alert(
-        'Внимание',
-        'Результат не сохранен, но вы можете продолжить использование приложения',
-        [{ text: 'OK', onPress: () => setShowTest(false) }]
-      );
-    }
+
+    Alert.alert(
+      'Тест завершен!',
+      `Ваш результат: ${result.score} из ${result.totalQuestions}`,
+      [{ text: 'OK', onPress: () => setShowTest(false) }]
+    );
   };
 
   if (loading) {
