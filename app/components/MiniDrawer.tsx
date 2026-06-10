@@ -32,7 +32,8 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
   const { theme } = useFinancialStore();
 
   const isDark = theme === 'dark';
-  const modalBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  // Фон/паддинги листа задаём инлайн-стилем (className на Animated.View ненадёжен в NativeWind).
+  const sheetBg = isDark ? '#1C1C1E' : '#FFFFFF';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const iconColor = isDark ? '#9CA3AF' : '#6B7280';
 
@@ -94,10 +95,17 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
           <TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose} />
         </Animated.View>
 
-        {/* Лист — выезжает снизу */}
+        {/* Лист — выезжает снизу (стили инлайн, как в Hint: className на Animated.View ненадёжен) */}
         <Animated.View
-          style={{ transform: [{ translateY }] }}
-          className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}
+          style={{
+            transform: [{ translateY }],
+            backgroundColor: sheetBg,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 16,
+          }}
         >
           {/* Handle Bar */}
           <View className={`w-10 h-1 ${isDark ? 'bg-gray-600' : 'bg-gray-400'} rounded-full self-center mb-6`} />

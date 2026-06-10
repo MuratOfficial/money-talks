@@ -118,10 +118,17 @@ const Drawer: React.FC<DrawerProps> = ({
           <TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose} />
         </Animated.View>
 
-        {/* Лист — выезжает снизу */}
+        {/* Лист — выезжает снизу (стили инлайн, как в Hint: className на Animated.View ненадёжен) */}
         <Animated.View
-          style={{ transform: [{ translateY }] }}
-          className={`${drawerBgColor} rounded-t-3xl px-4 pt-6 pb-4`}
+          style={{
+            transform: [{ translateY }],
+            backgroundColor: sheetBg,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 16,
+          }}
         >
           {/* Handle Bar */}
           <View className={`w-10 h-1 ${handleBarColor} rounded-full self-center mb-6`} />
