@@ -43,12 +43,12 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
 
           {/* Анимированные точки */}
           <View className="flex-row mt-2 space-x-1">
-            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`} 
-                  style={[styles.dot, { animationDelay: '0s' }]} />
-            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`} 
-                  style={[styles.dot, { animationDelay: '0.2s' }]} />
-            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`} 
-                  style={[styles.dot, { animationDelay: '0.4s' }]} />
+            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`}
+                  style={[styles.dot, { animationDelay: '0s' } as any]} />
+            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`}
+                  style={[styles.dot, { animationDelay: '0.2s' } as any]} />
+            <View className={`w-2 h-2 rounded-full ${isDark ? 'bg-green-400' : 'bg-green-600'}`}
+                  style={[styles.dot, { animationDelay: '0.4s' } as any]} />
           </View>
         </View>
       </View>

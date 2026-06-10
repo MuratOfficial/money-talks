@@ -15,7 +15,10 @@ export default function RootLayout(): ReactElement {
   const router = useRouter();
   const segments = useSegments();
   const { theme } = useFinancialStore();
-  const activeRoute = (segments[1] ? segments[1] : segments[0]) || "main";
+  // segments приводим к string[]: при включённых typedRoutes без сгенерированных
+  // типов (.expo/types) тип сужается до кортежа и индекс [1] был бы ошибкой.
+  const segs = segments as string[];
+  const activeRoute = (segs[1] ?? segs[0]) || "main";
   
   const isDark = theme === 'dark';
   const navBgColor = isDark ? 'bg-[#1D1F24]' : 'bg-gray-100';
