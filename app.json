@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "money-talks",
+    "name": "Money Talks",
     "slug": "money-talks",
     "version": "1.0.2",
     "orientation": "portrait",
@@ -20,7 +20,10 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.moneytalks.moneytalks"
+      "package": "com.moneytalks.moneytalks",
+      "blockedPermissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -44,6 +47,15 @@
         "expo-local-authentication",
         {
           "faceIDPermission": "Приложение использует Face ID для безопасного входа."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "targetSdkVersion": 35,
+            "compileSdkVersion": 35
+          }
         }
       ]
     ],
