@@ -38,9 +38,12 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "your@email.com",
-        "ascAppId": "your-app-store-connect-id",
-        "appleTeamId": "your-team-id"
+        "appleId": "moneytalksadmin@gmail.com",
+        "ascAppId": "6796022442",
+        "appleTeamId": "2PT6LQ66YQ",
+        "ascApiKeyPath": "../keys/AuthKey_S5HVK9RBJ7.p8",
+        "ascApiKeyId": "S5HVK9RBJ7",
+        "ascApiKeyIssuerId": "b4faf1d9-ce1f-4bd5-a866-716a50ab1f74"
       }
     }
   }

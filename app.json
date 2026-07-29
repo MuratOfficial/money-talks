@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.moneytalks.moneytalks",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -47,6 +47,12 @@
         "expo-local-authentication",
         {
           "faceIDPermission": "Приложение использует Face ID для безопасного входа."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Приложение использует доступ к фото, чтобы вы могли установить изображение профиля."
         }
       ],
       [
