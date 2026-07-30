@@ -63,7 +63,8 @@
             "compileSdkVersion": 35
           }
         }
-      ]
+      ],
+      "./plugins/withoutPushEntitlement"
     ],
     "experiments": {
       "typedRoutes": true
