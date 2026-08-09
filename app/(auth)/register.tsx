@@ -27,7 +27,7 @@ const RegistrationScreen: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const router = useRouter();
-  const { theme } = useFinancialStore();
+  const { theme, setUser } = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -97,6 +97,30 @@ const RegistrationScreen: React.FC = () => {
         throw error;
       }
 
+      // Если email уже занят, Supabase НЕ возвращает ошибку: вместо этого
+      // приходит «пустой» пользователь с identities: [] — так сервис не даёт
+      // перебирать существующие адреса. Без этой проверки пользователь увидел
+      // бы «успешную регистрацию» и ждал письмо, которое не отправляется.
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setErrors({ email: 'Пользователь с таким email уже зарегистрирован' });
+        return;
+      }
+
+      // Подтверждение email в Supabase может быть выключено — тогда сессия
+      // выдаётся сразу. В этом случае не отправляем человека на экран входа
+      // и не обещаем письмо, а сразу пускаем в приложение.
+      // Когда подтверждение включат обратно (после настройки SMTP), session
+      // будет null и сработает ветка с письмом ниже.
+      if (data.session && data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email!,
+          name: data.user.user_metadata?.full_name || data.user.email!,
+        });
+        router.replace('/main');
+        return;
+      }
+
       if (data.user) {
         Alert.alert(
           'Успешная регистрация!',
@@ -121,26 +145,30 @@ const RegistrationScreen: React.FC = () => {
         setConfirmPassword('');
         // Навигация выполняется кнопкой в Alert выше — здесь принудительный
         // replace убран, иначе он мгновенно закрывал диалог подтверждения.
+      } else {
+        // Ответ без пользователя и без ошибки — не оставляем экран без реакции.
+        setErrors({ general: 'Не удалось создать аккаунт. Попробуйте ещё раз.' });
       }
     } catch (error: any) {
       console.error('Ошибка регистрации:', error);
       
-      // Обработка специфических ошибок Supabase
-      switch (error.message) {
-        case 'User already registered':
-          setErrors({ email: 'Пользователь с таким email уже зарегистрирован' });
-          break;
-        case 'Password should be at least 6 characters':
-          setErrors({ password: 'Пароль должен содержать минимум 6 символов' });
-          break;
-        case 'Invalid email':
-          setErrors({ email: 'Некорректный формат email. Используйте настоящий email адрес' });
-          break;
-        case 'Email rate limit exceeded':
-          setErrors({ general: 'Слишком много попыток. Попробуйте через несколько минут' });
-          break;
-        default:
-          setErrors({ general: 'Произошла ошибка при регистрации. Попробуйте позже.' });
+      // Сообщения Supabase приходят в разном регистре и формулировках
+      // (например «email rate limit exceeded» со строчной буквы), поэтому
+      // сравнение по точному совпадению ненадёжно — ищем по подстроке.
+      const message = String(error?.message || '').toLowerCase();
+
+      if (message.includes('already registered')) {
+        setErrors({ email: 'Пользователь с таким email уже зарегистрирован' });
+      } else if (message.includes('rate limit')) {
+        setErrors({
+          general: 'Слишком много запросов. Попробуйте через несколько минут.',
+        });
+      } else if (message.includes('password')) {
+        setErrors({ password: 'Пароль должен содержать минимум 6 символов' });
+      } else if (message.includes('email') && message.includes('invalid')) {
+        setErrors({ email: 'Некорректный email. Используйте настоящий адрес' });
+      } else {
+        setErrors({ general: 'Произошла ошибка при регистрации. Попробуйте позже.' });
       }
     } finally {
       setIsLoading(false);
