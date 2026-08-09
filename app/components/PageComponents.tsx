@@ -44,6 +44,13 @@ interface PageComponentProps {
   analyzeList?: AnalyzeList[];
   diagramLink?:Href
   isPassive?:boolean;
+  /**
+   * Значение поля `page` для подсказок этого экрана (см. таблицу tips в БД
+   * и STATIC_TIPS в constants/staticTips.ts). Раньше компонент всегда грузил
+   * подсказки для 'incomes', из-за чего во всех разделах показывался один и
+   * тот же текст про доходы.
+   */
+  tipsPage?: string;
 }
 
 
@@ -54,7 +61,7 @@ interface AnalyzeList {
    item:Asset[]
 }
 
-const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets}:PageComponentProps) => {
+const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetName, diagramLink, emptyDesc, emptyTitle, categories, tab1, tab2, addLink, assets, tipsPage}:PageComponentProps) => {
   
   const{setCurrentAsset, setCategoryOption, currentCategoryOption, currentRegOption, setRegOption, currency, theme} = useFinancialStore();
   
@@ -70,8 +77,8 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   // Подсказки (tips) нужны только для модалки-хинта, поэтому НЕ блокируем ими
   // весь экран. Если есть кэш — берём сразу; иначе показываем лоадер лишь
   // при самой первой загрузке.
-  const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
-  const [loading, setLoading] = useState(getCachedTips('incomes') === null);
+  const [tips, setTips] = useState<Tip[]>(getCachedTips(tipsPage) || []);
+  const [loading, setLoading] = useState(getCachedTips(tipsPage) === null);
 
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -102,11 +109,12 @@ useEffect(() => {
 
   useEffect(() => {
     loadTips();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipsPage]);
 
   const loadTips = async () => {
     try {
-      const data = await fetchTips('incomes'); 
+      const data = await fetchTips(tipsPage);
       setTips(data);
     } catch (error) {
       console.error('Failed to load tips:', error);

@@ -28,7 +28,7 @@ const PassivesScreen: React.FC = () => {
 
 
   return (
-    <PageComponent title='Анализ' analyzeList={analyzeElements} assetName='1 янв - 1 фев' isAnalyze emptyTitle='У вас пока нет анализа' emptyDesc='Добавьте ваши  расходы, доходы, активы и пассивы, и начните следить за общим анализом'/>
+    <PageComponent tipsPage='analyze' title='Анализ' analyzeList={analyzeElements} assetName='1 янв - 1 фев' isAnalyze emptyTitle='У вас пока нет анализа' emptyDesc='Добавьте ваши  расходы, доходы, активы и пассивы, и начните следить за общим анализом'/>
   );
 };
 

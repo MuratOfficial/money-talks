@@ -76,7 +76,7 @@ const InvestmentsPage: React.FC = () => {
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
-    const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
+    const [tips, setTips] = useState<Tip[]>(getCachedTips('invest') || []);
 
     useEffect(() => {
       loadTips();
@@ -85,7 +85,7 @@ const InvestmentsPage: React.FC = () => {
 
     const loadTips = async () => {
       try {
-        const data = await fetchTips('incomes');
+        const data = await fetchTips('invest');
         setTips(data);
       } catch (error) {
         console.error('Failed to load tips:', error);

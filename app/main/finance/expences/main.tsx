@@ -15,7 +15,7 @@ const ExpensesScreen: React.FC = () => {
 
 
   return (
-    <PageComponent categories={categories} 
+    <PageComponent tipsPage='expenses' categories={categories}
     assets={expences}
     addLink={'/main/finance/expences/add-expence'} diagramLink={'/main/finance/expences/diagram'} assetName='1 янв' title='Расходы' tab1='Регулярные' tab2='Нерегулярные' emptyTitle='У вас пока нет расходов' emptyDesc='Добавьте ваши расходы, начните отслеживать свои денежные потоки'/>
   );

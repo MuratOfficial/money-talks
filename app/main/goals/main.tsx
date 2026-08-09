@@ -32,8 +32,8 @@ const GoalsScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
 
 
-      const [tips, setTips] = useState<Tip[]>(getCachedTips('incomes') || []);
-      const [loading, setLoading] = useState(getCachedTips('incomes') === null);
+      const [tips, setTips] = useState<Tip[]>(getCachedTips('goals') || []);
+      const [loading, setLoading] = useState(getCachedTips('goals') === null);
 
       useEffect(() => {
         loadTips();
@@ -42,7 +42,7 @@ const GoalsScreen = () => {
     
       const loadTips = async () => {
         try {
-          const data = await fetchTips('incomes'); 
+          const data = await fetchTips('goals');
           setTips(data);
         } catch (error) {
           console.error('Failed to load tips:', error);

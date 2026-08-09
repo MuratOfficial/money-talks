@@ -9,6 +9,7 @@ const ActivesScreen: React.FC = () => {
 
   return (
     <PageComponent
+    tipsPage='actives'
     assets={actives}
 
     title='Активы' assetName='Мои активы' tab1='Ликвидные' tab2='Неликвидные' addLink={'/main/finance/actives/add-actives'} emptyTitle='У вас пока нет активов' emptyDesc='Добавьте ваши активы, начните отслеживать свои денежные потоки'/>

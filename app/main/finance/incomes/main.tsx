@@ -13,7 +13,7 @@ const IncomesScreen: React.FC = () => {
   const {incomes} = useFinancialStore();
 
   return (
-    <PageComponent assets={incomes} diagramLink={'/main/finance/incomes/diagram'} assetName='1 янв - 1 фев' addLink={'/main/finance/incomes/add-income'} title='Доходы' tab1='Регулярные' tab2='Нерегулярные' categories={categories} emptyTitle='У вас пока нет доходов' emptyDesc='Добавьте ваши доходов, начните отслеживать свои денежные потоки'/>
+    <PageComponent tipsPage='incomes' assets={incomes} diagramLink={'/main/finance/incomes/diagram'} assetName='1 янв - 1 фев' addLink={'/main/finance/incomes/add-income'} title='Доходы' tab1='Регулярные' tab2='Нерегулярные' categories={categories} emptyTitle='У вас пока нет доходов' emptyDesc='Добавьте ваши доходов, начните отслеживать свои денежные потоки'/>
   );
 };
 

@@ -12,6 +12,7 @@ const {passives} = useFinancialStore();
 
   return (
     <PageComponent
+     tipsPage='passives'
      assets={passives}
     title='Пассивы' isPassive assetName='Мои пассивы' addLink={'/main/finance/passives/add-passives'} categories={categories} emptyTitle='У вас пока нет пассивов' emptyDesc='Добавьте ваши пассивы, начните отслеживать свои денежные потоки'/>
   );
