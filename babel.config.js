@@ -5,5 +5,10 @@ module.exports = function (api) {
         ["babel-preset-expo", { jsxImportSource: "nativewind" }],
         "nativewind/babel",
       ],
+      plugins: [
+        // Убирает import.meta из веб-бандла (приезжает из zustand devtools).
+        // См. комментарий в самом плагине.
+        "./plugins/babelTransformImportMeta.js",
+      ],
     };
   };
