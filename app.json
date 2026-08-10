@@ -64,6 +64,7 @@
           }
         }
       ],
+      "expo-asset",
       "./plugins/withoutPushEntitlement"
     ],
     "experiments": {
