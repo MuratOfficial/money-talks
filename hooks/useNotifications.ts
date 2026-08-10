@@ -59,8 +59,9 @@ export const useNotifications = () => {
     const [expoPushToken, setExpoPushToken] = useState<string>('');
     const [notification, setNotification] = useState<any>(null);
     const [isAvailable, setIsAvailable] = useState(isNotificationsAvailable);
-    const notificationListener = useRef<any>();
-    const responseListener = useRef<any>();
+    // React 19: useRef требует явное начальное значение.
+    const notificationListener = useRef<any>(null);
+    const responseListener = useRef<any>(null);
 
     useEffect(() => {
         if (!isNotificationsAvailable || !Notifications) {
