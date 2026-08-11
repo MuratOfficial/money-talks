@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Modal,
   View,
@@ -44,6 +45,9 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
   title,
   items,
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const { theme } = useFinancialStore();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   
@@ -108,7 +112,7 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-end">
-        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6 pb-4`}>
+        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6`} style={{ paddingBottom: 16 + insets.bottom }}>
           {/* Header */}
           <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
             <TouchableOpacity onPress={onClose}>

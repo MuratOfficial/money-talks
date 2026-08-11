@@ -2,6 +2,7 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
 import BiometricGate from '@/app/components/BiometricGate';
 
@@ -11,10 +12,18 @@ type NavButton = {
   label: string;
 };
 
+/** Высота самой панели навигации, без системной зоны жестов/кнопок. */
+const NAV_BAR_HEIGHT = 70;
+
 export default function RootLayout(): ReactElement {
   const router = useRouter();
   const segments = useSegments();
   const { theme } = useFinancialStore();
+  // Начиная с Android 15 (target API 35+) приложение рисует под системной
+  // панелью навигации — она больше не «отъедает» место сама. Поэтому нижнюю
+  // навигацию поднимаем на insets.bottom, иначе её кнопки оказываются под
+  // системными. На устройствах с жестами inset меньше, чем с тремя кнопками.
+  const insets = useSafeAreaInsets();
   // segments приводим к string[]: при включённых typedRoutes без сгенерированных
   // типов (.expo/types) тип сужается до кортежа и индекс [1] был бы ошибкой.
   const segs = segments as string[];
@@ -36,12 +45,19 @@ export default function RootLayout(): ReactElement {
     <BiometricGate>
     <View className="flex-1">
       {/* Основной контент с padding снизу для навигации */}
-      <View className="flex-1 pb-[70px]">
+      <View className="flex-1" style={{ paddingBottom: NAV_BAR_HEIGHT + insets.bottom }}>
         <Slot />
       </View>
 
       {/* Нижняя навигация */}
-      <View className={`absolute bottom-0 left-0 right-0 flex-row ${navBgColor} py-[15px] px-5 justify-around h-[70px]`}>
+      <View
+        className={`absolute bottom-0 left-0 right-0 flex-row ${navBgColor} px-5 justify-around`}
+        style={{
+          height: NAV_BAR_HEIGHT + insets.bottom,
+          paddingTop: 15,
+          paddingBottom: 15 + insets.bottom,
+        }}
+      >
         {navButtons.map((button) => (
           <TouchableOpacity
             key={button.route}

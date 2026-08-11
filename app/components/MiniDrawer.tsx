@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, Dimensions, Animated, Easing, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
@@ -29,6 +30,9 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
   confirmButtonColor = "#4CAF50", // brand green
   cancelButtonColor = "#374151"   // gray-700
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const { theme } = useFinancialStore();
 
   const isDark = theme === 'dark';
@@ -104,7 +108,7 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
             borderTopRightRadius: 24,
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 16,
+            paddingBottom: 16 + insets.bottom,
           }}
         >
           {/* Handle Bar */}

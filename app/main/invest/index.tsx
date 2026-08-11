@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import TestComponent from '@/app/components/TestComponent';
@@ -164,7 +165,7 @@ const InvestmentsPage: React.FC = () => {
   }
 
   return (
-  <View className={`flex-1 ${bgColor}`}>
+  <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-start justify-between px-4 py-3 pb-6">
         <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold']`}>
@@ -246,7 +247,7 @@ const InvestmentsPage: React.FC = () => {
         videoTitle={tips[0]?.videoTitle}
         enableChatGPT={true}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

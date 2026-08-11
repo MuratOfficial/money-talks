@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
@@ -13,6 +14,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   visible,
     onClose
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
 
     const segments = useSegments();
 
@@ -76,7 +80,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
         >
-          <View className={`${modalBgColor} rounded-t-2xl px-4 py-6`}>
+          <View className={`${modalBgColor} rounded-t-2xl px-4 pt-6`} style={{ paddingBottom: 24 + insets.bottom }}>
            
             <View className="flex-row items-center justify-between mb-6">
               <Text className={`${textColor} text-lg font-['SFProDisplayRegular'] font-medium flex-1`}>

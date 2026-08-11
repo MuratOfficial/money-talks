@@ -93,7 +93,7 @@ const DocumentsScreen = () => {
   // --- Детальный экран документа ---
   if (activeDoc) {
     return (
-      <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
         <View className="flex-1 px-4">
           <Header title={activeDoc.title} onBack={() => setActiveDoc(null)} />
 
@@ -132,7 +132,7 @@ const DocumentsScreen = () => {
 
   // --- Список документов ---
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         <Header title="Документы" onBack={() => router.replace('/main/profile')} />
 

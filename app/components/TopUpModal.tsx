@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   View,
   Text,
@@ -24,6 +25,9 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
   currency = '₸',
   goalId
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('200');
   const inputRef = useRef<TextInput>(null);
 
@@ -121,7 +125,8 @@ const TopUpModal: React.FC<TopUpModalProps> = ({
         onPress={onClose}
       >
         <TouchableOpacity 
-          className={`${modalBgColor} rounded-t-3xl px-4 pb-8`}
+          className={`${modalBgColor} rounded-t-3xl px-4`}
+          style={{ paddingBottom: 32 + insets.bottom }}
           activeOpacity={1}
           onPress={() => {}} // Предотвращаем закрытие при нажатии на контент
         >
