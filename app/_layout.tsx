@@ -7,6 +7,7 @@ import "../global.css"
 
 import { AuthGuard } from '@/components/AuthGuard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { SyncActivityIndicator } from '@/components/SyncActivityIndicator';
 import { SyncStatusBanner } from '@/components/SyncStatusBanner';
 import { useFinancialStore } from '@/hooks/useStore';
 import { useSync } from '@/hooks/useSync';
@@ -69,13 +70,9 @@ export default function RootLayout() {
           <Stack.Screen name="main" />
           <Stack.Screen name="+not-found" />
         </Stack>
-        {isSyncing && isAuthenticated && (
-          <SyncStatusBanner
-            message="Синхронизация данных…"
-            onDismiss={() => {}}
-            autoHideMs={0}
-          />
-        )}
+        {/* Синхронизация — фоновый процесс: показываем её тонкой полосой,
+            а не баннером с текстом поверх контента. */}
+        <SyncActivityIndicator active={isSyncing && isAuthenticated} />
         {!isOnline && (
           <SyncStatusBanner
             message="Нет подключения к интернету — изменения сохранены локально"

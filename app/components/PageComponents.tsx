@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -81,24 +81,36 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const [loading, setLoading] = useState(getCachedTips(tipsPage) === null);
 
   const [showTooltip, setShowTooltip] = useState(false);
+  // Реальные координаты кнопки подсказок. Раньше они были захардкожены, из-за
+  // чего стрелка указывала мимо кнопки, а с включённым edge-to-edge (Android 15+)
+  // подсказка уехала ещё выше: Modal рисуется во всё окно, включая зону
+  // статус-бара, и жёсткие координаты перестали совпадать с видимым хедером.
+  const hintButtonRef = useRef<View>(null);
+  const [hintButtonRect, setHintButtonRect] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
 useEffect(() => {
   if (!assets || assets.length === 0 ) {
     const timer = setTimeout(() => {
-      setShowTooltip(true);
+      // measureInWindow даёт координаты в системе окна — ровно в ней же
+      // позиционируется полноэкранный Modal подсказки.
+      hintButtonRef.current?.measureInWindow((x, y, width, height) => {
+        if (width > 0 && height > 0) {
+          setHintButtonRect({ x, y, width, height });
+          setShowTooltip(true);
+        }
+      });
     }, 500);
     return () => clearTimeout(timer);
   }
 }, [assets]);
 
-  const tutorialSteps = [
-    {
-      text: 'Не знаете, что делать? Нажмите, здесь есть подсказки!',
-      position: { x: 20, y: 10, width: 150, height: 50 },
-      arrowDirection: 'top' as const,
-      duration: 4000,
-    }
-  ];
+  const tooltipText = 'Не знаете, что делать? Нажмите, здесь есть подсказки!';
+  const tooltipDuration = 4000;
 
   const handleTooltipClose = () => {
   
@@ -265,7 +277,7 @@ useEffect(() => {
             <Ionicons name="pie-chart-outline" size={20} color={iconColor} />
           </TouchableOpacity>}
           
-          <TouchableOpacity className="p-2" onPress={openModal}>
+          <TouchableOpacity ref={hintButtonRef} className="p-2" onPress={openModal}>
             <Ionicons name="information-circle-outline" size={24} color={iconColor} />
           </TouchableOpacity>
         </View>
@@ -606,13 +618,15 @@ useEffect(() => {
           
           />
 
-           <TutorialTooltip
-        visible={showTooltip}
-        text={tutorialSteps[0].text}
-        position={tutorialSteps[0].position}
-        autoCloseDuration={tutorialSteps[0].duration}
-        onClose={handleTooltipClose}
-      />
+           {hintButtonRect && (
+        <TutorialTooltip
+          visible={showTooltip}
+          text={tooltipText}
+          position={hintButtonRect}
+          autoCloseDuration={tooltipDuration}
+          onClose={handleTooltipClose}
+        />
+      )}
       
     </SafeAreaView>
      </TouchableWithoutFeedback>

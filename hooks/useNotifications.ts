@@ -31,9 +31,12 @@ try {
 
     // Настройка обработчика уведомлений только если модуль доступен
     if (Notifications && !Constants.appOwnership) {
+        // В SDK 54 shouldShowAlert объявлен устаревшим и заменён парой
+        // shouldShowBanner / shouldShowList — они теперь обязательные.
         Notifications.setNotificationHandler({
             handleNotification: async () => ({
-                shouldShowAlert: true,
+                shouldShowBanner: true,
+                shouldShowList: true,
                 shouldPlaySound: true,
                 shouldSetBadge: false,
             }),
@@ -90,13 +93,14 @@ export const useNotifications = () => {
             }
         });
 
+        // expo-notifications 0.32 (SDK 54) убрал removeNotificationSubscription:
+        // слушатели возвращают EventSubscription, и отписываться нужно через
+        // subscription.remove(). Старый вызов падал с «is not a function» прямо
+        // в cleanup эффекта, а исключение при размонтировании ловил ErrorBoundary —
+        // поэтому любой уход с экрана Профиля показывал «Что-то пошло не так».
         return () => {
-            if (notificationListener.current) {
-                Notifications.removeNotificationSubscription(notificationListener.current);
-            }
-            if (responseListener.current) {
-                Notifications.removeNotificationSubscription(responseListener.current);
-            }
+            notificationListener.current?.remove();
+            responseListener.current?.remove();
         };
     }, []);
 

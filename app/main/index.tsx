@@ -14,8 +14,16 @@ const MainScreen = () => {
   
   const isDark = theme === 'dark';
   const gradientColors: readonly [string, string, ...string[]] = isDark ? ['#1B5E20', '#000000'] : ['#4CAF50', '#FFFFFF'];
+  // В светлой теме градиент уходит в белый, поэтому текст поверх него не может
+  // быть белым — ниже по экрану он полностью сливался с фоном.
   const textColor = isDark ? 'text-white' : 'text-gray-900';
-  
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-700';
+  const textMutedColor = isDark ? 'text-white/60' : 'text-gray-600';
+  const chipClass = isDark
+    ? 'bg-white/20 border-white/50'
+    : 'bg-black/10 border-black/20';
+  const chipIconColor = isDark ? '#FFF' : '#11181C';
+
 
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
   const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
@@ -97,69 +105,69 @@ const MainScreen = () => {
         }
       </View>
       
-      <Text className="text-white text-xs font-['SFProDisplayRegular'] text-center mb-1">
+      <Text className={`${textColor} text-xs font-['SFProDisplayRegular'] text-center mb-1`}>
         {item.name}
       </Text>
-      
+
       {item.amount && (
-        <Text className="text-white text-xs font-['SFProDisplayBold'] text-center">
+        <Text className={`${textColor} text-xs font-['SFProDisplayBold'] text-center`}>
           {item.amount}
         </Text>
       )}
     </TouchableOpacity>
-  ), [handleGoal]);
+  ), [handleGoal, textColor]);
 
   const CategorySection = useCallback(({ category }: any) => (
     <View className="mb-6">
       <View className="flex-row items-center justify-between mb-4">
         <View>
-          <Text className="text-white text-lg font-['SFProDisplaySemiBold']">
+          <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
             {category.title}
           </Text>
           {category.balance && (
-            <Text className="text-gray-400 text-sm w-52 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-sm w-52 font-['SFProDisplayRegular']`}>
               {category.balance} {category?.balanceUSD && `- ${category?.balanceUSD}`} {category?.balanceEUR && `- ${category?.balanceEUR}`}
             </Text>
           )}
         </View>
-        
+
         {category.title === 'Кошелек' ? (
           <TouchableOpacity
             onPress={() => { pickEditWallet(''); router.replace('/main/wallet/add-wallet'); }}
             activeOpacity={Opacity.press}
-            className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
+            className={`flex-row items-center ${chipClass} px-2 py-1 rounded-xl border`}
           >
-            <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-1`}>
               Добавить
             </Text>
-            <Ionicons name="add" size={16} color="#FFF" />
+            <Ionicons name="add" size={16} color={chipIconColor} />
           </TouchableOpacity>
         ) : category.title !== 'Цели' ? (
           <TouchableOpacity
             onPress={() => setShowDrawerFilter(true)}
             activeOpacity={Opacity.press}
-            className="flex-row items-center bg-white/20 px-2 py-1 rounded-xl border border-white/50"
+            className={`flex-row items-center ${chipClass} px-2 py-1 rounded-xl border`}
           >
-            <Text className="text-white text-sm font-['SFProDisplayRegular'] mr-1">
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-1`}>
               {selectedSortFilter}
             </Text>
-            <Ionicons name="chevron-down" size={16} color="#FFF" />
+            <Ionicons name="chevron-down" size={16} color={chipIconColor} />
           </TouchableOpacity>
         ) : null}
       </View>
-      
+
       <View className="flex-row flex-wrap justify-between">
         {category.items.length === 0 ?
-          <Text className='w-full text-center text-white/60 text-sm'>
+          <Text className={`w-full text-center ${textMutedColor} text-sm`}>
             Нету данных в данной категорий
-          </Text> : 
+          </Text> :
           category.items.map((item: any, index: number) => (
             <CategoryCard key={`${category.title}-${index}`} item={item} title={category.title}/>
           ))
         }
       </View>
     </View>
-  ), [router, selectedSortFilter, CategoryCard]);
+  ), [router, selectedSortFilter, CategoryCard, textColor, textSecondaryColor, textMutedColor, chipClass, chipIconColor, pickEditWallet]);
 
   useEffect(() => {
     getWalletBalance();

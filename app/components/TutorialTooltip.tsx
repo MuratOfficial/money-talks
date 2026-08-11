@@ -57,18 +57,22 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
     });
   };
 
-  const getTooltipPosition = () => {
-    const tooltipWidth = SCREEN_WIDTH - 32; 
-    const padding = 16;
+  const PADDING = 16;
+  const ARROW_HALF_WIDTH = 12;
 
-    // Позиционируем подсказку под целевым элементом
-    const top = position.y + position.height + 16; // под элементом
-    const left = padding;
+  const tooltipWidth = SCREEN_WIDTH - PADDING * 2;
+  const tooltipLeft = PADDING;
+  // Подсказка встаёт под элементом; координаты приходят из measureInWindow,
+  // а Modal рисуется во всё окно — системы координат совпадают.
+  const tooltipTop = position.y + position.height + 12;
 
-    return { top, left, width: tooltipWidth };
-  };
-
-  const tooltipStyle = getTooltipPosition();
+  // Стрелка указывает на центр цели. Держим её в пределах пузыря, иначе
+  // на краю экрана уголок вылезал бы за скруглённый угол.
+  const targetCenterX = position.x + position.width / 2;
+  const arrowLeft = Math.min(
+    Math.max(targetCenterX - tooltipLeft - ARROW_HALF_WIDTH, ARROW_HALF_WIDTH),
+    tooltipWidth - ARROW_HALF_WIDTH * 3
+  );
 
   if (!visible) return null;
 
@@ -89,9 +93,9 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
           style={[
             {
               position: 'absolute',
-              top: tooltipStyle.top,
-              left: tooltipStyle.left,
-              width: tooltipStyle.width,
+              top: tooltipTop,
+              left: tooltipLeft,
+              width: tooltipWidth,
             },
             { opacity: fadeAnim },
           ]}
@@ -101,16 +105,16 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
               {text}
             </Text>
             
-            {/* Стрелка вверх в правом верхнем углу */}
-            <View 
+            {/* Стрелка вверх — указывает точно на центр кнопки */}
+            <View
               style={{
                 position: 'absolute',
                 top: -12,
-                right: 40,
+                left: arrowLeft,
                 width: 0,
                 height: 0,
-                borderLeftWidth: 12,
-                borderRightWidth: 12,
+                borderLeftWidth: ARROW_HALF_WIDTH,
+                borderRightWidth: ARROW_HALF_WIDTH,
                 borderBottomWidth: 12,
                 borderLeftColor: 'transparent',
                 borderRightColor: 'transparent',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Modal,
@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
+  Easing,
   LayoutAnimation,
   Platform,
+  StyleSheet,
   UIManager,
   Dimensions,
 } from 'react-native';
@@ -50,9 +52,45 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
   const insets = useSafeAreaInsets();
   const { theme } = useFinancialStore();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  
+
+  // Раньше здесь был animationType="slide" самого Modal: на Android окно
+  // появлялось сразу с затемнением, и только потом уезжал лист — отсюда рывок
+  // «сначала тёмный фон, потом шторка». Теперь анимация своя, как в Drawer и
+  // Hint: затемнение жёстко привязано к позиции листа, поэтому рассинхрона нет.
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const [rendered, setRendered] = useState(visible);
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [0, screenHeight],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  useEffect(() => {
+    if (visible) {
+      setRendered(true);
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(translateY, {
+        toValue: screenHeight,
+        duration: 250,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setRendered(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
   const isDark = theme === 'dark';
-  const modalBgColor = isDark ? 'bg-[#1C1C1E]' : 'bg-white';
+  // Фон листа задаём инлайн-стилем: className на Animated.View в NativeWind ненадёжен.
+  const sheetBg = isDark ? '#1C1C1E' : '#FFFFFF';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const textSecondaryColor = isDark ? 'text-gray-300' : 'text-gray-700';
   const cardBgColor = isDark ? 'bg-[#333333]' : 'bg-gray-100';
@@ -106,13 +144,30 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
 
   return (
     <Modal
-      visible={visible}
+      visible={rendered}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50 justify-end">
-        <View className={`${modalBgColor} rounded-t-3xl px-4 pt-6`} style={{ paddingBottom: 16 + insets.bottom }}>
+      <View className="flex-1 justify-end">
+        {/* Затемнение — прозрачность считается из позиции листа */}
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
+        >
+          <TouchableOpacity className="flex-1" activeOpacity={1} onPress={onClose} />
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{ translateY }],
+            backgroundColor: sheetBg,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            paddingHorizontal: 16,
+            paddingTop: 24,
+            paddingBottom: 16 + insets.bottom,
+          }}
+        >
           {/* Header */}
           <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
             <TouchableOpacity onPress={onClose}>
@@ -133,7 +188,7 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
           >
             {items.map(renderAccordionItem)}
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
