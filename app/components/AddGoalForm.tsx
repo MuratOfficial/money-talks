@@ -5,8 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from './Drawer';
 import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore';
@@ -281,7 +281,7 @@ const handleSortSelectYear = (value: string) => {
   );
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 pt-4">
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Modal,
   View,
@@ -45,6 +46,9 @@ const InfoModal: React.FC<InfoModalProps> = ({
   videoTitle,
   enableChatGPT = true
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const { theme } = useFinancialStore();
   const [showChat, setShowChat] = useState(false);
   const chatButtonAnim = useRef(new Animated.Value(1)).current;
@@ -143,7 +147,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             borderTopRightRadius: 24,
             paddingHorizontal: 16,
             paddingTop: 24,
-            paddingBottom: 16,
+            paddingBottom: 16 + insets.bottom,
           }}>
           {/* Drag Indicator */}
           <View className="items-center py-2">

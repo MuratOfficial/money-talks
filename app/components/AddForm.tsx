@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   TextInput,
   ScrollView,
@@ -10,6 +9,7 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
@@ -216,7 +216,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}

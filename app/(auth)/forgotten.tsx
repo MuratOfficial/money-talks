@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator, StatusBar, SafeAreaView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
 
 export default function ForgottenScreen() {

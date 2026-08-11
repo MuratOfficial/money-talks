@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   TextInput,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
@@ -83,7 +83,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
   const isFormValid = title.trim() && amount.trim() && planningHorizon;
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}

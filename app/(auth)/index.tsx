@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,6 +45,9 @@ const slides = [
 ];
 
 export default function OnboardingScreen() {
+  // Кнопка и индикаторы позиционированы абсолютно от низа экрана,
+  // а с edge-to-edge низ — это уже под системной панелью навигации.
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -131,7 +135,7 @@ export default function OnboardingScreen() {
           })}
         />
 
-        <View style={styles.indicatorContainer}>
+        <View style={[styles.indicatorContainer, { bottom: 120 + insets.bottom }]}>
           {slides.map((_, index) => {
             const inputRange = [
               (index - 1) * width,
@@ -167,7 +171,7 @@ export default function OnboardingScreen() {
           })}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleNextOrStart}>
+        <TouchableOpacity style={[styles.button, { bottom: 60 + insets.bottom }]} onPress={handleNextOrStart}>
           <Text className="font-['SFProDisplayRegular']" style={styles.buttonText}>{buttonName}</Text>
         </TouchableOpacity>
       </View>

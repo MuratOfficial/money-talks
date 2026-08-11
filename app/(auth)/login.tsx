@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
 
 export default function LoginScreen() {

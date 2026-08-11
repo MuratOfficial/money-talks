@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Modal,
   View,
@@ -37,6 +38,9 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({
   title, 
   context 
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -279,7 +283,7 @@ const sendMessage = async () => {
           </ScrollView>
 
           {/* Input */}
-          <View className="p-4 border-t border-gray-700 bg-[#1C1C1E]">
+          <View className="px-4 pt-4 border-t border-gray-700 bg-[#1C1C1E]" style={{ paddingBottom: 16 + insets.bottom }}>
             <View className="flex-row items-center bg-gray-800 rounded-2xl px-4 py-3">
               <TextInput
                 value={inputText}

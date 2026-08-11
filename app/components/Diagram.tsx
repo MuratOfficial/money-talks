@@ -3,10 +3,10 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import CustomPieChart from './CustomChart';
 import { Href, useRouter } from 'expo-router';
@@ -98,7 +98,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}

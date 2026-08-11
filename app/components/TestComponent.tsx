@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Question } from '@/services/api';
 
@@ -35,7 +36,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
   // Проверка на наличие вопросов
   if (!questions || questions.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-black">
+      <SafeAreaView edges={['top']} className="flex-1 bg-black">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 pt-4">
           <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
@@ -160,7 +161,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
     const percentage = Math.round((score / questions.length) * 100);
 
     return (
-      <SafeAreaView className="flex-1 bg-black">
+      <SafeAreaView edges={['top']} className="flex-1 bg-black">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 pt-4">
           <Text className="text-white text-xl font-semibold font-['SFProDisplayRegular']">
@@ -222,7 +223,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView edges={['top']} className="flex-1 bg-black">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 pt-4">
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>

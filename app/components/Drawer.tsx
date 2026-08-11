@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView, Animated, Easing, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
@@ -30,6 +31,9 @@ const Drawer: React.FC<DrawerProps> = ({
   options,
   title,
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   const { theme } = useFinancialStore();
   const [selectedOption, setSelectedOption] = useState(selectedValue);
 
@@ -127,7 +131,7 @@ const Drawer: React.FC<DrawerProps> = ({
             borderTopRightRadius: 24,
             paddingHorizontal: 16,
             paddingTop: 16,
-            paddingBottom: 16,
+            paddingBottom: 16 + insets.bottom,
           }}
         >
           {/* Handle Bar */}

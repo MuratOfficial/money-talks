@@ -4,12 +4,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
 
   TouchableWithoutFeedback,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import Drawer from './Drawer';
@@ -236,7 +236,7 @@ useEffect(() => {
   // Показываем загрузку при первой загрузке
   if (loading) {
     return (
-      <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
         <LoadingAnimation 
           fullScreen 
           message="Загрузка..." 
@@ -247,7 +247,7 @@ useEffect(() => {
 
   return (
      <TouchableWithoutFeedback onPress={() => showTooltip && handleTooltipClose()}>
-          <SafeAreaView className={`flex-1 ${bgColor}`}>
+          <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
       
       {/* Header */}

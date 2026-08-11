@@ -217,7 +217,7 @@ const ProfileScreen = () => {
   );
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}

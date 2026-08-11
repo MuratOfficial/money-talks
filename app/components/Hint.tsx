@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Modal,
   View,
@@ -39,6 +40,9 @@ const InfoModal: React.FC<InfoModalProps> = ({
   videoUrl,
   videoTitle
 }) => {
+  // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
+  // поэтому шторка сама добавляет отступ на её высоту.
+  const insets = useSafeAreaInsets();
   // Анимация шторки: панель выезжает снизу, затемнение фона жёстко
   // привязано к её позиции (один источник анимации — без рассинхрона/«мути»)
   const translateY = useRef(new Animated.Value(screenHeight)).current;
@@ -108,7 +112,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             borderTopRightRadius: 24,
             paddingHorizontal: 16,
             paddingTop: 24,
-            paddingBottom: 16,
+            paddingBottom: 16 + insets.bottom,
           }}>
           {/* Drag Indicator */}
           <View className="items-center py-2">

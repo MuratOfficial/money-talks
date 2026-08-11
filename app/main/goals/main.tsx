@@ -383,7 +383,7 @@ useEffect(() => {
 // Показываем загрузку при первой загрузке
   if (loading) {
     return (
-      <SafeAreaView className={`flex-1 ${bgColor}`}>
+      <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
         <LoadingAnimation 
           fullScreen 
           message="Загрузка..." 
@@ -393,7 +393,7 @@ useEffect(() => {
   }
 
   return (
-    <SafeAreaView className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity

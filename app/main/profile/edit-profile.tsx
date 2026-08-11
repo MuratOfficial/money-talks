@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -135,7 +136,7 @@ const EditProfilePage: React.FC = () => {
   };
 
   return (
-    <View className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 pb-6">
         <TouchableOpacity className="mr-4" activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile')}>
@@ -260,7 +261,7 @@ const EditProfilePage: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
