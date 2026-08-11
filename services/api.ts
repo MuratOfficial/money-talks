@@ -128,6 +128,7 @@ export interface UserData {
   passives?: any[];
   goals?: any[];
   personalFinancialPlan?: any;
+  riskProfile?: any;
   theme?: string;
   language?: string;
   currency?: string;
@@ -293,6 +294,7 @@ export const syncUserDataToServer = async (
       passives: storeData.passives,
       goals: storeData.goals,
       personalFinancialPlan: storeData.personalFinancialPlan,
+      riskProfile: storeData.riskProfile,
       theme: storeData.theme,
       language: storeData.language,
       currency: storeData.currency,

@@ -104,6 +104,19 @@ export interface Asset {
   createdAt?: Date;
 }
 
+/**
+ * Результат теста на тип инвестора. `title` — один из четырёх профилей
+ * (Консервативный / Умеренный / Сбалансированный / Агрессивный),
+ * `percentage` — доля рискованных ответов, по ней профиль и определяется.
+ */
+export interface RiskProfile {
+  title: string;
+  percentage: number;
+  score: number;
+  totalQuestions: number;
+  completedAt: string;
+}
+
 export interface PersonalFinancialPlan {
   id: string;
   fio: string;
@@ -155,6 +168,10 @@ export interface AppState {
 
   // ЛФП данные
   personalFinancialPlan: PersonalFinancialPlan | null;
+
+  // Профиль риска — результат теста на тип инвестора. null, если тест не пройден.
+  riskProfile: RiskProfile | null;
+  setRiskProfile: (profile: RiskProfile | null) => void;
 
   // Настройки
   theme: 'light' | 'dark';

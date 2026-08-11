@@ -26,6 +26,7 @@ const extractSyncable = (s: AppState) => ({
   passives: s.passives,
   goals: s.goals,
   personalFinancialPlan: s.personalFinancialPlan,
+  riskProfile: s.riskProfile,
   theme: s.theme,
   language: s.language,
   currency: s.currency,
@@ -100,6 +101,7 @@ export const useSync = () => {
           passives: serverData.passives || [],
           goals: serverData.goals || [],
           personalFinancialPlan: serverData.personalFinancialPlan || null,
+          riskProfile: serverData.riskProfile || null,
           theme: coerceTheme(serverData.theme),
           language: coerceLanguage(serverData.language),
           currency: coerceCurrency(serverData.currency),
@@ -192,6 +194,7 @@ export const useSync = () => {
     store.passives,
     store.goals,
     store.personalFinancialPlan,
+    store.riskProfile,
   ]);
 
   // При восстановлении сети пробуем досинхронизировать локальные изменения

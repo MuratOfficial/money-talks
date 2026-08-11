@@ -12,7 +12,7 @@ interface RiskProfile {
   recommendations: string[];
 }
 
-interface TestResult extends RiskProfile {
+export interface TestResult extends RiskProfile {
   score: number;
   totalQuestions: number;
   percentage: number;

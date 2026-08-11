@@ -108,6 +108,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
         categories: [],
         wallets: [],
         personalFinancialPlan: null,
+        riskProfile: null,
       });
     } catch (error) {
       console.error('Ошибка при выходе:', error);
@@ -143,6 +144,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
         categories: [],
         wallets: [],
         personalFinancialPlan: null,
+        riskProfile: null,
       });
 
       return { success: true };
