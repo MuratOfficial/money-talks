@@ -2,7 +2,7 @@
   "expo": {
     "name": "Money Talks",
     "slug": "money-talks",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "money-talks",
@@ -59,12 +59,14 @@
         "expo-build-properties",
         {
           "android": {
-            "targetSdkVersion": 35,
-            "compileSdkVersion": 35
+            "targetSdkVersion": 36,
+            "compileSdkVersion": 36
           }
         }
       ],
       "expo-asset",
+      "expo-secure-store",
+      "expo-web-browser",
       "./plugins/withoutPushEntitlement"
     ],
     "experiments": {

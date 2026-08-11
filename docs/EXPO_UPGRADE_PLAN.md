@@ -3,6 +3,16 @@
 > Составлено: SDK 52.0.48 / React Native 0.76.9 / React 18.3.1
 > Цель: довести до актуального SDK, закрыв транзитивные уязвимости в тулчейне Expo.
 
+## Статус
+| Шаг | Состояние | Итог |
+|---|---|---|
+| 52 → 53 | ✅ выполнен | RN 0.79.6, React 19.0.0, expo-router 5. Влит в `master` (`7f894db`), проверен на устройстве. |
+| 53 → 54 | ✅ выполнен | RN 0.81.5, React 19.1.0, expo-router 6, reanimated 4. Ветка `chore/expo-upgrade-54`. |
+| 54 → 55 | ⏳ не начат | Удаление Legacy Architecture. |
+| 55 → 56 | ⏳ не начат | |
+
+Уязвимости npm: 41 (SDK 52) → 28 (SDK 53) → **30** (SDK 54, все — build-time).
+
 ## TL;DR
 - Апгрейдиться **по одному мажору за раз**: 52 → 53 → 54 → 55 → 56. Не прыгать через версии.
 - Каждый шаг = отдельная ветка + отдельный PR + сборка dev-client + ручная проверка на устройстве.
@@ -64,11 +74,31 @@ npx expo run:android   # и/или run:ios  (или EAS build)
 - [ ] Пройти миграционные заметки expo-router 5, починить типы `Href`.
 - [ ] Полный ручной regression-чек (см. чек-лист ниже).
 
-### Шаг 2. SDK 53 → 54
-- React Native → 0.81, React 19.1.
-- Ускоренные сборки iOS (precompiled RN). Меньше ломающих изменений, чем в 53.
-- [ ] `npx expo install expo@^54 && npx expo install --fix` → doctor → tsc → tests → сборка.
-- [ ] Свериться с официальным changelog SDK 54 (точные версии RN/React и breaking changes подтвердить на момент апгрейда).
+### Шаг 2. SDK 53 → 54 ✅ выполнен
+**Фактически поставлено:** expo 54.0.36, RN 0.81.5, React/React DOM 19.1.0, expo-router 6.0.24,
+reanimated **4.1.7** (+ новый обязательный `react-native-worklets` 0.5.1), nativewind снят с пина → 4.2.6,
+jest-expo 54, TypeScript 5.9.2.
+
+**Что пришлось поправить руками (не покрывается `expo install --fix`):**
+- `@types/react` был жёстко пришпилен к `~19.0.10` и блокировал резолв — поднят до `~19.1.x`.
+- `babel-preset-expo` перестал подниматься в корень `node_modules` (лежит внутри `expo/node_modules`),
+  из-за чего падали **все** jest-сьюты с `Cannot find module 'babel-preset-expo'`. Добавлен явной devDependency.
+- `expo install --fix` дописал плагины `expo-secure-store` и `expo-web-browser` **после**
+  `./plugins/withoutPushEntitlement`. Порядок восстановлен — этот плагин обязан быть последним,
+  иначе снятие `aps-environment` может быть перезатёрто (проверено: `expo config --type introspect` → `entitlements: {}`).
+- Патч `patches/@expo+cli+*.patch` (кириллица в пути ломала заголовок `X-React-Native-Project-Root`) **удалён** —
+  в `@expo/cli` 54.0.26 баг починен апстримом (`encodeURI`). `patch-package` в postinstall оставлен на будущее.
+- `targetSdkVersion`/`compileSdkVersion` подняты 35 → **36** (требование Google Play с 31.08.2026).
+
+**Проверено:** `tsc --noEmit` 0 ошибок · jest 13/13 · `expo-doctor` 18/18 ·
+веб-бандл экспортируется, 0 вхождений `import.meta`, логин-экран рендерится без ошибок в консоли.
+
+**Известное ограничение:** `expo prebuild` локально падает
+(`withAndroidDangerousBaseMod: Project file "MainApplication" does not exist`) — среда Windows + кириллица в пути.
+На EAS (Linux, ASCII-путь) prebuild отрабатывает штатно. Значит, фактический `targetSdk=36`
+подтверждать по логам EAS-сборки / Play Console, а не локально.
+
+- [ ] Ручной regression на устройстве (чек-лист ниже) — reanimated 4 и `react-native-modal@rc` под подозрением.
 
 ### Шаг 3. SDK 54 → 55  ⚠️ удаление Legacy Architecture
 - В SDK 55 **Legacy Architecture удаляется** — остаётся только New Arch. Если на шаге 1 всё переведено корректно, риск низкий.
