@@ -248,7 +248,7 @@ useEffect(() => {
   return (
      <TouchableWithoutFeedback onPress={() => showTooltip && handleTooltipClose()}>
           <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
       
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
