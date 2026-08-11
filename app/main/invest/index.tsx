@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import TestComponent from '@/app/components/TestComponent';
+import TestComponent, { TestResult } from '@/app/components/TestComponent';
 import { fetchQuestions, fetchTips, getCachedQuestions, getCachedTips, Question, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
 import useFinancialStore from '@/hooks/useStore';
@@ -18,8 +18,8 @@ interface AccordionItem {
 }
 
 const InvestmentsPage: React.FC = () => {
-  const { theme } = useFinancialStore();
-  
+  const { theme, riskProfile, setRiskProfile } = useFinancialStore();
+
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
@@ -62,9 +62,16 @@ const InvestmentsPage: React.FC = () => {
         }
       };
 
-  const handleTestComplete = (result: any) => {
-    console.log('Test completed:', result);
-    // Здесь можно сохранить результат или отправить на сервер
+  // Профиль кладём в стор: он персистится локально и уезжает на сервер
+  // ближайшей синхронизацией (см. useSync — riskProfile в списке зависимостей).
+  const handleTestComplete = (result: TestResult) => {
+    setRiskProfile({
+      title: result.title,
+      percentage: result.percentage,
+      score: result.score,
+      totalQuestions: result.totalQuestions,
+      completedAt: new Date().toISOString(),
+    });
   };
 
 
@@ -227,13 +234,29 @@ const InvestmentsPage: React.FC = () => {
 
       {/* Bottom Button */}
       <View className="px-4 pb-8 pt-4">
+        {riskProfile && (
+          <View className={`${cardBgColor} rounded-xl px-4 py-3 mb-3 flex-row items-center justify-between`}>
+            <View className="flex-1 mr-3">
+              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+                Ваш тип инвестора
+              </Text>
+              <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
+                {riskProfile.title}
+              </Text>
+            </View>
+            <Text className="text-[#4CAF50] text-lg font-['SFProDisplaySemiBold']">
+              {riskProfile.percentage}%
+            </Text>
+          </View>
+        )}
+
         <TouchableOpacity
           className="bg-[#4CAF50] rounded-xl py-4 items-center"
           activeOpacity={Opacity.press}
           onPress={() => setShowTest(true)}
         >
           <Text className="text-white text-base font-semibold font-['SFProDisplayRegular']">
-            Начать тест
+            {riskProfile ? 'Пройти тест заново' : 'Начать тест'}
           </Text>
         </TouchableOpacity>
       </View>

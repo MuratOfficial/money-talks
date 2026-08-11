@@ -54,6 +54,7 @@ export const useFinancialStore = create<AppState>()(
         passives: state.passives,
         goals: state.goals,
         personalFinancialPlan: state.personalFinancialPlan,
+        riskProfile: state.riskProfile,
         theme: state.theme,
         language: state.language,
         currency: state.currency,
