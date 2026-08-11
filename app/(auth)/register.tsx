@@ -192,7 +192,7 @@ const RegistrationScreen: React.FC = () => {
 
   return (
     <SafeAreaView className={`flex-1 ${bgColor}`}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#000000" : "#FFFFFF"} />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
       
       <KeyboardAvoidingView 
         className="flex-1" 

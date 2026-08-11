@@ -2,6 +2,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   Text, 
   TextInput, 
@@ -133,9 +134,9 @@ export default function NewPasswordScreen() {
   };
 
   return (
-    <View className={`flex-1 ${bgColor} px-6`}>
+    <SafeAreaView className={`flex-1 ${bgColor} px-6`}>
       {/* Header */}
-      <View className="flex-row items-center pt-12 pb-8">
+      <View className="flex-row items-center pt-4 pb-8">
         <TouchableOpacity 
           className="mr-4" 
           onPress={() => router.back()}
@@ -287,6 +288,6 @@ export default function NewPasswordScreen() {
           </Text>
         )}
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
