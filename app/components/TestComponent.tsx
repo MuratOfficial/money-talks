@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Question } from '@/services/api';
+import useFinancialStore from '@/hooks/useStore';
 
 
 
@@ -96,16 +97,33 @@ const TestComponent: React.FC<TestComponentProps> = ({
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<TestResult | null>(null);
 
+  const { theme } = useFinancialStore();
+  const isDark = theme === 'dark';
+
+  const bgColor = isDark ? 'bg-black' : 'bg-white';
+  const textColor = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondaryColor = isDark ? 'text-gray-400' : 'text-gray-600';
+  const textBodyColor = isDark ? 'text-gray-300' : 'text-gray-700';
+  const cardBgColor = isDark ? 'bg-gray-800' : 'bg-gray-100';
+  const circleBgColor = isDark ? 'bg-gray-700' : 'bg-gray-200';
+  const iconColor = isDark ? '#FFFFFF' : '#11181C';
+  // Невыбранный вариант ответа и выбранный — разница должна читаться в обеих темах.
+  const optionIdleClass = isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-300';
+  const optionActiveClass = isDark ? 'bg-gray-700 border-gray-500' : 'bg-gray-200 border-gray-400';
+  const radioIdleBorder = isDark ? 'border-gray-500' : 'border-gray-400';
+  const disabledBtnClass = isDark ? 'bg-gray-700' : 'bg-gray-300';
+  const disabledBtnTextColor = isDark ? 'text-gray-400' : 'text-gray-500';
+
   // Проверка на наличие вопросов
   if (!questions || questions.length === 0) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-black">
+      <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 pt-4">
           <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={24} color="white" />
+            <Ionicons name="chevron-back" size={24} color={iconColor} />
           </TouchableOpacity>
-          <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
+          <Text className={`${textColor} text-xl font-semibold font-['SFProDisplaySemiBold']`}>
             {testTitle}
           </Text>
           <View className="w-6" />
@@ -114,13 +132,13 @@ const TestComponent: React.FC<TestComponentProps> = ({
         {/* Error Message */}
         <View className="flex-1 items-center justify-center px-8">
           <View className="items-center">
-            <View className="w-20 h-20 bg-gray-800 rounded-full items-center justify-center mb-6">
+            <View className={`w-20 h-20 ${cardBgColor} rounded-full items-center justify-center mb-6`}>
               <Ionicons name="cloud-offline-outline" size={40} color="#9CA3AF" />
             </View>
-            <Text className="text-white text-2xl font-semibold mb-3 text-center font-['SFProDisplaySemiBold']">
+            <Text className={`${textColor} text-2xl font-semibold mb-3 text-center font-['SFProDisplaySemiBold']`}>
               Нет данных
             </Text>
-            <Text className="text-gray-400 text-base text-center mb-8 font-['SFProDisplayRegular']">
+            <Text className={`${textSecondaryColor} text-base text-center mb-8 font-['SFProDisplayRegular']`}>
               Не удалось загрузить вопросы с сервера. Пожалуйста, проверьте подключение к интернету и попробуйте снова.
             </Text>
             <TouchableOpacity
@@ -177,18 +195,18 @@ const TestComponent: React.FC<TestComponentProps> = ({
 
   if (showResult && result) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-black">
+      <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 pt-4">
-          <Text className="text-white text-xl font-semibold font-['SFProDisplayRegular']">
+          <Text className={`${textColor} text-xl font-semibold font-['SFProDisplayRegular']`}>
             Результат теста
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={onClose}
-            className="w-8 h-8 bg-gray-700 rounded-full items-center justify-center"
+            className={`w-8 h-8 ${circleBgColor} rounded-full items-center justify-center`}
             activeOpacity={0.7}
           >
-            <Ionicons name="close" size={20} color="white" />
+            <Ionicons name="close" size={20} color={iconColor} />
           </TouchableOpacity>
         </View>
 
@@ -196,17 +214,17 @@ const TestComponent: React.FC<TestComponentProps> = ({
           {/* Result Content */}
           <View className="px-6 py-8">
             <View className="items-center mb-8">
-              <Text className="text-gray-400 mb-2 font-['SFProDisplayRegular']">Ваш тип инвестора</Text>
-              <Text className="text-white text-4xl font-bold mb-2 font-['SFProDisplaySemiBold']">
+              <Text className={`${textSecondaryColor} mb-2 font-['SFProDisplayRegular']`}>Ваш тип инвестора</Text>
+              <Text className={`${textColor} text-4xl font-bold mb-2 font-['SFProDisplaySemiBold']`}>
                 {result.title}
               </Text>
-              <Text className="text-gray-300 font-['SFProDisplayRegular']">
+              <Text className={`${textBodyColor} font-['SFProDisplayRegular']`}>
                 {result.description}
               </Text>
             </View>
 
-            <View className="bg-gray-800 rounded-2xl p-6 mb-6">
-              <Text className="text-gray-300 text-sm leading-6 font-['SFProDisplayRegular']">
+            <View className={`${cardBgColor} rounded-2xl p-6 mb-6`}>
+              <Text className={`${textBodyColor} text-sm leading-6 font-['SFProDisplayRegular']`}>
                 Готовность к риску: {result.percentage}%. Вы выбрали {result.score} из{' '}
                 {result.totalQuestions} наиболее рискованных вариантов ответа. Это ориентир, а не
                 финансовая рекомендация — при выборе инструментов учитывайте ещё и срок цели, и
@@ -220,7 +238,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
                   <View className="w-6 h-6 bg-green-500 rounded-full items-center justify-center mr-3 mt-1">
                     <Ionicons name="checkmark" size={16} color="white" />
                   </View>
-                  <Text className="text-gray-300 text-sm flex-1 leading-5 font-['SFProDisplayRegular']">
+                  <Text className={`${textBodyColor} text-sm flex-1 leading-5 font-['SFProDisplayRegular']`}>
                     {text}
                   </Text>
                 </View>
@@ -233,13 +251,13 @@ const TestComponent: React.FC<TestComponentProps> = ({
   }
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-black">
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 pt-4">
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-          <Ionicons name="chevron-back" size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
-        <Text className="text-white text-xl font-semibold font-['SFProDisplaySemiBold']">
+        <Text className={`${textColor} text-xl font-semibold font-['SFProDisplaySemiBold']`}>
           {testTitle}
         </Text>
         <View className="w-6" />
@@ -249,7 +267,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
       <View className="px-4 mb-6">
         <View className="flex-row items-center mb-2">
           <View className="w-4 h-4 bg-blue-500 rounded-full mr-2" />
-          <Text className="text-gray-400 text-sm font-['SFProDisplayRegular']">
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             Пройдите тест чтобы определить свой тип инвестора
           </Text>
         </View>
@@ -258,7 +276,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Question */}
         <View className="px-4 mb-8">
-          <Text className="text-white text-lg mb-6 font-['SFProDisplayRegular']">
+          <Text className={`${textColor} text-lg mb-6 font-['SFProDisplayRegular']`}>
             {currentQuestionIndex + 1}. {currentQuestion.question}
           </Text>
 
@@ -269,19 +287,19 @@ const TestComponent: React.FC<TestComponentProps> = ({
                 onPress={() => handleAnswerSelect(index)}
                 className={`p-4 rounded-2xl border ${
                   selectedAnswers[currentQuestionIndex] === index
-                    ? 'bg-gray-700 border-gray-500'
-                    : 'bg-gray-800 border-gray-700'
+                    ? optionActiveClass
+                    : optionIdleClass
                 }`}
                 activeOpacity={0.8}
               >
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-white flex-1 mr-4 font-['SFProDisplayRegular']">
+                  <Text className={`${textColor} flex-1 mr-4 font-['SFProDisplayRegular']`}>
                     {option}
                   </Text>
                   <View className={`w-6 h-6 rounded-full border-2 ${
                     selectedAnswers[currentQuestionIndex] === index
                       ? 'bg-[#4CAF50] border-[#4CAF50]'
-                      : 'border-gray-500'
+                      : radioIdleBorder
                   }`}>
                     {selectedAnswers[currentQuestionIndex] === index && (
                       <View className="w-full h-full items-center justify-center">
@@ -304,12 +322,12 @@ const TestComponent: React.FC<TestComponentProps> = ({
           className={`w-full py-4 rounded-2xl items-center ${
             canProceed
               ? 'bg-[#4CAF50]'
-              : 'bg-gray-700'
+              : disabledBtnClass
           }`}
           activeOpacity={canProceed ? 0.8 : 1}
         >
           <Text className={`text-base font-['SFProDisplaySemiBold'] ${
-            canProceed ? 'text-white' : 'text-gray-400'
+            canProceed ? 'text-white' : disabledBtnTextColor
           }`}>
             {isLastQuestion ? 'Завершить' : 'Далее'}
           </Text>
