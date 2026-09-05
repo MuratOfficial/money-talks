@@ -6,10 +6,10 @@ export const initialCategories: FinancialCategory[] = [
     title: 'Доходы',
     balance: '1 050 000 ₸',
     items: [
-      { id: 'salary', name: 'Зарплата', amount: '600 000 ₸', color: '#4FC3F7', icon: 'wallet' },
-      { id: 'bank-income', name: 'Банк', amount: '50 000 ₸', color: '#66BB6A', icon: 'business' },
-      { id: 'crypto', name: 'Криптовалюта', amount: '200 000 ₸', color: '#7986CB', icon: 'logo-bitcoin' },
-      { id: 'pension-income', name: 'Пенсия', amount: '200 000 ₸', color: '#FFB74D', icon: 'card' },
+      { id: 'salary', name: 'Зарплата', amount: '600 000 ₸', color: '#4FC3F7', icon: 'wallet', iconType: 'ionicons' },
+      { id: 'bank-income', name: 'Банк', amount: '50 000 ₸', color: '#66BB6A', icon: 'business', iconType: 'ionicons' },
+      { id: 'crypto', name: 'Криптовалюта', amount: '200 000 ₸', color: '#7986CB', icon: 'logo-bitcoin', iconType: 'ionicons' },
+      { id: 'pension-income', name: 'Пенсия', amount: '200 000 ₸', color: '#FFB74D', icon: 'card', iconType: 'ionicons' },
     ],
   },
   {
@@ -17,10 +17,10 @@ export const initialCategories: FinancialCategory[] = [
     title: 'Расходы',
     balance: '79 500 ₸',
     items: [
-      { id: 'payments', name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag' },
-      { id: 'education', name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school' },
-      { id: 'tech', name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait' },
-      { id: 'entertainment', name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller' },
+      { id: 'payments', name: 'Покупки', amount: '40 000 ₸', color: '#4FC3F7', icon: 'bag', iconType: 'ionicons' },
+      { id: 'education', name: 'Образование', amount: '8 000 ₸', color: '#66BB6A', icon: 'school', iconType: 'ionicons' },
+      { id: 'tech', name: 'Техника', amount: '6 000 ₸', color: '#E91E63', icon: 'phone-portrait', iconType: 'ionicons' },
+      { id: 'entertainment', name: 'Развлечения', amount: '1 300 ₸', color: '#FF9800', icon: 'game-controller', iconType: 'ionicons' },
     ],
   },
 ];

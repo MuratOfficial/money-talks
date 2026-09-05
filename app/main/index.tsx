@@ -99,9 +99,13 @@ const MainScreen = () => {
         className="w-14 h-14 rounded-full items-center justify-center mb-2"
         style={{ backgroundColor: item.color }}
       >
-        {item.iconType === "ionicons" ? 
-          <Ionicons name={item.icon} size={24} color="white" /> : 
-          <MaterialIcons name={item.icon} size={24} color="white" />
+        {/* По умолчанию Ionicons: имена иконок в данных — оттуда. Раньше набор
+            выбирался наоборот, и категории без iconType (а такими они лежат
+            в сторе у всех, кто установил приложение раньше) рисовались через
+            MaterialIcons — вместо иконки выходил знак вопроса. */}
+        {item.iconType === "materialicons" ?
+          <MaterialIcons name={item.icon} size={24} color="white" /> :
+          <Ionicons name={item.icon} size={24} color="white" />
         }
       </View>
       
@@ -159,7 +163,7 @@ const MainScreen = () => {
       <View className="flex-row flex-wrap justify-between">
         {category.items.length === 0 ?
           <Text className={`w-full text-center ${textMutedColor} text-sm`}>
-            Нету данных в данной категорий
+            Нет данных в этой категории
           </Text> :
           category.items.map((item: any, index: number) => (
             <CategoryCard key={`${category.title}-${index}`} item={item} title={category.title}/>
