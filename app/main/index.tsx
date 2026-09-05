@@ -176,7 +176,11 @@ const MainScreen = () => {
   return (
     <LinearGradient
       colors={gradientColors}
-      className="flex-1"
+      // Размер задаём обычным стилем, а не className: NativeWind не применяет
+      // классы к сторонним компонентам без cssInterop, и на iOS градиент
+      // оставался нулевой высоты — главный экран показывался пустым, хотя
+      // таб-бар и остальные экраны работали. Так же сделано в LoadingAnimation.
+      style={{ flex: 1 }}
     >
       <SafeAreaView edges={['top']} className="flex-1">
         {/* Header */}

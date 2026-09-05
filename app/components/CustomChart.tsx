@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
+import useFinancialStore from '@/hooks/useStore';
 
 interface PieSegment {
   value: number;
@@ -23,6 +24,11 @@ const CustomPieChart: React.FC<CustomPieChartProps> = ({
   totalAmount,
   currency = '₸'
 }) => {
+  // Сумма в центре диаграммы была жёстко белой и в светлой теме сливалась
+  // с белым фоном экрана.
+  const { theme } = useFinancialStore();
+  const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900';
+
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
@@ -75,7 +81,7 @@ const CustomPieChart: React.FC<CustomPieChartProps> = ({
         
         {/* Центральная сумма */}
         <View className="absolute inset-0 justify-center items-center">
-          <Text className="text-white text-2xl font-['SFProDisplaySemiBold'] text-center">
+          <Text className={`${textColor} text-2xl font-['SFProDisplaySemiBold'] text-center`}>
             {formatAmount(totalAmount)}
           </Text>
         </View>
