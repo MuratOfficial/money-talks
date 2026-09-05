@@ -128,14 +128,28 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
         console.warn('deleteAccount: не удалось удалить данные с сервера', e);
       }
 
-      // 2. Удаляем сам аккаунт через серверный RPC (требует прав admin на бэкенде).
-      //    Функцию delete_user нужно создать в Supabase (SECURITY DEFINER).
+      // 2. Удаляем саму учётную запись через RPC delete_user (SECURITY DEFINER,
+      //    удаляет строку в auth.users по auth.uid()).
+      //
+      //    Если удалить не удалось — ОСТАНАВЛИВАЕМСЯ и честно возвращаем ошибку.
+      //    Раньше здесь был console.warn и success: true: пользователь видел
+      //    «аккаунт удалён», его разлогинивало, а учётная запись оставалась жива,
+      //    и под ней можно было войти снова. Apple проверяет ровно этот сценарий
+      //    (гайдлайн 5.1.1(v)), да и обманывать пользователя нельзя.
+      //
+      //    Локальные данные при этом намеренно не трогаем: серверные уже удалены
+      //    шагом выше, и ближайшая синхронизация зальёт их обратно из локальной
+      //    копии — так частичный сбой не превращается в потерю данных.
       const { error: rpcError } = await supabase.rpc('delete_user');
       if (rpcError) {
-        console.warn('deleteAccount: RPC delete_user недоступен', rpcError.message);
+        console.error('deleteAccount: RPC delete_user не выполнился', rpcError.message);
+        return {
+          success: false,
+          error: 'Не удалось удалить аккаунт. Попробуйте позже или напишите в поддержку.',
+        };
       }
 
-      // 3. Завершаем сессию и очищаем локальное состояние в любом случае.
+      // 3. Аккаунта больше нет — завершаем сессию и чистим локальное состояние.
       await supabase.auth.signOut();
       set({
         user: null,
