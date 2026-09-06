@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { deleteUserDataFromServer } from '@/services/api';
+import { deleteUserDataFromServer, syncUserDataToServer } from '@/services/api';
 import {
   AppState,
   AuthResponse,
@@ -8,6 +8,7 @@ import {
   User,
   VerifyOtpParams,
 } from './types';
+import { initialCategories } from './initialData';
 
 type AuthSlice = Pick<
   AppState,
@@ -28,6 +29,37 @@ type AuthSlice = Pick<
   | 'verifyResetCode'
 >;
 
+/**
+ * Синхронизируемые данные, приведённые к состоянию «как после установки».
+ *
+ * Раньше signOut чистил только часть полей (goals, categories, wallets, ЛФП),
+ * а expences/incomes/actives/passives и lastSyncHash оставались от прошлого
+ * пользователя. При следующем входе useSync видел «локальные данные есть и они
+ * разошлись с последней синхронизацией» и отправлял этот огрызок на сервер,
+ * затирая там нормальную копию — отсюда «данные пропали после выхода». Если на
+ * устройстве входил другой человек, ему в аккаунт уезжали чужие доходы и расходы.
+ *
+ * Поэтому сбрасываем ВСЕ поля из SYNCABLE_FIELDS и lastSyncHash: пустое
+ * состояние не проходит hasSyncableData, и на входе серверные данные будут
+ * приняты, а не перезаписаны. categories возвращаем к начальному набору, иначе
+ * следующий пользователь остался бы вообще без категорий доходов и расходов.
+ *
+ * theme/language/currency намеренно не трогаем — это настройки устройства,
+ * и на затирание серверных данных они не влияют.
+ */
+const freshSyncableState = () => ({
+  categories: initialCategories,
+  wallets: [],
+  expences: [],
+  incomes: [],
+  actives: [],
+  passives: [],
+  goals: [],
+  personalFinancialPlan: null,
+  riskProfile: null,
+  lastSyncHash: null,
+});
+
 export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
   user: null,
   isAuthenticated: false,
@@ -35,7 +67,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
 
   setUser: (user) => set({ user, isAuthenticated: true, isLoading: false }),
 
-  logout: () => set({ user: null, isAuthenticated: false }),
+  logout: () => set({ user: null, isAuthenticated: false, ...freshSyncableState() }),
 
   setLoading: (isLoading) => set({ isLoading }),
 
@@ -99,17 +131,21 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
   },
 
   signOut: async () => {
+    const { user } = get();
     try {
+      // Досылаем последние правки перед очисткой: автосинхронизация работает с
+      // задержкой, и всё, что не успело уехать, иначе пропало бы вместе с
+      // локальным состоянием.
+      if (user?.id) {
+        try {
+          await syncUserDataToServer(user.id, get());
+        } catch (e) {
+          console.warn('signOut: финальная синхронизация не удалась', e);
+        }
+      }
+
       await supabase.auth.signOut();
-      set({
-        user: null,
-        isAuthenticated: false,
-        goals: [],
-        categories: [],
-        wallets: [],
-        personalFinancialPlan: null,
-        riskProfile: null,
-      });
+      set({ user: null, isAuthenticated: false, ...freshSyncableState() });
     } catch (error) {
       console.error('Ошибка при выходе:', error);
     }
@@ -151,15 +187,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({
 
       // 3. Аккаунта больше нет — завершаем сессию и чистим локальное состояние.
       await supabase.auth.signOut();
-      set({
-        user: null,
-        isAuthenticated: false,
-        goals: [],
-        categories: [],
-        wallets: [],
-        personalFinancialPlan: null,
-        riskProfile: null,
-      });
+      set({ user: null, isAuthenticated: false, ...freshSyncableState() });
 
       return { success: true };
     } catch (error: any) {
