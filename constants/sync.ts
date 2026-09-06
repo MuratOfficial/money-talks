@@ -1,3 +1,5 @@
+import { initialCategories } from '@/hooks/store/initialData';
+
 // Конфигурация синхронизации данных с сервером
 
 /** Минимальный интервал между отправками на сервер (мс) */
@@ -59,9 +61,23 @@ export const syncSignature = (data: Record<string, unknown>): string => {
   return h.toString(16);
 };
 
-/** Есть ли в данных хоть что-то значимое (защита от затирания сервера пустотой). */
+/** Подпись стартового набора категорий — с ней сравниваем, менял ли их человек. */
+const DEFAULT_CATEGORIES = JSON.stringify(initialCategories);
+
+/**
+ * Есть ли в данных хоть что-то значимое (защита от затирания сервера пустотой).
+ *
+ * ВАЖНО про categories: они НЕ пустые ни при первой установке, ни после выхода
+ * из аккаунта — там лежит стартовый демо-набор «Доходы/Расходы». Пока они
+ * учитывались наравне с остальным, «пустой» стор считался наполненным: на входе
+ * useSync решал, что на устройстве есть несинхронизированные правки, и отправлял
+ * этот набор на сервер, затирая реальные данные пользователя. Поэтому категории
+ * засчитываем, только если они отличаются от стартовых.
+ */
 export const hasSyncableData = (data: Record<string, unknown>): boolean => {
-  const arrays = ['categories', 'wallets', 'expences', 'incomes', 'actives', 'passives', 'goals'];
+  const arrays = ['wallets', 'expences', 'incomes', 'actives', 'passives', 'goals'];
   const anyArray = arrays.some((f) => Array.isArray(data[f]) && (data[f] as unknown[]).length > 0);
-  return anyArray || data.personalFinancialPlan != null;
+  const customCategories =
+    Array.isArray(data.categories) && JSON.stringify(data.categories) !== DEFAULT_CATEGORIES;
+  return anyArray || customCategories || data.personalFinancialPlan != null;
 };
