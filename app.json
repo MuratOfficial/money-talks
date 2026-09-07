@@ -2,7 +2,7 @@
   "expo": {
     "name": "Money Talks",
     "slug": "money-talks",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "money-talks",

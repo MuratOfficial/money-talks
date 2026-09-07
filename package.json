@@ -1,7 +1,7 @@
 {
   "name": "money-talks",
   "main": "expo-router/entry",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "start": "expo start",
     "start:go": "expo start --go",
