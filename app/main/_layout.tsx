@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
 import BiometricGate from '@/app/components/BiometricGate';
 import LevelUpWatcher from '@/app/components/LevelUpWatcher';
+import { useReminders } from '@/hooks/useReminders';
 
 type NavButton = {
   route: "/main" | '/main/finance' | '/main/lfp' | '/main/invest' | '/main/profile';
@@ -25,6 +26,8 @@ export default function RootLayout(): ReactElement {
   // навигацию поднимаем на insets.bottom, иначе её кнопки оказываются под
   // системными. На устройствах с жестами inset меньше, чем с тремя кнопками.
   const insets = useSafeAreaInsets();
+  // Локальные напоминания: планируются на устройстве, сервер не нужен.
+  useReminders();
   // segments приводим к string[]: при включённых typedRoutes без сгенерированных
   // типов (.expo/types) тип сужается до кортежа и индекс [1] был бы ошибкой.
   const segs = segments as string[];

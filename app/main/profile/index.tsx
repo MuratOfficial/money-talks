@@ -8,7 +8,7 @@ import Drawer from '@/app/components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
 import FaceIDModal from '@/app/components/FaceIDModal';
-import InvestmentNotificationManager from '@/app/components/InvestmentNotificationManager';
+import { ensureNotificationPermission, notificationsAvailable } from '@/lib/localNotifications';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import { useBiometric } from '@/hooks/useBiometric';
@@ -21,7 +21,7 @@ const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled, incomes, expences, passives, wallets, goals, currency } = useFinancialStore();
+    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled, remindersEnabled, setRemindersEnabled, incomes, expences, passives, wallets, goals, currency } = useFinancialStore();
   const health = useMemo(
     () => computeFinancialHealth({ incomes, expences, passives, wallets, goals, currency }),
     [incomes, expences, passives, wallets, goals, currency]
@@ -73,6 +73,25 @@ const ProfileScreen = () => {
       // Выключаем сразу.
       setBiometricEnabled(false);
     }
+  };
+
+  // Напоминания о записях, целях и челленджах — локальные, без сервера.
+  const handleRemindersToggle = async (value: boolean) => {
+    if (!value) {
+      setRemindersEnabled(false);
+      return;
+    }
+    if (!notificationsAvailable()) {
+      Alert.alert('Недоступно', 'Напоминания работают в установленном приложении на телефоне.');
+      return;
+    }
+    const granted = await ensureNotificationPermission();
+    if (!granted) {
+      Alert.alert('Нет разрешения', 'Разрешите уведомления для Money Talks в настройках телефона.');
+      return;
+    }
+    setRemindersEnabled(true);
+    Alert.alert('Готово', 'Будем напоминать о записях, сроках целей и челленджах.');
   };
 
   const handleFaceIDSuccess = () => {
@@ -180,6 +199,14 @@ const ProfileScreen = () => {
       hasSwitch: true,
       switchValue: biometricEnabled,
       onSwitchChange: handleFaceIDToggle
+    },
+    {
+      id: 'reminders',
+      title: 'Напоминания',
+      icon: 'notifications-outline',
+      hasSwitch: true,
+      switchValue: remindersEnabled,
+      onSwitchChange: handleRemindersToggle
     },
     {
       id: 'theme',
@@ -318,8 +345,6 @@ const ProfileScreen = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Investment Notification Manager */}
-        <InvestmentNotificationManager />
 
         {/* Menu Items */}
         <View className="mb-8">

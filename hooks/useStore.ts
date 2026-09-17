@@ -65,6 +65,7 @@ export const useFinancialStore = create<AppState>()(
         language: state.language,
         currency: state.currency,
         biometricEnabled: state.biometricEnabled,
+        remindersEnabled: state.remindersEnabled,
         lastSyncHash: state.lastSyncHash,
         // Геймификация: то, что нельзя вывести из синхронизируемых данных.
         activeDays: state.activeDays,

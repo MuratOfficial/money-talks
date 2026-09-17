@@ -212,6 +212,10 @@ export interface AppState extends GamificationState {
   biometricEnabled: boolean;
   setBiometricEnabled: (enabled: boolean) => void;
 
+  // Локальные напоминания (utils/reminders) — включаются пользователем в профиле
+  remindersEnabled: boolean;
+  setRemindersEnabled: (enabled: boolean) => void;
+
   // Подпись данных на момент последней успешной синхронизации (для защиты
   // локальных правок от затирания серверной версией). null — ещё не синхронизировано.
   lastSyncHash: string | null;
