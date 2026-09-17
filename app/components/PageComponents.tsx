@@ -20,12 +20,12 @@ import InfoModal from './HintWithChat';
 import TutorialTooltip from './TutorialTooltip';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
-import { resolveExpenseCategory } from '@/constants/expenseCategories';
+import { resolveExpenseCategory, resolveExpenseSubcategory } from '@/constants/expenseCategories';
 
 /** «Еда · Доставка еды» — подпись категории под названием расхода. */
 const expenseCategoryLabel = (asset: Asset) => {
   const category = resolveExpenseCategory(asset);
-  const sub = category.subcategories.find((s) => s.id === asset.subcategory);
+  const sub = resolveExpenseSubcategory(asset);
   return sub ? `${category.name} · ${sub.name}` : category.name;
 };
 import FadeInView from './FadeInView';

@@ -1,4 +1,9 @@
-import { groupExpensesByCategory, resolveExpenseCategory } from '@/constants/expenseCategories';
+import {
+  EXPENSE_CATEGORIES,
+  groupExpensesByCategory,
+  resolveExpenseCategory,
+  resolveExpenseSubcategory,
+} from '@/constants/expenseCategories';
 import type { Asset } from '@/hooks/store/types';
 
 const expense = (fields: Partial<Asset>): Asset => ({ id: Math.random().toString(), name: 'x', amount: 0, ...fields });
@@ -8,13 +13,32 @@ describe('resolveExpenseCategory', () => {
     expect(resolveExpenseCategory({ category: 'medicine', icon: 'restaurant' }).id).toBe('medicine');
   });
 
-  it('старые расходы относит к категории по иконке', () => {
+  it('старые расходы относит к категории и подкатегории по иконке', () => {
     expect(resolveExpenseCategory({ icon: 'restaurant' }).id).toBe('food');
-    expect(resolveExpenseCategory({ icon: 'car' }).id).toBe('transport');
+    expect(resolveExpenseSubcategory({ icon: 'car' })?.name).toBe('Такси');
+    expect(resolveExpenseSubcategory({ icon: 'shirt' })?.name).toBe('Одежда');
+    expect(resolveExpenseSubcategory({ icon: 'home' })?.name).toBe('Ипотека');
+  });
+
+  it('ни один значок из прежнего набора не теряется в «Прочее»', () => {
+    const oldIcons = ['restaurant', 'car', 'water', 'car-sport', 'heart', 'medkit', 'gift', 'bag-handle', 'home', 'shirt',
+      'card', 'account-balance', 'phone-portrait', 'logo-bitcoin', 'wifi', 'play', 'fitness', 'business', 'school'];
+    for (const icon of oldIcons) {
+      expect([icon, resolveExpenseCategory({ icon }).id]).not.toEqual([icon, 'other']);
+    }
+  });
+
+  it('у сохранённой категории подкатегория берётся из записи, а не из значка', () => {
+    expect(resolveExpenseSubcategory({ category: 'transport', icon: 'car' })).toBeUndefined();
+  });
+
+  it('id категорий уникальны', () => {
+    const ids = EXPENSE_CATEGORIES.map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('неизвестное — в «Прочее»', () => {
-    expect(resolveExpenseCategory({ icon: 'logo-bitcoin' }).id).toBe('other');
+    expect(resolveExpenseCategory({ icon: 'unknown-icon' }).id).toBe('other');
     expect(resolveExpenseCategory({ category: 'removed-category' }).id).toBe('other');
   });
 });

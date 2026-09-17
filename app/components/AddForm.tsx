@@ -16,7 +16,7 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 import { assetFormSchema, firstError, parseAmountInput } from '@/validation/forms';
 import FadeInView from './FadeInView';
 import { Opacity } from '@/constants/design';
-import { EXPENSE_CATEGORIES, findExpenseCategory, resolveExpenseCategory } from '@/constants/expenseCategories';
+import { EXPENSE_CATEGORIES, findExpenseCategory, resolveExpenseCategory, resolveExpenseSubcategory } from '@/constants/expenseCategories';
 
 interface CategoryItem {
   id: string;
@@ -47,7 +47,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
       if (type === 'expence') {
         // Старые расходы без категории относим к ней по иконке.
         setSelectedCategory(resolveExpenseCategory(formItem).id);
-        setSelectedSubcategory(formItem.subcategory || '');
+        setSelectedSubcategory(resolveExpenseSubcategory(formItem)?.id || '');
       } else {
         // В state хранится id значка, а в записи — имя иконки; раньше их
         // сравнивали напрямую, и при редактировании значок не выделялся.
@@ -380,7 +380,7 @@ const ExpenseCategoryPicker = ({
               >
                 <Ionicons name={c.icon as any} size={24} color="#FFFFFF" />
               </View>
-              <Text className={`${textColor} text-xs mt-1 text-center font-['SFProDisplayRegular']`} numberOfLines={1}>
+              <Text className={`${textColor} text-[11px] mt-1 text-center font-['SFProDisplayRegular']`} numberOfLines={2}>
                 {c.name}
               </Text>
             </TouchableOpacity>
