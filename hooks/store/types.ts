@@ -125,15 +125,15 @@ export interface Asset {
   color?: string;
   regularity?: string;
   categoryTab?: string;
-  /** Категория и подкатегория расхода (constants/expenseCategories). */
+  /** Категория и подкатегория дохода или расхода (constants/categories). */
   category?: string;
   subcategory?: string;
   createdAt?: Date;
 }
 
 /**
- * Результат теста на тип инвестора. `title` — один из четырёх профилей
- * (Консервативный / Умеренный / Сбалансированный / Агрессивный),
+ * Результат теста на тип инвестора. `title` — один из профилей
+ * (constants/riskProfiles: от Консервативного до Агрессивного, пять профилей),
  * `percentage` — доля рискованных ответов, по ней профиль и определяется.
  */
 export interface RiskProfile {
