@@ -21,6 +21,7 @@ import TutorialTooltip from './TutorialTooltip';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
 import { RecordKind, categoryLabel } from '@/constants/categories';
+import MonthlyTrends from './MonthlyTrends';
 
 /** Разделы, записи которых делятся на категории. */
 const CATEGORY_KIND: Record<string, RecordKind> = { incomes: 'income', expenses: 'expence' };
@@ -565,6 +566,8 @@ useEffect(() => {
                   </View>
 
             </View>
+
+          <MonthlyTrends />
        
         
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
