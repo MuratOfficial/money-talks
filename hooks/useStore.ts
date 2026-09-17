@@ -12,6 +12,7 @@ import { createPfpSlice } from './store/pfpSlice';
 // Реэкспорт типов для обратной совместимости (импорты вида `import { Asset } from '@/hooks/useStore'`)
 export type {
   Goal,
+  GoalPriority,
   AuthResponse,
   VerifyOtpParams,
   UpdatePasswordParams,
@@ -122,6 +123,7 @@ export const convertFormDataToGoal = (
   inflationRate: formData.inflationRate,
   returnRate: formData.returnRate,
   monthlyInvestment: formData.monthlyInvestment,
+  priority: formData.priority,
 });
 
 export default useFinancialStore;

@@ -1,4 +1,8 @@
 // Типы данных стора
+
+/** Приоритет цели: влияет на сортировку списка целей. */
+export type GoalPriority = 'high' | 'medium' | 'low';
+
 export interface Goal {
   id: string;
   name: string;
@@ -15,6 +19,7 @@ export interface Goal {
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
+  priority?: GoalPriority;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +55,7 @@ export interface GoalFormData {
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
+  priority?: GoalPriority;
 }
 
 export interface FinancialItem {

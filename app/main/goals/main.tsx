@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import useFinancialStore, { Goal } from '@/hooks/useStore';
+import useFinancialStore, { Goal, GoalPriority } from '@/hooks/useStore';
 import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
 import { fetchTips, getCachedTips, Tip } from '@/services/api';
@@ -11,6 +11,25 @@ import InfoModal from '@/app/components/HintWithChat';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
+import { monthNameToIndex } from '@/hooks/pdf/pdfCalculations';
+
+const PRIORITY_ORDER: Record<GoalPriority, number> = { high: 0, medium: 1, low: 2 };
+
+const PRIORITY_BADGE: Record<GoalPriority, { label: string; color: string }> = {
+  high: { label: 'Высокий приоритет', color: '#EF4444' },
+  medium: { label: 'Средний приоритет', color: '#F59E0B' },
+  low: { label: 'Низкий приоритет', color: '#9CA3AF' },
+};
+
+const SORT_OPTIONS = ['По дате', 'По %', 'По приоритету'];
+
+/** Срок цели как timestamp; цели без полного срока — в конец списка. */
+const goalDeadline = (goal: Goal): number => {
+  const year = parseInt(goal.timeframe?.year, 10);
+  if (isNaN(year)) return Number.MAX_SAFE_INTEGER;
+  const day = parseInt(goal.timeframe.day, 10);
+  return new Date(year, monthNameToIndex(goal.timeframe.month), isNaN(day) ? 1 : day).getTime();
+};
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -116,11 +135,15 @@ const GoalsScreen = () => {
       case 'По %':
         return sortedGoals.sort((a, b) => b.progress! - a.progress!);
       case 'По дате':
-        return sortedGoals.sort((a, b) => {
-          const dateA = new Date(Number(a.timeframe.year), Number(a.timeframe.day));
-          const dateB = new Date(Number(b.timeframe.year), Number(b.timeframe.day));
-          return dateA.getTime() - dateB.getTime();
-        });
+        // Месяц хранится названием («Март»); раньше вместо месяца в дату
+        // подставлялся день, и сортировка внутри года была случайной.
+        return sortedGoals.sort((a, b) => goalDeadline(a) - goalDeadline(b));
+      case 'По приоритету':
+        return sortedGoals.sort(
+          (a, b) =>
+            PRIORITY_ORDER[a.priority ?? 'medium'] - PRIORITY_ORDER[b.priority ?? 'medium'] ||
+            goalDeadline(a) - goalDeadline(b)
+        );
       default:
         return sortedGoals;
     }
@@ -209,37 +232,24 @@ useEffect(() => {
 
           {/* Sort Options */}
           <View className="mb-6">
-            <TouchableOpacity
-              onPress={() => setSelectedSort('По дате')}
-              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={Opacity.press}
-            >
-              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
-                По дате
-              </Text>
-              
-              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
-                {selectedSort === 'По дате' && (
-                  <View className={`w-3 h-3 rounded-full ${isDark ? 'bg-white' : 'bg-gray-900'}`} />
-                )}
-              </View>
-            </TouchableOpacity>
+            {SORT_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => setSelectedSort(option)}
+                className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
+                activeOpacity={Opacity.press}
+              >
+                <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
+                  {option}
+                </Text>
 
-            <TouchableOpacity
-              onPress={() => setSelectedSort('По %')}
-              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={Opacity.press}
-            >
-              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
-                По %
-              </Text>
-              
-              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
-                {selectedSort === 'По %' && (
-                  <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
-                )}
-              </View>
-            </TouchableOpacity>
+                <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
+                  {selectedSort === option && (
+                    <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Select Button */}
@@ -326,19 +336,32 @@ useEffect(() => {
               Собрано {goal.collected ?? 0} из {goal.amount}
             </Text>
 
-            {/* Бейдж с процентом прогресса */}
-            <View className="mt-2">
-              <View 
+            {/* Бейджи: прогресс и приоритет */}
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              <View
                 className="self-start px-3 py-1 rounded-full"
                 style={{ backgroundColor: colors.accent + '20' }}
               >
-                <Text 
+                <Text
                   className="text-xs font-['SFProDisplaySemibold']"
                   style={{ color: colors.accent }}
                 >
                   {progress.toFixed(0)}% выполнено
                 </Text>
               </View>
+              {goal.priority && (
+                <View
+                  className="self-start px-3 py-1 rounded-full"
+                  style={{ backgroundColor: PRIORITY_BADGE[goal.priority].color + '20' }}
+                >
+                  <Text
+                    className="text-xs font-['SFProDisplaySemibold']"
+                    style={{ color: PRIORITY_BADGE[goal.priority].color }}
+                  >
+                    {PRIORITY_BADGE[goal.priority].label}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
           
