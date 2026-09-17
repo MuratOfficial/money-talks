@@ -32,6 +32,10 @@ describe('computeFinancialHealth', () => {
     expect(part(h, 'budget').advice).toMatch(/доходы и расходы/);
   });
 
+  it('бюджет без расходов не считается идеальным', () => {
+    expect(part(computeFinancialHealth({ ...base, incomes: [rec(1000)] }), 'budget')).toMatchObject({ points: 0, summary: 'Нет данных о расходах' });
+  });
+
   it('бюджет: 20% дельты и больше — максимум, минус — ноль', () => {
     expect(part(computeFinancialHealth({ ...base, incomes: [rec(1000)], expences: [rec(800)] }), 'budget').points).toBe(30);
     expect(part(computeFinancialHealth({ ...base, incomes: [rec(1000)], expences: [rec(1200)] }), 'budget').points).toBe(0);

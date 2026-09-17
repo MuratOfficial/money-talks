@@ -101,15 +101,16 @@ export function computeFinancialHealth({
   // 1. Бюджет: доля дохода, которая остаётся (дельта). Цель — от 20%.
   {
     const max = 30;
-    if (income <= 0) {
+    // Без расходов дельта выглядит как «весь доход остаётся» — это не данные, а их отсутствие.
+    if (income <= 0 || expense <= 0) {
       components.push({
         id: 'budget',
         title: 'Контроль бюджета',
         points: 0,
         max,
-        summary: 'Нет данных о доходах',
+        summary: income <= 0 ? 'Нет данных о доходах' : 'Нет данных о расходах',
         advice: 'Внесите доходы и расходы — так рассчитается ваша дельта.',
-        route: '/main/finance/incomes/main',
+        route: income <= 0 ? '/main/finance/incomes/main' : '/main/finance/expences/main',
       });
     } else {
       const deltaShare = (income - expense) / income;
