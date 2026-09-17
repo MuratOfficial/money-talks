@@ -4,6 +4,7 @@ import useFinancialStore from '@/hooks/useStore';
 import { Opacity } from '@/constants/design';
 import FinGuide, { FinGuideMood } from './FinGuide';
 import FinGuideCard, { cardPalette } from './FinGuideCard';
+import FadeInView from './FadeInView';
 
 interface AnimatedAssistantProps {
   message: string;
@@ -40,22 +41,19 @@ const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible,
     }
   }, [visible, progress]);
 
-  if (!visible && !cardMounted && !onOpen) return null;
+  if (!cardMounted && !onOpen) return null;
 
   const cardStyle = {
+    width: '100%' as const,
     opacity: progress,
     transform: [
       { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) },
       { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] }) },
     ],
   };
-  const fabStyle = {
-    opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
-    transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.6] }) }],
-  };
 
   return (
-    <View style={{ position: 'absolute', bottom: 16, right: 16, left: 16, zIndex: 50 }} pointerEvents="box-none">
+    <View style={{ position: 'absolute', bottom: 16, right: 16, left: 16, alignItems: 'flex-end', zIndex: 50 }} pointerEvents="box-none">
       {cardMounted && (
         <Animated.View style={cardStyle} pointerEvents={visible ? 'auto' : 'none'}>
           {/* key: при каждом новом сообщении персонаж заново машет рукой */}
@@ -63,11 +61,14 @@ const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible,
         </Animated.View>
       )}
 
-      {onOpen && !visible && (
-        <Animated.View style={[{ position: 'absolute', right: 0, bottom: 0 }, fabStyle]}>
+      {/* Свёрнутый ФинГид лежит в обычном потоке, а не absolute: на Android
+          нажатия по ребёнку за границами родителя до него не доходят. */}
+      {onOpen && !cardMounted && (
+        <FadeInView offset={10}>
           <TouchableOpacity
             activeOpacity={Opacity.press}
             onPress={onOpen}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityLabel="Открыть подсказку ФинГида"
             style={{
               width: 60,
@@ -90,7 +91,7 @@ const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible,
               </View>
             </View>
           </TouchableOpacity>
-        </Animated.View>
+        </FadeInView>
       )}
     </View>
   );
