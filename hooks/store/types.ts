@@ -125,6 +125,9 @@ export interface Asset {
   color?: string;
   regularity?: string;
   categoryTab?: string;
+  /** Категория и подкатегория расхода (constants/expenseCategories). */
+  category?: string;
+  subcategory?: string;
   createdAt?: Date;
 }
 

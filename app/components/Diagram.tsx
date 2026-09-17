@@ -13,6 +13,7 @@ import { Href, useRouter } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import { groupExpensesByCategory } from '@/constants/expenseCategories';
 
 interface ExpenseCategory {
   id: string;
@@ -20,6 +21,8 @@ interface ExpenseCategory {
   amount: number;
   color: string;
   percentage: number;
+  /** Разбивка по подкатегориям — только в режиме группировки расходов. */
+  subcategories?: { name: string; amount: number }[];
 }
 
 interface PieSegment {
@@ -31,9 +34,12 @@ interface PieSegment {
 interface ChartScreenProps {
     backLink?:Href;
     assets: Asset[] | null
+    /** Сложить расходы по категориям из ТЗ вместо отдельных записей. */
+    groupByCategory?: boolean
 }
 
-const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
+const ChartScreen = ({backLink, assets, groupByCategory}:ChartScreenProps) => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<DateFilterType>('За месяц');
   const {currency, theme} = useFinancialStore();  
   const router = useRouter();
@@ -68,6 +74,20 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
         const total = filteredAssets.reduce((sum, item) => sum + item.amount, 0);
         setTotalAmount(total);
 
+        if (groupByCategory) {
+          setExpenseData(
+            groupExpensesByCategory(filteredAssets).map((g) => ({
+              id: g.category.id,
+              name: g.category.name,
+              amount: g.amount,
+              color: g.category.color,
+              percentage: total > 0 ? getPercentage(total, g.amount) : 0,
+              subcategories: g.subcategories,
+            }))
+          )
+          return
+        }
+
         // Используем вычисленное значение total для процентов
         setExpenseData(
           filteredAssets.map(x=>(
@@ -81,7 +101,7 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
           ))
         )
       }
-    }, [assets, selectedPeriod])
+    }, [assets, selectedPeriod, groupByCategory])
 
   const chartData: PieSegment[]|undefined = expenseData?.map(item => ({
     value: item.amount,
@@ -171,9 +191,17 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
         {/* Expense Categories */}
         <View className="px-4 pb-6">
           <View className={`${cardBgColor} rounded-xl px-3`}>
-            {expenseData?.map((item, index) => (
+            {expenseData?.map((item, index) => {
+              const expandable = !!item.subcategories?.length;
+              const expanded = expandable && expandedId === item.id;
+              return (
               <View key={item.id}>
-                <View className="flex-row items-center justify-between py-3">
+                <TouchableOpacity
+                  className="flex-row items-center justify-between py-3"
+                  disabled={!expandable}
+                  activeOpacity={0.7}
+                  onPress={() => setExpandedId(expanded ? null : item.id)}
+                >
                   <View className="flex-row items-center flex-1">
                     <View 
                       className="w-4 h-4 rounded mr-3"
@@ -192,11 +220,27 @@ const ChartScreen = ({backLink, assets}:ChartScreenProps) => {
                   <Text className={`${textColor} text-sm font-medium font-['SFProDisplayRegular']`}>
                     {formatAmount(item.amount)}
                   </Text>
-                </View>
-                
-               
+                  {expandable && (
+                    <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={iconColor} style={{ marginLeft: 6 }} />
+                  )}
+                </TouchableOpacity>
+
+                {expanded && item.subcategories!.map((sub) => (
+                  <View key={sub.name} className="flex-row items-center justify-between pb-2 pl-7 pr-6">
+                    <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] flex-1`}>
+                      {sub.name}
+                    </Text>
+                    <Text className={`${textSecondaryColor} text-xs mr-3 font-['SFProDisplayRegular']`}>
+                      {item.amount > 0 ? ((sub.amount / item.amount) * 100).toFixed(0) : 0}%
+                    </Text>
+                    <Text className={`${textColor} text-xs font-['SFProDisplayRegular']`}>
+                      {formatAmount(sub.amount)}
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ))}
+              );
+            })}
           </View>
         </View>
       </ScrollView>

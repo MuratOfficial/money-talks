@@ -20,6 +20,14 @@ import InfoModal from './HintWithChat';
 import TutorialTooltip from './TutorialTooltip';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import { resolveExpenseCategory } from '@/constants/expenseCategories';
+
+/** «Еда · Доставка еды» — подпись категории под названием расхода. */
+const expenseCategoryLabel = (asset: Asset) => {
+  const category = resolveExpenseCategory(asset);
+  const sub = category.subcategories.find((s) => s.id === asset.subcategory);
+  return sub ? `${category.name} · ${sub.name}` : category.name;
+};
 import FadeInView from './FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 
@@ -404,6 +412,12 @@ useEffect(() => {
                   <Text className={`${textColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
                     {asset.name}
                   </Text>
+
+                  {asset.category && (
+                    <Text className={`${textSecondaryColor} text-xs mb-1 font-['SFProDisplayRegular']`}>
+                      {expenseCategoryLabel(asset)}
+                    </Text>
+                  )}
 
                   {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
                     Доходность {asset.yield}%

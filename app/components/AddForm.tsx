@@ -16,6 +16,7 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 import { assetFormSchema, firstError, parseAmountInput } from '@/validation/forms';
 import FadeInView from './FadeInView';
 import { Opacity } from '@/constants/design';
+import { EXPENSE_CATEGORIES, findExpenseCategory, resolveExpenseCategory } from '@/constants/expenseCategories';
 
 interface CategoryItem {
   id: string;
@@ -36,13 +37,22 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
 
 
   useEffect(()=>{
     if(formItem){
       setTitle(formItem.name);
       setAmount(formItem.amount.toString());
-      setSelectedCategory(formItem.icon || '')
+      if (type === 'expence') {
+        // Старые расходы без категории относим к ней по иконке.
+        setSelectedCategory(resolveExpenseCategory(formItem).id);
+        setSelectedSubcategory(formItem.subcategory || '');
+      } else {
+        // В state хранится id значка, а в записи — имя иконки; раньше их
+        // сравнивали напрямую, и при редактировании значок не выделялся.
+        setSelectedCategory(categories.find((c) => c.icon === formItem.icon)?.id || '');
+      }
     }
   }, [formItem])
 
@@ -58,6 +68,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
   const handleCategorySelect = (categoryId: string) => {
     try {
+      if (categoryId !== selectedCategory) setSelectedSubcategory('');
       setSelectedCategory(categoryId);
       console.log('Selected category:', categoryId);
     } catch (error) {
@@ -81,27 +92,9 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
     { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#F97316' },
     { id: 'bonus', name: 'Бонус', icon: 'star', iconLibrary: 'ionicons', color: '#FBBF24' },
   
-  ]: [
-    { id: 'restaurant', name: 'Еда', icon: 'restaurant', iconLibrary: 'ionicons', color: '#F97316' },
-    { id: 'taxi', name: 'Такси', icon: 'car', iconLibrary: 'ionicons', color: '#FBBF24' },
-    { id: 'utilities', name: 'Коммуналка', icon: 'water', iconLibrary: 'ionicons', color: '#3B82F6' },
-    { id: 'carwash', name: 'Мойка', icon: 'car-sport', iconLibrary: 'ionicons', color: '#06B6D4' },
-    { id: 'charity', name: 'Благотворительность', icon: 'heart', iconLibrary: 'ionicons', color: '#EC4899' },
-    { id: 'medical', name: 'Медицина', icon: 'medkit', iconLibrary: 'ionicons', color: '#EF4444' },
-    { id: 'gift', name: 'Подарки', icon: 'gift', iconLibrary: 'ionicons', color: '#A855F7' },
-    { id: 'shopping', name: 'Шопинг', icon: 'bag-handle', iconLibrary: 'ionicons', color: '#EC4899' },
-    { id: 'mortgage', name: 'Ипотека', icon: 'home', iconLibrary: 'ionicons', color: '#8B5CF6' },
-    { id: 'clothing', name: 'Одежда', icon: 'shirt', iconLibrary: 'ionicons', color: '#F472B6' },
-    { id: 'card', name: 'Карта', icon: 'card', iconLibrary: 'ionicons', color: '#FDE1EF' },
-    { id: 'bank', name: 'Банк', icon: 'account-balance', iconLibrary: 'material', color: '#10B981' },
-    { id: 'phone', name: 'Телефон', icon: 'phone-portrait', iconLibrary: 'ionicons', color: '#F6A4CC' },
-    { id: 'bitcoin', name: 'Криpto', icon: 'logo-bitcoin', iconLibrary: 'ionicons', color: '#F59E0B' },
-    { id: 'wifi', name: 'WiFi', icon: 'wifi', iconLibrary: 'ionicons', color: '#14B8A6' },
-    { id: 'play', name: 'Развлечения', icon: 'play', iconLibrary: 'ionicons', color: '#A78BFA' },
-    { id: 'fitness', name: 'Спорт', icon: 'fitness', iconLibrary: 'ionicons', color: '#84CC16' },
-    { id: 'business', name: 'Бизнес', icon: 'business', iconLibrary: 'ionicons', color: '#EC4899' },
-    { id: 'education', name: 'Образование', icon: 'school', iconLibrary: 'ionicons', color: '#6366F1' },
-  ];
+  ]
+    // У расходов значки заменены категориями из ТЗ — см. ExpenseCategoryPicker.
+    : [];
 
   const handleGoBack = () => {
     try {
@@ -132,6 +125,16 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
     try {
       const parsedAmount = parseAmountInput(amount);
       const selectedCat = categories.find(x => x.id === selectedCategory);
+      const expenseCat = findExpenseCategory(selectedCategory);
+      const expenseFields = expenseCat
+        ? {
+            icon: expenseCat.icon,
+            iconType: 'ionicons',
+            color: expenseCat.color,
+            category: expenseCat.id,
+            subcategory: selectedSubcategory || undefined,
+          }
+        : {};
 
       if(formItem){
         if(type === "income"){
@@ -150,9 +153,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         updateExpences(formItem.id,{
           name: title,
           amount: parsedAmount,
-          icon: selectedCat?.icon,
-          iconType:selectedCat?.iconLibrary,
-          color: selectedCat?.color,
+          ...expenseFields,
           categoryTab: currentCategoryOption || "",
           regularity: currentRegOption || "regular"
         });
@@ -173,8 +174,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         addExpences({
           name: title,
           amount: parsedAmount,
-          icon: selectedCat?.icon,
-          color: selectedCat?.color,
+          ...expenseFields,
           categoryTab: currentCategoryOption || "",
           regularity: currentRegOption || "regular"
         });
@@ -268,7 +268,17 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
           />
         </View>
 
-        {/* Category Selection */}
+        {type === 'expence' ? (
+          <ExpenseCategoryPicker
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            onSelectCategory={handleCategorySelect}
+            onSelectSubcategory={setSelectedSubcategory}
+            isDark={isDark}
+            textColor={textColor}
+            textSecondaryColor={textSecondaryColor}
+          />
+        ) : (
         <View className="mb-8">
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
             Выберите значок
@@ -301,6 +311,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
             ))}
           </View>
         </View>
+        )}
       </ScrollView>
       </FadeInView>
 
@@ -320,6 +331,94 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+  );
+};
+
+interface ExpenseCategoryPickerProps {
+  selectedCategory: string;
+  selectedSubcategory: string;
+  onSelectCategory: (id: string) => void;
+  onSelectSubcategory: (id: string) => void;
+  isDark: boolean;
+  textColor: string;
+  textSecondaryColor: string;
+}
+
+/** Выбор категории расхода и, если есть, подкатегории. */
+const ExpenseCategoryPicker = ({
+  selectedCategory,
+  selectedSubcategory,
+  onSelectCategory,
+  onSelectSubcategory,
+  isDark,
+  textColor,
+  textSecondaryColor,
+}: ExpenseCategoryPickerProps) => {
+  const category = findExpenseCategory(selectedCategory);
+  const chipBorder = isDark ? 'border-gray-600' : 'border-gray-300';
+
+  return (
+    <View className="mb-8">
+      <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2`}>
+        Категория
+      </Text>
+      <View className="flex-row flex-wrap justify-between">
+        {EXPENSE_CATEGORIES.map((c) => {
+          const selected = c.id === selectedCategory;
+          return (
+            <TouchableOpacity
+              key={c.id}
+              onPress={() => onSelectCategory(c.id)}
+              activeOpacity={Opacity.press}
+              className="w-[23%] items-center mb-4"
+            >
+              <View
+                style={[
+                  { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', backgroundColor: c.color },
+                  selected && { borderWidth: 2, borderColor: isDark ? 'white' : '#11181C' },
+                ]}
+              >
+                <Ionicons name={c.icon as any} size={24} color="#FFFFFF" />
+              </View>
+              <Text className={`${textColor} text-xs mt-1 text-center font-['SFProDisplayRegular']`} numberOfLines={1}>
+                {c.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+        {/* Выравнивание последней строки сетки */}
+        {Array.from({ length: (4 - (EXPENSE_CATEGORIES.length % 4)) % 4 }).map((_, i) => (
+          <View key={i} className="w-[23%]" />
+        ))}
+      </View>
+
+      {category && category.subcategories.length > 0 && (
+        <>
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-2 mt-2`}>
+            Подкатегория
+          </Text>
+          <View className="flex-row flex-wrap">
+            {category.subcategories.map((sub) => {
+              const selected = sub.id === selectedSubcategory;
+              return (
+                <TouchableOpacity
+                  key={sub.id}
+                  // Повторное нажатие снимает выбор: подкатегория необязательна.
+                  onPress={() => onSelectSubcategory(selected ? '' : sub.id)}
+                  activeOpacity={Opacity.press}
+                  className={`px-4 py-2 mr-2 mb-2 rounded-full border ${selected ? 'border-[#4CAF50]' : chipBorder}`}
+                  style={selected ? { backgroundColor: '#4CAF50' } : undefined}
+                >
+                  <Text className={`text-sm font-['SFProDisplayRegular'] ${selected ? 'text-white' : textColor}`}>
+                    {sub.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>
+      )}
+    </View>
   );
 };
 
