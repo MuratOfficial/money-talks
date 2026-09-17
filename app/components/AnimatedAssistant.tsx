@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Animated, Easing, TouchableOpacity } from 'react-native';
 import useFinancialStore from '@/hooks/useStore';
+import { Opacity } from '@/constants/design';
 import FinGuide, { FinGuideMood } from './FinGuide';
+import FinGuideCard, { cardPalette } from './FinGuideCard';
 
 interface AnimatedAssistantProps {
   message: string;
@@ -16,68 +17,81 @@ interface AnimatedAssistantProps {
 }
 
 /**
- * ФинГид с речевым облаком. Появляется с взмахом руки; после закрытия
- * сворачивается в плавающую кнопку (ТЗ: «плавающая кнопка ФинГида с реакциями»).
+ * ФинГид с подсказкой: карточка выезжает снизу, персонаж машет рукой.
+ * После закрытия сворачивается в плавающую кнопку
+ * (ТЗ: «плавающая кнопка ФинГида с реакциями»).
  */
 const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible, mood = 'happy', action, onClose, onOpen }) => {
-  const { theme } = useFinancialStore();
-  const isDark = theme === 'dark';
+  const isDark = useFinancialStore((s) => s.theme) === 'dark';
+  const palette = cardPalette(isDark);
 
-  const bubble = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(visible ? 1 : 0)).current;
+  // Карточка остаётся в дереве, пока доигрывает анимация скрытия.
+  const [cardMounted, setCardMounted] = useState(visible);
 
   useEffect(() => {
-    Animated.spring(bubble, { toValue: visible ? 1 : 0, friction: 7, tension: 50, useNativeDriver: true }).start();
-  }, [visible, message, bubble]);
+    if (visible) {
+      setCardMounted(true);
+      Animated.spring(progress, { toValue: 1, friction: 8, tension: 60, useNativeDriver: true }).start();
+    } else {
+      Animated.timing(progress, { toValue: 0, duration: 200, easing: Easing.in(Easing.ease), useNativeDriver: true }).start(
+        ({ finished }) => finished && setCardMounted(false)
+      );
+    }
+  }, [visible, progress]);
 
-  if (!visible && !onOpen) return null;
+  if (!visible && !cardMounted && !onOpen) return null;
 
-  const bubbleStyle = {
-    opacity: bubble,
+  const cardStyle = {
+    opacity: progress,
     transform: [
-      { translateY: bubble.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) },
-      { scale: bubble.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) },
+      { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) },
+      { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] }) },
     ],
+  };
+  const fabStyle = {
+    opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+    transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.6] }) }],
   };
 
   return (
-    <View
-      style={{ position: 'absolute', bottom: 16, right: 16, left: 16, alignItems: 'flex-end', zIndex: 50 }}
-      pointerEvents="box-none"
-    >
-      <View className="flex-row items-end justify-end w-full" pointerEvents="box-none">
-        {visible && (
-          <Animated.View
-            className={`mr-2 mb-8 p-4 rounded-2xl rounded-br-none shadow-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
-            style={[{ maxWidth: '72%' }, bubbleStyle]}
-          >
-            <Text className="text-[#4CAF50] text-xs mb-1 font-['SFProDisplaySemiBold']">ФинГид</Text>
-            <Text className={`${isDark ? 'text-gray-100' : 'text-gray-800'} text-sm font-['SFProDisplayRegular'] leading-5`}>
-              {message}
-            </Text>
-
-            {action && (
-              <TouchableOpacity onPress={action.onPress} activeOpacity={0.7} className="mt-3 bg-[#4CAF50] rounded-xl py-2 px-3 self-start">
-                <Text className="text-white text-xs font-['SFProDisplaySemiBold']">{action.label}</Text>
-              </TouchableOpacity>
-            )}
-
-            {onClose && (
-              <TouchableOpacity
-                onPress={onClose}
-                className={`absolute -top-2 -left-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full p-1 shadow-sm`}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="close" size={14} color={isDark ? '#FFF' : '#000'} />
-              </TouchableOpacity>
-            )}
-          </Animated.View>
-        )}
-
-        <TouchableOpacity activeOpacity={0.8} disabled={visible || !onOpen} onPress={onOpen}>
+    <View style={{ position: 'absolute', bottom: 16, right: 16, left: 16, zIndex: 50 }} pointerEvents="box-none">
+      {cardMounted && (
+        <Animated.View style={cardStyle} pointerEvents={visible ? 'auto' : 'none'}>
           {/* key: при каждом новом сообщении персонаж заново машет рукой */}
-          <FinGuide key={visible ? message : 'minimized'} size={visible ? 76 : 52} mood={visible ? mood : 'neutral'} wave={visible} />
-        </TouchableOpacity>
-      </View>
+          <FinGuideCard key={message} message={message} mood={mood} action={action} onClose={onClose} wave />
+        </Animated.View>
+      )}
+
+      {onOpen && !visible && (
+        <Animated.View style={[{ position: 'absolute', right: 0, bottom: 0 }, fabStyle]}>
+          <TouchableOpacity
+            activeOpacity={Opacity.press}
+            onPress={onOpen}
+            accessibilityLabel="Открыть подсказку ФинГида"
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 30,
+              backgroundColor: palette.background,
+              borderWidth: 1,
+              borderColor: palette.border,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: isDark ? 0.4 : 0.15,
+              shadowRadius: 10,
+              elevation: 6,
+            }}
+          >
+            {/* Тень на iOS пропадает при overflow: hidden, поэтому обрезаем во внутреннем слое */}
+            <View style={{ flex: 1, borderRadius: 30, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <View style={{ marginBottom: -14 }}>
+                <FinGuide size={46} mood="neutral" />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
     </View>
   );
 };

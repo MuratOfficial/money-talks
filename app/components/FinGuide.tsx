@@ -13,6 +13,8 @@ interface FinGuideProps {
   animated?: boolean;
   /** Помахать рукой при появлении. */
   wave?: boolean;
+  /** Поднять руку и указывать вверх-вправо (на кнопку над персонажем). */
+  point?: boolean;
   /** По умолчанию — скин, выбранный пользователем. */
   skin?: FinGuideSkinId;
 }
@@ -28,7 +30,7 @@ const VIEW_H = 150;
  * (улыбка, вопросительный знак, мигающие глаза-звёзды при достижениях).
  * Анимации: покачивание головой, взмах рукой, лёгкое подпрыгивание.
  */
-const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated = true, wave = false, skin }) => {
+const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated = true, wave = false, point = false, skin }) => {
   const activeSkin = useFinancialStore((s) => s.activeSkin);
   const skinId = skin ?? activeSkin;
   const palette = FINGUIDE_SKINS.find((s) => s.id === skinId)?.palette ?? FINGUIDE_SKINS[0].palette;
@@ -72,6 +74,19 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
   }, [animated, mood, bob, headTilt]);
 
   useEffect(() => {
+    if (point) {
+      // Рука поднята и «тычет» в цель короткими толчками.
+      const nudge = Animated.loop(
+        Animated.sequence([
+          Animated.timing(arm, { toValue: 1, duration: 260, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+          Animated.timing(arm, { toValue: 0, duration: 260, easing: Easing.in(Easing.ease), useNativeDriver: true }),
+          Animated.delay(500),
+        ])
+      );
+      arm.setValue(0);
+      nudge.start();
+      return () => nudge.stop();
+    }
     if (!wave && mood !== 'celebrate') return;
     const swing = Animated.sequence([
       Animated.timing(arm, { toValue: 1, duration: 220, useNativeDriver: true }),
@@ -82,7 +97,7 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
     const anim = mood === 'celebrate' ? Animated.loop(Animated.sequence([swing, Animated.delay(400)])) : swing;
     anim.start();
     return () => anim.stop();
-  }, [wave, mood, arm]);
+  }, [wave, point, mood, arm]);
 
   const width = size;
   const height = (size * VIEW_H) / VIEW_W;
@@ -90,9 +105,22 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
 
   const bobY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, (mood === 'celebrate' ? -8 : -4) * scale] });
   const tilt = headTilt.interpolate({ inputRange: [-1, 1], outputRange: [mood === 'thinking' ? '4deg' : '-5deg', mood === 'thinking' ? '12deg' : '5deg'] });
-  const armRotate = arm.interpolate({ inputRange: [-1, 1], outputRange: ['30deg', '-40deg'] });
+  // Рука свисает вниз; −135° разворачивает её вверх-вправо.
+  const armRotate = point
+    ? arm.interpolate({ inputRange: [0, 1], outputRange: ['-128deg', '-142deg'] })
+    : arm.interpolate({ inputRange: [-1, 1], outputRange: ['30deg', '-40deg'] });
 
   const layer = { position: 'absolute' as const, left: 0, top: 0, width, height };
+
+  // Правая рука — машет или указывает.
+  const rightArm = (
+    <Animated.View style={[layer, { transform: [{ rotate: armRotate }], transformOrigin: `${(88 / VIEW_W) * 100}% ${(88 / VIEW_H) * 100}%` }]}>
+      <Svg width={width} height={height} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}>
+        <Rect x={84} y={86} width={12} height={34} rx={6} fill={palette.bodyDark} transform="rotate(-12 90 88)" />
+        <Circle cx={96} cy={118} r={6} fill={palette.helmet} />
+      </Svg>
+    </Animated.View>
+  );
 
   return (
     <Animated.View style={{ width, height, transform: [{ translateY: bobY }] }}>
@@ -120,13 +148,7 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
         </SvgText>
       </Svg>
 
-      {/* Правая рука — машет */}
-      <Animated.View style={[layer, { transform: [{ rotate: armRotate }], transformOrigin: `${(88 / VIEW_W) * 100}% ${(88 / VIEW_H) * 100}%` }]}>
-        <Svg width={width} height={height} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}>
-          <Rect x={84} y={86} width={12} height={34} rx={6} fill={palette.bodyDark} transform="rotate(-12 90 88)" />
-          <Circle cx={96} cy={118} r={6} fill={palette.helmet} />
-        </Svg>
-      </Animated.View>
+      {!point && rightArm}
 
       {/* Голова с визором — покачивается */}
       <Animated.View style={[layer, { transform: [{ rotate: tilt }], transformOrigin: `50% ${(76 / VIEW_H) * 100}%` }]}>
@@ -144,6 +166,9 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
           <Face mood={mood} blink={blink} color={palette.glow} />
         </Svg>
       </Animated.View>
+
+      {/* Указывающая рука рисуется поверх шлема */}
+      {point && rightArm}
     </Animated.View>
   );
 };
