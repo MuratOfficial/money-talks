@@ -164,7 +164,14 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
   const canSend = !!inputText.trim() && !isLoading;
 
   return (
-    <Modal visible={rendered} transparent animationType="none" onRequestClose={handleClose}>
+    <Modal
+      visible={rendered}
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={handleClose}
+    >
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}>
           <Pressable style={{ flex: 1 }} onPress={handleClose} />
@@ -173,6 +180,9 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
         <Animated.View
           style={{
             height: '88%',
+            // Android: со statusBarTranslucent модалка занимает всё окно, поэтому
+            // сверху оставляем строку состояния свободной.
+            maxHeight: screenHeight - insets.top - 8,
             backgroundColor: c.sheet,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,

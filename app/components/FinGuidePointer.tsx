@@ -103,7 +103,16 @@ const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
   };
 
   return (
-    <Modal visible={rendered} transparent animationType="none" onRequestClose={() => hide(onClose)}>
+    <Modal
+      visible={rendered}
+      transparent
+      animationType="none"
+      // Android: без этого Modal рисуется под строкой состояния, и координаты
+      // кнопки из measureInWindow не совпадают с координатами внутри модалки.
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={() => hide(onClose)}
+    >
       <Animated.View style={{ flex: 1, opacity: appear }}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={() => hide(onClose)} />
 

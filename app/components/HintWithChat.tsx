@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
-  Dimensions,
+  useWindowDimensions,
   Animated,
   Easing,
   StyleSheet,
@@ -36,9 +36,6 @@ interface InfoModalProps {
   enableChatGPT?: boolean;
 }
 
-const { height: screenHeight } = Dimensions.get('window');
-const height = screenHeight * 0.8;
-
 const styles = StyleSheet.create({
   block: { marginTop: 24, paddingTop: 16, borderTopWidth: 1 },
 });
@@ -57,6 +54,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
   // Нижняя системная панель Android перекрывает контент (edge-to-edge с API 35+),
   // поэтому шторка сама добавляет отступ на её высоту.
   const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
   const { theme } = useFinancialStore();
   const [showChat, setShowChat] = useState(false);
   const chatButtonAnim = useRef(new Animated.Value(1)).current;
@@ -132,6 +130,8 @@ const InfoModal: React.FC<InfoModalProps> = ({
       visible={rendered}
       transparent
       animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onClose}
     >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
@@ -151,6 +151,8 @@ const InfoModal: React.FC<InfoModalProps> = ({
             backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
+            // Шторка не выше свободного места под строкой состояния.
+            maxHeight: screenHeight - insets.top - 12,
             paddingHorizontal: 16,
             paddingTop: 24,
             paddingBottom: 16 + insets.bottom,
@@ -209,7 +211,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
           </View>
 
           <ScrollView 
-            style={{ maxHeight: height, marginBottom: 16 }}
+            style={{ flexShrink: 1, marginBottom: 16 }}
             showsVerticalScrollIndicator={true}
             contentContainerStyle={{ paddingBottom: 10 }}
           >
