@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,12 +12,18 @@ import InvestmentNotificationManager from '@/app/components/InvestmentNotificati
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import { useBiometric } from '@/hooks/useBiometric';
+import ScoreRing from '@/app/components/ScoreRing';
+import { computeFinancialHealth } from '@/utils/financialHealth';
 
 const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled } = useFinancialStore();
+    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled, incomes, expences, passives, wallets, goals, currency } = useFinancialStore();
+  const health = useMemo(
+    () => computeFinancialHealth({ incomes, expences, passives, wallets, goals, currency }),
+    [incomes, expences, passives, wallets, goals, currency]
+  );
   const { isAvailable: biometricAvailable, label: biometricLabel } = useBiometric();
   const router = useRouter();
   
@@ -270,6 +276,22 @@ const ProfileScreen = () => {
             <Ionicons name="pencil" size={16} color="#4CAF50" />
           </TouchableOpacity>
         </View>
+
+        {/* Финансовое здоровье (ТЗ: центральный элемент профиля) */}
+        <TouchableOpacity
+          onPress={() => router.replace('/main/profile/health')}
+          activeOpacity={Opacity.press}
+          className={`${cardBgColor} rounded-2xl p-4 mb-6 flex-row items-center`}
+        >
+          <ScoreRing score={health.score} color={health.level.color} />
+          <View className="flex-1 ml-4">
+            <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>Финансовое здоровье</Text>
+            <Text className="text-sm font-['SFProDisplayRegular']" style={{ color: health.level.color }}>
+              {health.level.title}
+            </Text>
+            <Text className="text-[#4CAF50] text-xs mt-1 font-['SFProDisplayRegular']">Как улучшить? →</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* Investment Notification Manager */}
         <InvestmentNotificationManager />
