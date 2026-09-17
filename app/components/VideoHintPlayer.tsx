@@ -48,7 +48,7 @@ const VideoHintPlayer: React.FC<VideoHintPlayerProps> = ({
     <View style={styles.wrapper}>
       {/* Заголовок */}
       <View style={styles.header}>
-        <Ionicons name="play-circle" size={18} color="#F97316" />
+        <Ionicons name="play-circle" size={18} color="#4CAF50" />
         <Text style={[styles.title, { color: labelColor }]} numberOfLines={1}>
           {title}
         </Text>
@@ -80,7 +80,7 @@ const VideoHintPlayer: React.FC<VideoHintPlayerProps> = ({
             />
             {isLoading && (
               <View style={styles.loadingOverlay} pointerEvents="none">
-                <ActivityIndicator size="large" color="#F97316" />
+                <ActivityIndicator size="large" color="#4CAF50" />
               </View>
             )}
           </>

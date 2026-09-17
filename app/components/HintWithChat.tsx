@@ -17,6 +17,9 @@ import Markdown from 'react-native-markdown-display';
 import ChatGPTFeature from './ChatGPTFeature';
 import VideoHintPlayer from './VideoHintPlayer';
 import useFinancialStore from '@/hooks/useStore';
+import { Colors, Opacity } from '@/constants/design';
+import FinGuide from './FinGuide';
+import { cardPalette } from './FinGuideCard';
 
 interface InfoModalProps {
   visible: boolean;
@@ -91,6 +94,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
   const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
   const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
   const iconColor = isDark ? 'white' : '#11181C';
+  const askCard = cardPalette(isDark);
 
   const handleLinkPress = async () => {
     if (!linkUrl) return;
@@ -170,10 +174,12 @@ const InfoModal: React.FC<InfoModalProps> = ({
               >
                 <TouchableOpacity
                   onPress={handleChatPress}
-                  className="bg-[#F97316] p-2 rounded-full"
-                  activeOpacity={0.8}
+                  className="p-2 rounded-full"
+                  style={{ backgroundColor: Colors.primary }}
+                  activeOpacity={Opacity.press}
+                  accessibilityLabel="Спросить ФинГида"
                 >
-                  <Ionicons name="chatbubble" size={20} color="white" />
+                  <Ionicons name="chatbubbles" size={20} color="white" />
                 </TouchableOpacity>
               </Animated.View>
             )}
@@ -224,11 +230,11 @@ const InfoModal: React.FC<InfoModalProps> = ({
                       marginBottom: 4,
                     },
                     strong: {
-                      color: '#F97316',
+                      color: Colors.primary,
                       fontWeight: '600',
                     },
                     em: {
-                      color: '#F97316',
+                      color: Colors.primary,
                       fontStyle: 'italic',
                     },
                     paragraph: {
@@ -254,7 +260,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                     blockquote: {
                       backgroundColor: isDark ? '#374151' : '#E5E7EB',
                       borderLeftWidth: 4,
-                      borderLeftColor: '#F97316',
+                      borderLeftColor: Colors.primary,
                       paddingLeft: 12,
                       paddingVertical: 8,
                       marginBottom: 12,
@@ -297,6 +303,26 @@ const InfoModal: React.FC<InfoModalProps> = ({
                   </TouchableOpacity>
                 </View>
               ) : null}
+
+              {enableChatGPT && (
+                <TouchableOpacity
+                  onPress={handleChatPress}
+                  activeOpacity={Opacity.press}
+                  className="mt-6 flex-row items-center rounded-2xl p-3"
+                  style={{ backgroundColor: askCard.background, borderWidth: 1, borderColor: askCard.border }}
+                >
+                  <FinGuide size={48} mood="thinking" />
+                  <View className="flex-1 ml-3">
+                    <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold']`}>Остались вопросы?</Text>
+                    <Text style={{ color: askCard.muted }} className="text-xs mt-0.5 font-['SFProDisplayRegular']">
+                      Спроси ФинГида — объясню простыми словами
+                    </Text>
+                  </View>
+                  <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: Colors.primary }}>
+                    <Ionicons name="chatbubbles" size={16} color="#FFFFFF" />
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
           </ScrollView>
         </Animated.View>
