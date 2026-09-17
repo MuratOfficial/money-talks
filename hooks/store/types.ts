@@ -3,6 +3,20 @@
 /** Приоритет цели: влияет на сортировку списка целей. */
 export type GoalPriority = 'high' | 'medium' | 'low';
 
+export type SmarterKey = 'specific' | 'measurable' | 'achievable' | 'relevant' | 'timeBound' | 'evaluated' | 'rewarded';
+
+export type DescartesKey = 'ifDo' | 'ifNotDo' | 'notIfDo' | 'notIfNotDo';
+
+/**
+ * Проработка цели по методикам из ТЗ: «5 Почему», SMARTER и «Квадрат Декарта».
+ * Все ответы необязательные — пользователь может заполнить часть и вернуться.
+ */
+export interface GoalAnalysis {
+  whys?: string[];
+  smarter?: Partial<Record<SmarterKey, string>>;
+  descartes?: Partial<Record<DescartesKey, string>>;
+}
+
 export interface Goal {
   id: string;
   name: string;
@@ -20,6 +34,7 @@ export interface Goal {
   returnRate: string;
   monthlyInvestment: string;
   priority?: GoalPriority;
+  analysis?: GoalAnalysis;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +71,7 @@ export interface GoalFormData {
   returnRate: string;
   monthlyInvestment: string;
   priority?: GoalPriority;
+  analysis?: GoalAnalysis;
 }
 
 export interface FinancialItem {

@@ -13,6 +13,9 @@ import { createPfpSlice } from './store/pfpSlice';
 export type {
   Goal,
   GoalPriority,
+  GoalAnalysis,
+  SmarterKey,
+  DescartesKey,
   AuthResponse,
   VerifyOtpParams,
   UpdatePasswordParams,

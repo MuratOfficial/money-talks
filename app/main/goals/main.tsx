@@ -12,6 +12,7 @@ import LoadingAnimation from '@/app/components/LoadingAnimation';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import { monthNameToIndex } from '@/hooks/pdf/pdfCalculations';
+import { ANALYSIS_TOOLS, completedToolsCount } from '@/constants/goalAnalysis';
 
 const PRIORITY_ORDER: Record<GoalPriority, number> = { high: 0, medium: 1, low: 2 };
 
@@ -76,6 +77,11 @@ const GoalsScreen = () => {
       const handleEdit = (id:string) =>{
         pickEditGoal(id);
         router.push("/main/goals/add-goal")
+      }
+
+      const handleTools = (id: string) => {
+        pickEditGoal(id);
+        router.push("/main/goals/tools")
       }
 
       const handleTopUp = (id:string, title: string) => {
@@ -391,7 +397,24 @@ useEffect(() => {
             <Ionicons name="pencil" size={16} color={iconColor} />
           </TouchableOpacity>
         </View>
-        
+
+        {/* Проработка цели: 5 Почему / SMARTER / Квадрат Декарта */}
+        <TouchableOpacity
+          onPress={() => handleTools(goal.id)}
+          activeOpacity={Opacity.press}
+          className={`mt-3 ${buttonBgColor} rounded-xl py-3 px-4 flex-row items-center justify-between`}
+        >
+          <View className="flex-row items-center">
+            <Ionicons name="bulb-outline" size={16} color="#4CAF50" />
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] ml-2`}>
+              Проверить истинность цели
+            </Text>
+          </View>
+          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+            {completedToolsCount(goal.analysis)}/{ANALYSIS_TOOLS.length}
+          </Text>
+        </TouchableOpacity>
+
         <TopUpModal
           visible={showTopUpModal}
           onClose={() => setShowTopUpModal(false)}
