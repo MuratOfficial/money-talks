@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
-import { Opacity, Motion } from '@/constants/design';
+import { Colors, Opacity, Motion } from '@/constants/design';
 
 type DocType = 'text' | 'development';
 
@@ -17,11 +17,15 @@ interface DocItem {
   type: DocType;
   /** Параграфы для текстовых документов. */
   body?: string[];
+  /** Кнопка-ссылка под текстом, открывается во внешнем браузере. */
+  link?: { label: string; url: string };
 }
 
 // Версию берём из сборки, чтобы она не расходилась с app.json.
 const APP_VERSION = Constants.expoConfig?.version ?? '1.0.4';
 const DOC_REVISION = 'Редакция от 18 сентября 2026 года.';
+const SUPPORT_URL = 'https://money-talks-admin.vercel.app/support';
+const SUPPORT_LINK = { label: 'Открыть страницу поддержки', url: SUPPORT_URL };
 
 const DOCUMENTS: DocItem[] = [
   {
@@ -34,8 +38,10 @@ const DOCUMENTS: DocItem[] = [
       'ФинГид — встроенный помощник. Он подсказывает следующий шаг на основе ваших данных, отвечает на вопросы в чате и ведёт вас через уровни, челленджи и достижения.',
       'Финансовые данные хранятся в вашем аккаунте и синхронизируются между устройствами. Прогресс игровой части (открытые сундуки, купленные образы ФинГида, запущенные челленджи) хранится на самом устройстве.',
       'Напоминания планируются локально на вашем телефоне и включаются переключателем «Напоминания» в профиле.',
+      'Вопрос, ошибка или пожелание — напишите нам через страницу поддержки.',
       `Версия приложения: ${APP_VERSION}`,
     ],
+    link: SUPPORT_LINK,
   },
   {
     id: 'license',
@@ -53,6 +59,7 @@ const DOCUMENTS: DocItem[] = [
       '7. Изменения. Условия соглашения могут обновляться. Продолжая использовать Приложение, вы соглашаетесь с актуальной редакцией.',
       DOC_REVISION,
     ],
+    link: SUPPORT_LINK,
   },
   {
     id: 'policy',
@@ -71,9 +78,10 @@ const DOCUMENTS: DocItem[] = [
       '8. Реклама и аналитика. Приложение не показывает рекламу и не использует рекламные идентификаторы.',
       '9. Удаление данных. Вы можете удалить аккаунт вместе со всеми связанными данными в разделе «Редактировать профиль». Удаление необратимо.',
       '10. Ваши права. Вы вправе запросить доступ к своим персональным данным, их исправление или удаление, а также отозвать согласие на обработку — для этого достаточно обратиться в поддержку или удалить аккаунт.',
-      '11. Контакты. По вопросам обработки персональных данных напишите в службу поддержки приложения.',
+      `11. Контакты. По вопросам обработки персональных данных, удаления аккаунта и отзыва согласия напишите нам через страницу поддержки: ${SUPPORT_URL}`,
       DOC_REVISION,
     ],
+    link: SUPPORT_LINK,
   },
   {
     id: 'payment',
@@ -138,6 +146,29 @@ const DocumentsScreen = () => {
                     {paragraph}
                   </Text>
                 ))}
+
+                {activeDoc.link && (
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL(activeDoc.link!.url)}
+                    activeOpacity={Opacity.press}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'flex-start',
+                      marginTop: 4,
+                      marginBottom: 8,
+                      paddingHorizontal: 16,
+                      paddingVertical: 11,
+                      borderRadius: 12,
+                      backgroundColor: Colors.primary,
+                    }}
+                  >
+                    <Ionicons name="open-outline" size={16} color="#FFFFFF" />
+                    <Text style={{ color: '#FFFFFF', fontSize: 14, marginLeft: 8, fontFamily: 'SFProDisplaySemiBold' }}>
+                      {activeDoc.link.label}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </FadeInView>
             </ScrollView>
           )}
