@@ -1,5 +1,8 @@
 // Типы данных стора
 
+import type { ChallengeId, GamificationState, LootResult } from '@/utils/gamification';
+import type { FinGuideSkinId } from '@/constants/finGuide';
+
 /** Приоритет цели: влияет на сортировку списка целей. */
 export type GoalPriority = 'high' | 'medium' | 'low';
 
@@ -165,7 +168,7 @@ export interface PersonalFinancialPlan {
   updatedAt: Date;
 }
 
-export interface AppState {
+export interface AppState extends GamificationState {
   // Пользователь
   user: User | null;
   isAuthenticated: boolean;
@@ -303,6 +306,15 @@ export interface AppState {
   resetPersonalFinancialPlan: () => void;
   clearPersonalFinancialPlan: () => void;
   getPersonalFinancialPlan: () => PersonalFinancialPlan | null;
+
+  // Геймификация (utils/gamification): хранится на устройстве
+  markActiveDay: (date?: Date) => void;
+  startChallenge: (id: ChallengeId, date?: Date) => void;
+  claimChallenge: (id: ChallengeId, reward: { coins: number; xp: number }, date?: Date) => void;
+  applyLootbox: (result: LootResult) => void;
+  buySkin: (id: FinGuideSkinId, price: number) => void;
+  setActiveSkin: (id: FinGuideSkinId) => void;
+  setLastSeenLevel: (level: number) => void;
 }
 
 /** Тип создателя слайса для общего стора */

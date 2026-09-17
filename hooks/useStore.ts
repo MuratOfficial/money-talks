@@ -8,6 +8,7 @@ import { createSettingsSlice } from './store/settingsSlice';
 import { createFinanceSlice } from './store/financeSlice';
 import { createGoalsSlice } from './store/goalsSlice';
 import { createPfpSlice } from './store/pfpSlice';
+import { createGamificationSlice } from './store/gamificationSlice';
 
 // Реэкспорт типов для обратной совместимости (импорты вида `import { Asset } from '@/hooks/useStore'`)
 export type {
@@ -42,6 +43,7 @@ export const useFinancialStore = create<AppState>()(
       ...createFinanceSlice(set, get),
       ...createGoalsSlice(set, get),
       ...createPfpSlice(set, get),
+      ...createGamificationSlice(set, get),
     }),
     {
       name: 'financial-app-storage',
@@ -64,6 +66,16 @@ export const useFinancialStore = create<AppState>()(
         currency: state.currency,
         biometricEnabled: state.biometricEnabled,
         lastSyncHash: state.lastSyncHash,
+        // Геймификация: то, что нельзя вывести из синхронизируемых данных.
+        activeDays: state.activeDays,
+        challengeRuns: state.challengeRuns,
+        claimedChallenges: state.claimedChallenges,
+        openedBoxes: state.openedBoxes,
+        lootCoins: state.lootCoins,
+        ownedSkins: state.ownedSkins,
+        activeSkin: state.activeSkin,
+        spentCoins: state.spentCoins,
+        lastSeenLevel: state.lastSeenLevel,
       }),
     }
   )

@@ -1,3 +1,4 @@
+import { freshGamificationState } from '@/utils/gamification';
 import { supabase } from '@/lib/supabase';
 import { deleteUserDataFromServer, syncUserDataToServer } from '@/services/api';
 import {
@@ -58,6 +59,8 @@ const freshSyncableState = () => ({
   personalFinancialPlan: null,
   riskProfile: null,
   lastSyncHash: null,
+  // Прогресс в игре принадлежит пользователю, а не устройству.
+  ...freshGamificationState(),
 });
 
 export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => ({

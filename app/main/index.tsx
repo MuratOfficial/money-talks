@@ -8,6 +8,7 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '../components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
+import ChallengeBanner from '@/app/components/ChallengeBanner';
 
 const MainScreen = () => {
   const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
@@ -215,6 +216,9 @@ const MainScreen = () => {
           className="flex-1 px-4"
           showsVerticalScrollIndicator={false}
         >
+          <FadeInView>
+            <ChallengeBanner />
+          </FadeInView>
           {categoriesWith.map((category, index) => (
             <FadeInView key={`category-${index}`} delay={index * Motion.stagger}>
               <CategorySection category={category} />

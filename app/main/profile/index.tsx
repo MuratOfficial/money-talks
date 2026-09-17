@@ -14,6 +14,8 @@ import { Opacity, Motion } from '@/constants/design';
 import { useBiometric } from '@/hooks/useBiometric';
 import ScoreRing from '@/app/components/ScoreRing';
 import { computeFinancialHealth } from '@/utils/financialHealth';
+import FinGuide from '@/app/components/FinGuide';
+import { useGamification } from '@/hooks/useGamification';
 
 const ProfileScreen = () => {
 
@@ -24,6 +26,7 @@ const ProfileScreen = () => {
     () => computeFinancialHealth({ incomes, expences, passives, wallets, goals, currency }),
     [incomes, expences, passives, wallets, goals, currency]
   );
+  const game = useGamification();
   const { isAvailable: biometricAvailable, label: biometricLabel } = useBiometric();
   const router = useRouter();
   
@@ -276,6 +279,28 @@ const ProfileScreen = () => {
             <Ionicons name="pencil" size={16} color="#4CAF50" />
           </TouchableOpacity>
         </View>
+
+        {/* Уровень и монеты (ТЗ: прогресс-бар по уровням в профиле) */}
+        <TouchableOpacity
+          onPress={() => router.replace('/main/profile/progress')}
+          activeOpacity={Opacity.press}
+          className={`${cardBgColor} rounded-2xl p-4 mb-3 flex-row items-center`}
+        >
+          <FinGuide size={60} mood="happy" animated={false} />
+          <View className="flex-1 ml-4">
+            <View className="flex-row justify-between items-center">
+              <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{game.level.level.title}</Text>
+              <Text className="text-sm text-[#F59E0B] font-['SFProDisplaySemiBold']">🪙 {game.coins.balance}</Text>
+            </View>
+            <Text className={`${textSecondaryColor} text-xs mb-2 font-['SFProDisplayRegular']`}>
+              {game.level.next ? `${game.xp.total} / ${game.level.next.xp} XP` : `${game.xp.total} XP`}
+              {game.boxes > 0 ? ` · сундуков: ${game.boxes}` : ''}
+            </Text>
+            <View className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
+              <View className="h-full rounded-full bg-[#4CAF50]" style={{ width: `${Math.round(game.level.progress * 100)}%` }} />
+            </View>
+          </View>
+        </TouchableOpacity>
 
         {/* Финансовое здоровье (ТЗ: центральный элемент профиля) */}
         <TouchableOpacity

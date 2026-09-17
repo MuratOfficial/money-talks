@@ -5,6 +5,7 @@ import React, { ReactElement } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
 import BiometricGate from '@/app/components/BiometricGate';
+import LevelUpWatcher from '@/app/components/LevelUpWatcher';
 
 type NavButton = {
   route: "/main" | '/main/finance' | '/main/lfp' | '/main/invest' | '/main/profile';
@@ -48,6 +49,8 @@ export default function RootLayout(): ReactElement {
       <View className="flex-1" style={{ paddingBottom: NAV_BAR_HEIGHT + insets.bottom }}>
         <Slot />
       </View>
+
+      <LevelUpWatcher />
 
       {/* Нижняя навигация */}
       <View
