@@ -21,6 +21,7 @@ import Markdown from 'react-native-markdown-display';
 import { ChatGPTMessage, sendChatGPTMessage } from '@/services/api';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
+import { markdownStyles } from '@/constants/markdown';
 import FinGuide from './FinGuide';
 import FadeInView from './FadeInView';
 
@@ -159,18 +160,6 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
     ]);
   };
 
-  const markdownStyles = {
-    body: { color: c.text, fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
-    paragraph: { marginTop: 0, marginBottom: 6 },
-    strong: { fontFamily: 'SFProDisplaySemiBold', fontWeight: '600' as const },
-    bullet_list: { marginBottom: 6 },
-    ordered_list: { marginBottom: 6 },
-    list_item: { marginBottom: 2 },
-    heading1: { fontSize: 17, fontFamily: 'SFProDisplaySemiBold', marginBottom: 6, color: c.text },
-    heading2: { fontSize: 16, fontFamily: 'SFProDisplaySemiBold', marginBottom: 6, color: c.text },
-    heading3: { fontSize: 15, fontFamily: 'SFProDisplaySemiBold', marginBottom: 4, color: c.text },
-    code_inline: { backgroundColor: 'transparent', color: Colors.primary },
-  };
 
   const canSend = !!inputText.trim() && !isLoading;
 
@@ -283,7 +272,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                         {message.text}
                       </Text>
                     ) : (
-                      <Markdown style={markdownStyles}>{message.text}</Markdown>
+                      <Markdown style={markdownStyles({ isDark, compact: true })}>{message.text}</Markdown>
                     )}
                     {message.failedQuestion && (
                       <TouchableOpacity

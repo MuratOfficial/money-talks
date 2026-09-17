@@ -18,6 +18,7 @@ import ChatGPTFeature from './ChatGPTFeature';
 import VideoHintPlayer from './VideoHintPlayer';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
+import { markdownStyles } from '@/constants/markdown';
 import FinGuide from './FinGuide';
 import { cardPalette } from './FinGuideCard';
 
@@ -163,7 +164,12 @@ const InfoModal: React.FC<InfoModalProps> = ({
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={24} color={iconColor} />
             </TouchableOpacity>
-            <Text className={`${textColor} text-lg font-semibold font-['SFProDisplaySemiBold']`}>
+            {/* Заголовки подсказок приходят из БД и бывают длинными: без flex-1
+                они выдавливали кнопки из шапки. */}
+            <Text
+              className={`${textColor} flex-1 mx-3 text-center text-base font-semibold font-['SFProDisplaySemiBold']`}
+              numberOfLines={2}
+            >
               {title}
             </Text>
             {enableChatGPT && (
@@ -195,78 +201,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             <View className="p-4">
               {/* Показываем Markdown только если есть контент */}
               {safeContent ? (
-                <Markdown
-                  style={{
-                    body: {
-                      color: isDark ? '#D1D5DB' : '#374151',
-                      fontSize: 14,
-                      lineHeight: 20,
-                      fontFamily: "SFProDisplayRegular"
-                    },
-                    heading1: {
-                      color: isDark ? '#FFFFFF' : '#11181C',
-                      fontSize: 20,
-                      fontWeight: '600',
-                      marginBottom: 12,
-                    },
-                    heading2: {
-                      color: isDark ? '#FFFFFF' : '#11181C',
-                      fontSize: 18,
-                      fontWeight: '600',
-                      marginBottom: 8,
-                    },
-                    heading3: {
-                      color: isDark ? '#FFFFFF' : '#11181C',
-                      fontSize: 16,
-                      fontWeight: '600',
-                      marginBottom: 6,
-                    },
-                    bullet_list: {
-                      marginBottom: 8,
-                    },
-                    list_item: {
-                      color: isDark ? '#D1D5DB' : '#374151',
-                      fontSize: 14,
-                      marginBottom: 4,
-                    },
-                    strong: {
-                      color: Colors.primary,
-                      fontWeight: '600',
-                    },
-                    em: {
-                      color: Colors.primary,
-                      fontStyle: 'italic',
-                    },
-                    paragraph: {
-                      color: isDark ? '#D1D5DB' : '#374151',
-                      fontSize: 14,
-                      lineHeight: 20,
-                      marginBottom: 8,
-                    },
-                    code_inline: {
-                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
-                      color: isDark ? '#F3F4F6' : '#11181C',
-                      paddingHorizontal: 4,
-                      paddingVertical: 2,
-                      borderRadius: 4,
-                    },
-                    code_block: {
-                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
-                      color: isDark ? '#F3F4F6' : '#11181C',
-                      padding: 12,
-                      borderRadius: 8,
-                      marginBottom: 12,
-                    },
-                    blockquote: {
-                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
-                      borderLeftWidth: 4,
-                      borderLeftColor: Colors.primary,
-                      paddingLeft: 12,
-                      paddingVertical: 8,
-                      marginBottom: 12,
-                    },
-                  }}
-                >
+                <Markdown style={markdownStyles({ isDark })}>
                   {safeContent}
                 </Markdown>
               ) : (
