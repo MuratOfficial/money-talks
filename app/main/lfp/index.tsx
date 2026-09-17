@@ -10,6 +10,13 @@ import GoalCard from './components/GoalCard';
 import PDFLoadingModal from './components/PDFLoadingComponent';
 import { useLFPExport } from '@/hooks/useLFPExport';
 import FadeInView from '@/app/components/FadeInView';
+import { InsuranceKind, computeInsurancePlan } from '@/utils/insurance';
+
+const INSURANCE_ROWS: { kind: InsuranceKind; label: string }[] = [
+  { kind: 'life', label: 'Уход из жизни' },
+  { kind: 'disability', label: 'Инвалидность' },
+  { kind: 'medical', label: 'Больничный лист' },
+];
 
 const PersonalFinancialPlanScreen = () => {
   const router = useRouter();
@@ -80,6 +87,25 @@ const PersonalFinancialPlanScreen = () => {
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
     : 0;
   const securityPillowValue = regularExpenses * 3;
+
+  // Рекомендуемые страховые суммы — от тех же доходов и расходов, что показаны выше.
+  const insurancePlan = computeInsurancePlan({
+    plan: personalFinancialPlan,
+    monthlyIncome: income,
+    monthlyExpense: expence,
+    actives: actives || [],
+    passives: passives || [],
+  });
+
+  const updateInsurance = (kind: InsuranceKind, value: string) =>
+    updatePersonalFinancialPlan({
+      insurance: {
+        life: personalFinancialPlan?.insurance?.life || '0',
+        disability: personalFinancialPlan?.insurance?.disability || '0',
+        medical: personalFinancialPlan?.insurance?.medical || '0',
+        [kind]: value,
+      },
+    });
   const securityPillowFormatted = formatAmount(securityPillowValue);
 
   // Синхронизируем вычисленную подушку в ЛФП, чтобы она попала в PDF
@@ -427,50 +453,64 @@ const PersonalFinancialPlanScreen = () => {
 
         {/* ============== СТРАХОВАЯ ЗАЩИТА ============== */}
         <View className="mb-6">
-          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
-            Страховая защита
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
+            Защита жизни, здоровья и капитала
+          </Text>
+          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mb-3`}>
+            {insurancePlan.yearsLeft === null
+              ? 'Укажите дату рождения — рассчитаем срок страхования (до 82 лет)'
+              : insurancePlan.yearsLeft > 0
+                ? `Страхование доступно до 82 лет: ещё ${insurancePlan.yearsLeft} ${insurancePlan.yearsLeft % 10 === 1 && insurancePlan.yearsLeft % 100 !== 11 ? 'год' : [2, 3, 4].includes(insurancePlan.yearsLeft % 10) && ![12, 13, 14].includes(insurancePlan.yearsLeft % 100) ? 'года' : 'лет'}`
+                : 'Страхование доступно до 82 лет включительно'}
           </Text>
 
-          <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
-            {/* Страхование жизни */}
-            <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Уход из жизни</Text>
-              <TextInput
-                value={personalFinancialPlan?.insurance.life ?? '0'}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { disability: personalFinancialPlan?.insurance?.disability || '0', medical: personalFinancialPlan?.insurance?.medical || '0', life: val } })}
-                keyboardType="number-pad"
-                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
-                placeholder="0"
-                placeholderTextColor={isDark ? "#666" : "#999"}
-              />
-            </View>
-
-            {/* Страхование от инвалидности */}
-            <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Инвалидность</Text>
-              <TextInput
-                value={personalFinancialPlan?.insurance.disability ?? '0'}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '0', medical: personalFinancialPlan?.insurance?.medical || '0', disability: val } })}
-                keyboardType="number-pad"
-                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
-                placeholder="0"
-                placeholderTextColor={isDark ? "#666" : "#999"}
-              />
-            </View>
-
-            {/* Медицинское страхование */}
-            <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Болезненный лист</Text>
-              <TextInput
-                value={personalFinancialPlan?.insurance.medical ?? '0'}
-                onChangeText={(val) => updatePersonalFinancialPlan({ insurance: { life: personalFinancialPlan?.insurance?.life || '0', disability: personalFinancialPlan?.insurance?.disability || '0', medical: val } })}
-                keyboardType="number-pad"
-                className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
-                placeholder="0"
-                placeholderTextColor={isDark ? "#666" : "#999"}
-              />
-            </View>
+          <View className={`p-3 rounded-xl ${cardBgColor}`}>
+            {INSURANCE_ROWS.map(({ kind, label }, index) => {
+              const rec = insurancePlan.recommendations.find((r) => r.kind === kind)!;
+              return (
+                <View key={kind} className={index > 0 ? 'mt-4' : ''}>
+                  <View className="flex-row justify-between items-center">
+                    <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{label}</Text>
+                    <TextInput
+                      value={personalFinancialPlan?.insurance[kind] ?? '0'}
+                      onChangeText={(val) => updateInsurance(kind, val)}
+                      keyboardType="number-pad"
+                      className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
+                      placeholder="0"
+                      placeholderTextColor={isDark ? "#666" : "#999"}
+                    />
+                  </View>
+                  {rec.recommended > 0 && (
+                    <>
+                      <View className={`h-1.5 rounded-full overflow-hidden mt-2 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
+                        <View
+                          className="h-full rounded-full"
+                          style={{ width: `${rec.coverage}%`, backgroundColor: rec.coverage >= 100 ? '#4CAF50' : rec.coverage >= 50 ? '#F59E0B' : '#EF4444' }}
+                        />
+                      </View>
+                      <Text className={`${textSecondaryColor} text-xs mt-1 font-['SFProDisplayRegular']`}>
+                        Рекомендуется {formatAmount(rec.recommended)} · покрыто {rec.coverage}%
+                      </Text>
+                    </>
+                  )}
+                  <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>{rec.explanation}</Text>
+                </View>
+              );
+            })}
           </View>
+
+          {insurancePlan.hints.length > 0 && (
+            <View className={`p-3 rounded-xl mt-3 flex-row ${cardBgColor}`}>
+              <Ionicons name="sparkles-outline" size={18} color="#4CAF50" style={{ marginRight: 8, marginTop: 2 }} />
+              <View className="flex-1">
+                {insurancePlan.hints.map((hint) => (
+                  <Text key={hint} className={`${textSecondaryColor} text-xs leading-5 mb-1 font-['SFProDisplayRegular']`}>
+                    {hint}
+                  </Text>
+                ))}
+              </View>
+            </View>
+          )}
         </View>
 
         {/* ============== РИСК-ПРОФИЛЬ ============== */}
