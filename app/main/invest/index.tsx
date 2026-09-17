@@ -135,7 +135,9 @@ const InvestmentsPage: React.FC = () => {
   const isExpanded = (itemId: string) => expandedItems.includes(itemId);
 
   const handleOpenBrokerCheck = async () => {
-    const url = 'https://data.egov.kz/';
+    // Агентство РК по регулированию и развитию финансового рынка (АРРФР):
+    // реестр лицензий и предупреждения о нелицензированных компаниях.
+    const url = 'https://www.gov.kz/memleket/entities/ardfm';
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {
@@ -221,7 +223,7 @@ const InvestmentsPage: React.FC = () => {
                   >
                     <MaterialIcons name="open-in-new" size={20} color="white" style={{ marginRight: 8 }} />
                     <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
-                      Проверить брокера в реестре РК
+                      Проверить брокера на сайте АРРФР
                     </Text>
                   </TouchableOpacity>
                 )}

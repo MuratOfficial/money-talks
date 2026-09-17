@@ -88,6 +88,8 @@ export interface Wallet {
   currency: string;
   icon?: string;
   color?: string;
+  /** Счёт показывается в кошельке, но не входит в общий баланс. */
+  excludeFromBalance?: boolean;
 }
 
 export interface Asset {

@@ -75,7 +75,8 @@ const MainScreen = () => {
         amount: `${x.summ.toString()} ${x.currency}`,
         color: x.color,
         icon: x.icon || 'card',
-        iconType: "ionicons"
+        iconType: "ionicons",
+        excluded: !!x.excludeFromBalance,
       }))
     },
     ...categories,
@@ -92,6 +93,8 @@ const MainScreen = () => {
   const CategoryCard = useCallback(({ item, title }: any) => (
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
+      // Счёт, исключённый из баланса, приглушён — видно, что он не в общей сумме.
+      style={item.excluded ? { opacity: Opacity.disabled } : undefined}
       activeOpacity={Opacity.press}
       onPress={() => handleGoal(title, item.name, item.id)}
     >
@@ -116,6 +119,11 @@ const MainScreen = () => {
       {item.amount && (
         <Text className={`${textColor} text-xs font-['SFProDisplayBold'] text-center`}>
           {item.amount}
+        </Text>
+      )}
+      {item.excluded && (
+        <Text className={`${textColor} text-[10px] font-['SFProDisplayRegular'] text-center`}>
+          не в балансе
         </Text>
       )}
     </TouchableOpacity>
