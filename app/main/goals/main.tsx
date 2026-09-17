@@ -8,6 +8,8 @@ import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
 import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
+import FinGuidePointer from '@/app/components/FinGuidePointer';
+import { useHintPointer } from '@/hooks/useHintPointer';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
@@ -73,6 +75,9 @@ const GoalsScreen = () => {
     
       const openModal = () => setModalVisible(true);
       const closeModal = () => setModalVisible(false);
+
+      // Целей ещё нет — ФинГид показывает на кнопку «Подсказки».
+      const hintPointer = useHintPointer(goals.length === 0 && !loading);
 
       const handleEdit = (id:string) =>{
         pickEditGoal(id);
@@ -454,7 +459,7 @@ useEffect(() => {
           Цели
         </Text>
         
-        <TouchableOpacity className="p-2" onPress={openModal}>
+        <TouchableOpacity ref={hintPointer.targetRef} className="p-2" onPress={openModal}>
           <Ionicons name="information-circle-outline" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
@@ -533,7 +538,18 @@ useEffect(() => {
         enableChatGPT={true}
       />
 
-      
+      {hintPointer.target && (
+        <FinGuidePointer
+          visible={hintPointer.visible}
+          target={hintPointer.target}
+          message="Целей пока нет. Загляни в подсказки: там про SMART-цели и видео, а ещё можно спросить меня в чате."
+          onPressTarget={() => {
+            hintPointer.hide();
+            openModal();
+          }}
+          onClose={hintPointer.hide}
+        />
+      )}
     </SafeAreaView>
   );
 };
