@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Drawer from '@/app/components/Drawer';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
@@ -10,6 +10,8 @@ import GoalCard from './components/GoalCard';
 import PDFLoadingModal from './components/PDFLoadingComponent';
 import { useLFPExport } from '@/hooks/useLFPExport';
 import FadeInView from '@/app/components/FadeInView';
+import InfoModal from '@/app/components/HintWithChat';
+import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import { InsuranceKind, computeInsurancePlan } from '@/utils/insurance';
 
 const INSURANCE_ROWS: { kind: InsuranceKind; label: string }[] = [
@@ -23,6 +25,17 @@ const PersonalFinancialPlanScreen = () => {
 
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedSort, setSelectedSort] = useState('1 год');
+
+  // Подсказки раздела: сразу отдаём уже закэшированные, чтобы кнопка работала
+  // без ожидания сети, а в фоне обновляем из БД (там же лежит видеоурок).
+  const [hintVisible, setHintVisible] = useState(false);
+  const [tips, setTips] = useState<Tip[]>(getCachedTips('lfp') || []);
+
+  React.useEffect(() => {
+    fetchTips('lfp')
+      .then(setTips)
+      .catch((error) => console.error('Failed to load tips:', error));
+  }, []);
 
   // Получаем ВСЕ необходимые данные из store
   const {
@@ -247,10 +260,12 @@ const PersonalFinancialPlanScreen = () => {
     <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-        <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold']`}>
+        <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold'] flex-1 mr-3`}>
           Личный финансовый план
         </Text>
-        <View className="w-8" />
+        <TouchableOpacity className="p-1" onPress={() => setHintVisible(true)}>
+          <MaterialIcons name="info-outline" size={24} color={iconColor} />
+        </TouchableOpacity>
       </View>
 
       <FadeInView style={{ flex: 1 }}>
@@ -294,6 +309,9 @@ const PersonalFinancialPlanScreen = () => {
               isLast
             />
           </View>
+          <Text className={`${textSecondaryColor} text-xs leading-5 mt-2 font-['SFProDisplayRegular']`}>
+            Точная дата нужна для расчёта страхового полиса и пенсионного планирования.
+          </Text>
         </View>
 
         {/* ============== ДЕЯТЕЛЬНОСТЬ ============== */}
@@ -323,6 +341,9 @@ const PersonalFinancialPlanScreen = () => {
             keyboardType="number-pad"
             placeholderTextColor={isDark ? "#666" : "#999"}
           />
+          <Text className={`${textSecondaryColor} text-xs leading-5 mt-2 font-['SFProDisplayRegular']`}>
+            Сколько людей финансово зависят от вас — это учитывается в расходах и страховании.
+          </Text>
         </View>
 
         <View className="mb-6">
@@ -582,6 +603,16 @@ const PersonalFinancialPlanScreen = () => {
           options={risks}        />
       </ScrollView>
       </FadeInView>
+
+      <InfoModal
+        visible={hintVisible}
+        onClose={() => setHintVisible(false)}
+        title={tips[0]?.title || 'Подсказки про ЛФП'}
+        content={tips[0]?.content}
+        videoUrl={tips[0]?.videoUrl}
+        videoTitle={tips[0]?.videoTitle}
+        enableChatGPT
+      />
     </SafeAreaView>
   );
 };

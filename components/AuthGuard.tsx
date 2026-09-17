@@ -3,8 +3,25 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useRouter, useSegments, useRootNavigationState, Href } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { ONBOARDING_SEEN_KEY } from '@/constants/storageKeys';
 import useFinancialStore from '@/hooks/useStore';
+
+/**
+ * Куда отправлять неавторизованного: пока приветствие не показали — на слайды,
+ * потом всегда на вход. Ошибку чтения флага трактуем как «уже показывали»,
+ * чтобы сбой хранилища не крутил человека по онбордингу каждый запуск.
+ */
+async function unauthenticatedRoute(): Promise<Href> {
+  try {
+    const seen = await AsyncStorage.getItem(ONBOARDING_SEEN_KEY);
+    return seen === 'true' ? '/(auth)/login' : '/(auth)';
+  } catch (error) {
+    console.warn('Failed to read onboarding flag:', error);
+    return '/(auth)/login';
+  }
+}
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +44,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (!session && segments[0] === 'new-password') {
           setShouldRedirect({ to: "/(auth)/new-password", replace: false });
         } else if (!session && segments[0] !== '(auth)') {
-          setShouldRedirect({ to: '/(auth)/login', replace: true });
+          setShouldRedirect({ to: await unauthenticatedRoute(), replace: true });
         } else if (session?.user && segments[0] === 'login') {
           setUser({
             id: session.user.id,
@@ -57,6 +74,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!session && segments[0] !== '(auth)') {
+          // Здесь человек уже пользовался приложением — приветствие ни к чему.
           setShouldRedirect({ to: '/(auth)/login', replace: true });
         }
       }
