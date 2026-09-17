@@ -1,4 +1,25 @@
 // Типы данных стора
+
+import type { ChallengeId, GamificationState, LootResult } from '@/utils/gamification';
+import type { FinGuideSkinId } from '@/constants/finGuide';
+
+/** Приоритет цели: влияет на сортировку списка целей. */
+export type GoalPriority = 'high' | 'medium' | 'low';
+
+export type SmarterKey = 'specific' | 'measurable' | 'achievable' | 'relevant' | 'timeBound' | 'evaluated' | 'rewarded';
+
+export type DescartesKey = 'ifDo' | 'ifNotDo' | 'notIfDo' | 'notIfNotDo';
+
+/**
+ * Проработка цели по методикам из ТЗ: «5 Почему», SMARTER и «Квадрат Декарта».
+ * Все ответы необязательные — пользователь может заполнить часть и вернуться.
+ */
+export interface GoalAnalysis {
+  whys?: string[];
+  smarter?: Partial<Record<SmarterKey, string>>;
+  descartes?: Partial<Record<DescartesKey, string>>;
+}
+
 export interface Goal {
   id: string;
   name: string;
@@ -15,6 +36,8 @@ export interface Goal {
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
+  priority?: GoalPriority;
+  analysis?: GoalAnalysis;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +73,8 @@ export interface GoalFormData {
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
+  priority?: GoalPriority;
+  analysis?: GoalAnalysis;
 }
 
 export interface FinancialItem {
@@ -88,6 +113,8 @@ export interface Wallet {
   currency: string;
   icon?: string;
   color?: string;
+  /** Счёт показывается в кошельке, но не входит в общий баланс. */
+  excludeFromBalance?: boolean;
 }
 
 export interface Asset {
@@ -101,12 +128,15 @@ export interface Asset {
   color?: string;
   regularity?: string;
   categoryTab?: string;
+  /** Категория и подкатегория дохода или расхода (constants/categories). */
+  category?: string;
+  subcategory?: string;
   createdAt?: Date;
 }
 
 /**
- * Результат теста на тип инвестора. `title` — один из четырёх профилей
- * (Консервативный / Умеренный / Сбалансированный / Агрессивный),
+ * Результат теста на тип инвестора. `title` — один из профилей
+ * (constants/riskProfiles: от Консервативного до Агрессивного, пять профилей),
  * `percentage` — доля рискованных ответов, по ней профиль и определяется.
  */
 export interface RiskProfile {
@@ -138,7 +168,7 @@ export interface PersonalFinancialPlan {
   updatedAt: Date;
 }
 
-export interface AppState {
+export interface AppState extends GamificationState {
   // Пользователь
   user: User | null;
   isAuthenticated: boolean;
@@ -181,6 +211,10 @@ export interface AppState {
   // Биометрия (Face ID / отпечаток) — вход в приложение по биометрии
   biometricEnabled: boolean;
   setBiometricEnabled: (enabled: boolean) => void;
+
+  // Локальные напоминания (utils/reminders) — включаются пользователем в профиле
+  remindersEnabled: boolean;
+  setRemindersEnabled: (enabled: boolean) => void;
 
   // Подпись данных на момент последней успешной синхронизации (для защиты
   // локальных правок от затирания серверной версией). null — ещё не синхронизировано.
@@ -276,6 +310,15 @@ export interface AppState {
   resetPersonalFinancialPlan: () => void;
   clearPersonalFinancialPlan: () => void;
   getPersonalFinancialPlan: () => PersonalFinancialPlan | null;
+
+  // Геймификация (utils/gamification): хранится на устройстве
+  markActiveDay: (date?: Date) => void;
+  startChallenge: (id: ChallengeId, date?: Date) => void;
+  claimChallenge: (id: ChallengeId, reward: { coins: number; xp: number }, date?: Date) => void;
+  applyLootbox: (result: LootResult) => void;
+  buySkin: (id: FinGuideSkinId, price: number) => void;
+  setActiveSkin: (id: FinGuideSkinId) => void;
+  setLastSeenLevel: (level: number) => void;
 }
 
 /** Тип создателя слайса для общего стора */

@@ -10,6 +10,8 @@ type SettingsSlice = Pick<
   | 'setCurrency'
   | 'biometricEnabled'
   | 'setBiometricEnabled'
+  | 'remindersEnabled'
+  | 'setRemindersEnabled'
   | 'riskProfile'
   | 'setRiskProfile'
   | 'lastSyncHash'
@@ -28,6 +30,9 @@ export const createSettingsSlice: SliceCreator<SettingsSlice> = (set, get) => ({
   currency: '₸',
 
   setTheme: (theme) => set({ theme }),
+
+  remindersEnabled: false,
+  setRemindersEnabled: (remindersEnabled) => set({ remindersEnabled }),
   setLanguage: (language) => set({ language }),
   setCurrency: (currency) => set({ currency }),
 

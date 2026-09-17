@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,16 +8,25 @@ import Drawer from '@/app/components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import AdviceAccordionModal from '@/app/components/AdviceAccordeon';
 import FaceIDModal from '@/app/components/FaceIDModal';
-import InvestmentNotificationManager from '@/app/components/InvestmentNotificationManager';
+import { ensureNotificationPermission, notificationsAvailable } from '@/lib/localNotifications';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import { useBiometric } from '@/hooks/useBiometric';
+import ScoreRing from '@/app/components/ScoreRing';
+import { computeFinancialHealth } from '@/utils/financialHealth';
+import FinGuide from '@/app/components/FinGuide';
+import { useGamification } from '@/hooks/useGamification';
 
 const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled } = useFinancialStore();
+    const { signOut, user, setTheme, theme, biometricEnabled, setBiometricEnabled, remindersEnabled, setRemindersEnabled, incomes, expences, passives, wallets, goals, currency } = useFinancialStore();
+  const health = useMemo(
+    () => computeFinancialHealth({ incomes, expences, passives, wallets, goals, currency }),
+    [incomes, expences, passives, wallets, goals, currency]
+  );
+  const game = useGamification();
   const { isAvailable: biometricAvailable, label: biometricLabel } = useBiometric();
   const router = useRouter();
   
@@ -64,6 +73,25 @@ const ProfileScreen = () => {
       // Выключаем сразу.
       setBiometricEnabled(false);
     }
+  };
+
+  // Напоминания о записях, целях и челленджах — локальные, без сервера.
+  const handleRemindersToggle = async (value: boolean) => {
+    if (!value) {
+      setRemindersEnabled(false);
+      return;
+    }
+    if (!notificationsAvailable()) {
+      Alert.alert('Недоступно', 'Напоминания работают в установленном приложении на телефоне.');
+      return;
+    }
+    const granted = await ensureNotificationPermission();
+    if (!granted) {
+      Alert.alert('Нет разрешения', 'Разрешите уведомления для Money Talks в настройках телефона.');
+      return;
+    }
+    setRemindersEnabled(true);
+    Alert.alert('Готово', 'Будем напоминать о записях, сроках целей и челленджах.');
   };
 
   const handleFaceIDSuccess = () => {
@@ -173,6 +201,14 @@ const ProfileScreen = () => {
       onSwitchChange: handleFaceIDToggle
     },
     {
+      id: 'reminders',
+      title: 'Напоминания',
+      icon: 'notifications-outline',
+      hasSwitch: true,
+      switchValue: remindersEnabled,
+      onSwitchChange: handleRemindersToggle
+    },
+    {
       id: 'theme',
       title: 'Выбор темы',
       icon: 'phone-portrait-outline',
@@ -271,8 +307,44 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Investment Notification Manager */}
-        <InvestmentNotificationManager />
+        {/* Уровень и монеты (ТЗ: прогресс-бар по уровням в профиле) */}
+        <TouchableOpacity
+          onPress={() => router.replace('/main/profile/progress')}
+          activeOpacity={Opacity.press}
+          className={`${cardBgColor} rounded-2xl p-4 mb-3 flex-row items-center`}
+        >
+          <FinGuide size={60} mood="happy" animated={false} />
+          <View className="flex-1 ml-4">
+            <View className="flex-row justify-between items-center">
+              <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{game.level.level.title}</Text>
+              <Text className="text-sm text-[#F59E0B] font-['SFProDisplaySemiBold']">🪙 {game.coins.balance}</Text>
+            </View>
+            <Text className={`${textSecondaryColor} text-xs mb-2 font-['SFProDisplayRegular']`}>
+              {game.level.next ? `${game.xp.total} / ${game.level.next.xp} XP` : `${game.xp.total} XP`}
+              {game.boxes > 0 ? ` · сундуков: ${game.boxes}` : ''}
+            </Text>
+            <View className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
+              <View className="h-full rounded-full bg-[#4CAF50]" style={{ width: `${Math.round(game.level.progress * 100)}%` }} />
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {/* Финансовое здоровье (ТЗ: центральный элемент профиля) */}
+        <TouchableOpacity
+          onPress={() => router.replace('/main/profile/health')}
+          activeOpacity={Opacity.press}
+          className={`${cardBgColor} rounded-2xl p-4 mb-6 flex-row items-center`}
+        >
+          <ScoreRing score={health.score} color={health.level.color} />
+          <View className="flex-1 ml-4">
+            <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>Финансовое здоровье</Text>
+            <Text className="text-sm font-['SFProDisplayRegular']" style={{ color: health.level.color }}>
+              {health.level.title}
+            </Text>
+            <Text className="text-[#4CAF50] text-xs mt-1 font-['SFProDisplayRegular']">Как улучшить? →</Text>
+          </View>
+        </TouchableOpacity>
+
 
         {/* Menu Items */}
         <View className="mb-8">

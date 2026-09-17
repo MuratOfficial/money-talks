@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
+import { markdownStyles } from '@/constants/markdown';
 import VideoHintPlayer from './VideoHintPlayer';
 
 interface InfoModalProps {
@@ -139,78 +140,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             <View className="p-4">
               {/* ИСПРАВЛЕНИЕ: Показываем Markdown только если есть контент */}
               {safeContent ? (
-                <Markdown
-                  style={{
-                    body: {
-                      color: '#D1D5DB',
-                      fontSize: 14,
-                      lineHeight: 20,
-                      fontFamily: "SFProDisplayRegular"
-                    },
-                    heading1: {
-                      color: '#FFFFFF',
-                      fontSize: 20,
-                      fontWeight: '600',
-                      marginBottom: 12,
-                    },
-                    heading2: {
-                      color: '#FFFFFF',
-                      fontSize: 18,
-                      fontWeight: '600',
-                      marginBottom: 8,
-                    },
-                    heading3: {
-                      color: '#FFFFFF',
-                      fontSize: 16,
-                      fontWeight: '600',
-                      marginBottom: 6,
-                    },
-                    bullet_list: {
-                      marginBottom: 8,
-                    },
-                    list_item: {
-                      color: '#D1D5DB',
-                      fontSize: 14,
-                      marginBottom: 4,
-                    },
-                    strong: {
-                      color: '#F97316',
-                      fontWeight: '600',
-                    },
-                    em: {
-                      color: '#F97316',
-                      fontStyle: 'italic',
-                    },
-                    paragraph: {
-                      color: '#D1D5DB',
-                      fontSize: 14,
-                      lineHeight: 20,
-                      marginBottom: 8,
-                    },
-                    code_inline: {
-                      backgroundColor: '#374151',
-                      color: '#F3F4F6',
-                      paddingHorizontal: 4,
-                      paddingVertical: 2,
-                      borderRadius: 4,
-                    },
-                    code_block: {
-                      backgroundColor: '#374151',
-                      color: '#F3F4F6',
-                      padding: 12,
-                      borderRadius: 8,
-                      marginBottom: 12,
-                    },
-                    blockquote: {
-                      backgroundColor: '#374151',
-                      borderLeftWidth: 4,
-                      borderLeftColor: '#F97316',
-                      paddingLeft: 12,
-                      paddingVertical: 8,
-                      marginBottom: 12,
-                    },
-                  }}
-                >
+                <Markdown style={markdownStyles({ isDark: true })}>
                   {safeContent}
                 </Markdown>
               ) : (

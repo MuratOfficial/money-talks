@@ -9,7 +9,7 @@ const DiagramExpenceScreen: React.FC = () => {
 
 
   return (
-    <ChartScreen assets={expences} backLink={'/main/finance/expences/main'}/>
+    <ChartScreen assets={expences} backLink={'/main/finance/expences/main'} categoryKind="expence"/>
   );
 };
 

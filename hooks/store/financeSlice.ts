@@ -269,7 +269,9 @@ export const createFinanceSlice: SliceCreator<FinanceSlice> = (set, get) => ({
   },
 
   getWalletBalance: () => {
-    const { wallets } = get();
+    // Скрытые из баланса счета (например, чужая карта или «неприкосновенный»
+    // депозит) остаются в списке, но в итоговую сумму не входят.
+    const wallets = get().wallets.filter((w) => !w.excludeFromBalance);
     const sumBy = (predicate: (w: Wallet) => boolean) =>
       wallets.filter(predicate).reduce((sum, item) => sum + item.summ, 0);
 

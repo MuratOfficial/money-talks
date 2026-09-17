@@ -8,6 +8,7 @@ import Drawer from '../components/Drawer';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '../components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
+import ChallengeBanner from '@/app/components/ChallengeBanner';
 
 const MainScreen = () => {
   const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
@@ -75,7 +76,8 @@ const MainScreen = () => {
         amount: `${x.summ.toString()} ${x.currency}`,
         color: x.color,
         icon: x.icon || 'card',
-        iconType: "ionicons"
+        iconType: "ionicons",
+        excluded: !!x.excludeFromBalance,
       }))
     },
     ...categories,
@@ -92,6 +94,8 @@ const MainScreen = () => {
   const CategoryCard = useCallback(({ item, title }: any) => (
     <TouchableOpacity
       className="w-[23%] items-center mb-6"
+      // Счёт, исключённый из баланса, приглушён — видно, что он не в общей сумме.
+      style={item.excluded ? { opacity: Opacity.disabled } : undefined}
       activeOpacity={Opacity.press}
       onPress={() => handleGoal(title, item.name, item.id)}
     >
@@ -116,6 +120,11 @@ const MainScreen = () => {
       {item.amount && (
         <Text className={`${textColor} text-xs font-['SFProDisplayBold'] text-center`}>
           {item.amount}
+        </Text>
+      )}
+      {item.excluded && (
+        <Text className={`${textColor} text-[10px] font-['SFProDisplayRegular'] text-center`}>
+          не в балансе
         </Text>
       )}
     </TouchableOpacity>
@@ -207,6 +216,9 @@ const MainScreen = () => {
           className="flex-1 px-4"
           showsVerticalScrollIndicator={false}
         >
+          <FadeInView>
+            <ChallengeBanner />
+          </FadeInView>
           {categoriesWith.map((category, index) => (
             <FadeInView key={`category-${index}`} delay={index * Motion.stagger}>
               <CategorySection category={category} />

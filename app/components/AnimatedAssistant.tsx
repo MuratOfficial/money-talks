@@ -1,140 +1,98 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, Easing, TouchableOpacity } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Animated, Easing, TouchableOpacity } from 'react-native';
 import useFinancialStore from '@/hooks/useStore';
+import { Opacity } from '@/constants/design';
+import FinGuide, { FinGuideMood } from './FinGuide';
+import FinGuideCard, { cardPalette } from './FinGuideCard';
 
 interface AnimatedAssistantProps {
   message: string;
   visible: boolean;
+  mood?: FinGuideMood;
+  /** Кнопка под сообщением, например «Внести доход». */
+  action?: { label: string; onPress: () => void };
   onClose?: () => void;
+  /** Если задан, после закрытия ФинГид остаётся маленькой кнопкой в углу. */
+  onOpen?: () => void;
 }
 
-const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible, onClose }) => {
-  const { theme } = useFinancialStore();
-  const isDark = theme === 'dark';
-  const [isVisible, setIsVisible] = useState(visible);
-  
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const floatAnim = useRef(new Animated.Value(0)).current;
+/**
+ * ФинГид с подсказкой: карточка выезжает снизу, персонаж машет рукой.
+ * После закрытия сворачивается в плавающую кнопку
+ * (ТЗ: «плавающая кнопка ФинГида с реакциями»).
+ */
+const AnimatedAssistant: React.FC<AnimatedAssistantProps> = ({ message, visible, mood = 'happy', action, onClose, onOpen }) => {
+  const isDark = useFinancialStore((s) => s.theme) === 'dark';
+  const palette = cardPalette(isDark);
+
+  const progress = useRef(new Animated.Value(visible ? 1 : 0)).current;
+  // Карточка остаётся в дереве, пока доигрывает анимация скрытия.
+  const [cardMounted, setCardMounted] = useState(visible);
 
   useEffect(() => {
-    setIsVisible(visible);
     if (visible) {
-      // Появление
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      // Анимация плавания
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(floatAnim, {
-            toValue: -10,
-            duration: 1500,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(floatAnim, {
-            toValue: 0,
-            duration: 1500,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
+      setCardMounted(true);
+      Animated.spring(progress, { toValue: 1, friction: 8, tension: 60, useNativeDriver: true }).start();
     } else {
-        // Исчезновение перед скрытием
-        Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true
-        }).start(() => {
-            // Опционально можно скрыть компонент полностью
-        });
+      Animated.timing(progress, { toValue: 0, duration: 200, easing: Easing.in(Easing.ease), useNativeDriver: true }).start(
+        ({ finished }) => finished && setCardMounted(false)
+      );
     }
-  }, [visible]);
+  }, [visible, progress]);
 
-  if (!isVisible && !visible) return null;
+  if (!visible && !cardMounted && !onOpen) return null;
+
+  const cardStyle = {
+    opacity: progress,
+    transform: [
+      { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) },
+      { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] }) },
+    ],
+  };
+  const fabStyle = {
+    opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+    transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.6] }) }],
+  };
 
   return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        bottom: 80, 
-        right: 16,
-        left: 16,
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        alignItems: 'flex-end',
-        zIndex: 50,
-        pointerEvents: 'box-none' 
-      }}
-    >
-      <View className="flex-row items-end justify-end w-full" style={{pointerEvents: 'auto'}}>
-        {/* Сообщение */}
-        <View 
-            className={`mr-3 p-4 rounded-2xl rounded-br-none shadow-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
-            style={{ maxWidth: '75%' }}
-        >
-          <Text className={`${isDark ? 'text-gray-100' : 'text-gray-800'} text-sm font-['SFProDisplayRegular'] leading-5`}>
-            {message}
-          </Text>
-          
-          {/* Треугольник для бабла (хвостик) */}
-          <View 
-            style={{
-                position: 'absolute',
-                right: -8,
-                bottom: 0,
-                width: 0,
-                height: 0,
-                borderTopWidth: 10,
-                borderLeftWidth: 10,
-                borderRightWidth: 10,
-                borderBottomWidth: 0,
-                borderStyle: 'solid',
-                backgroundColor: 'transparent',
-                borderTopColor: 'transparent',
-                borderRightColor: 'transparent',
-                borderBottomColor: 'transparent',
-                borderLeftColor: isDark ? '#1F2937' : '#FFFFFF', 
-            }} 
-          />
-          
-          {onClose && (
-            <TouchableOpacity 
-                onPress={onClose}
-                className={`absolute -top-2 -left-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full p-1 shadow-sm`}
-                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-            >
-                <Ionicons name="close" size={14} color={isDark ? '#FFF' : '#000'} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Робот-иконка */}
-        <Animated.View style={{ transform: [{ translateY: floatAnim }] }}>
-            <View className={`w-14 h-14 rounded-full items-center justify-center ${isDark ? 'bg-cyan-900' : 'bg-cyan-100'} border-2 ${isDark ? 'border-cyan-700' : 'border-cyan-200'} shadow-sm`}>
-                <MaterialCommunityIcons 
-                    name="robot-excited-outline" 
-                    size={32} 
-                    color={isDark ? '#22D3EE' : '#0891B2'} 
-                />
-            </View>
+    <View style={{ position: 'absolute', bottom: 16, right: 16, left: 16, zIndex: 50 }} pointerEvents="box-none">
+      {cardMounted && (
+        <Animated.View style={cardStyle} pointerEvents={visible ? 'auto' : 'none'}>
+          {/* key: при каждом новом сообщении персонаж заново машет рукой */}
+          <FinGuideCard key={message} message={message} mood={mood} action={action} onClose={onClose} wave />
         </Animated.View>
-      </View>
-    </Animated.View>
+      )}
+
+      {onOpen && !visible && (
+        <Animated.View style={[{ position: 'absolute', right: 0, bottom: 0 }, fabStyle]}>
+          <TouchableOpacity
+            activeOpacity={Opacity.press}
+            onPress={onOpen}
+            accessibilityLabel="Открыть подсказку ФинГида"
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 30,
+              backgroundColor: palette.background,
+              borderWidth: 1,
+              borderColor: palette.border,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: isDark ? 0.4 : 0.15,
+              shadowRadius: 10,
+              elevation: 6,
+            }}
+          >
+            {/* Тень на iOS пропадает при overflow: hidden, поэтому обрезаем во внутреннем слое */}
+            <View style={{ flex: 1, borderRadius: 30, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <View style={{ marginBottom: -14 }}>
+                <FinGuide size={46} mood="neutral" />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+    </View>
   );
 };
 

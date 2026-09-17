@@ -4,78 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Question } from '@/services/api';
 import useFinancialStore from '@/hooks/useStore';
+import { FINGUIDE_RISK_TIP, RiskProfileInfo, allocationText, riskProfileByPercentage } from '@/constants/riskProfiles';
 
 
 
-interface RiskProfile {
-  title: string;
-  description: string;
-  recommendations: string[];
-}
-
-export interface TestResult extends RiskProfile {
+export interface TestResult extends RiskProfileInfo {
   score: number;
   totalQuestions: number;
   percentage: number;
 }
-
-/**
- * Варианты ответа в вопросах упорядочены от самого осторожного к самому
- * рискованному, и `correctAnswer` указывает на самый рискованный. Поэтому
- * доля таких ответов и есть мера готовности пользователя к риску — чем она
- * выше, тем агрессивнее профиль.
- */
-const getRiskProfile = (percentage: number): RiskProfile => {
-  if (percentage >= 75) {
-    return {
-      title: 'Агрессивный',
-      description: 'Вы готовы к высокой волатильности ради высокой доходности',
-      recommendations: [
-        'Держите долю рисковых активов высокой, но фиксируйте правила выхода заранее',
-        'Не вкладывайте в один инструмент больше, чем готовы потерять целиком',
-        'Обязательно держите подушку безопасности отдельно от инвестиций',
-        'Пересматривайте портфель регулярно — агрессивная стратегия требует внимания',
-      ],
-    };
-  }
-
-  if (percentage >= 50) {
-    return {
-      title: 'Сбалансированный',
-      description: 'Вы принимаете умеренный риск ради роста капитала',
-      recommendations: [
-        'Разделите портфель между защитными и растущими активами',
-        'Диверсифицируйте по классам активов и валютам',
-        'Реинвестируйте доход — на длинном горизонте это даёт основной эффект',
-        'Раз в полгода проверяйте, не сместились ли доли от плановых',
-      ],
-    };
-  }
-
-  if (percentage >= 25) {
-    return {
-      title: 'Умеренный',
-      description: 'Вы предпочитаете предсказуемый результат заметному риску',
-      recommendations: [
-        'Основу портфеля держите в надёжных инструментах',
-        'Рисковую часть вводите небольшими долями и постепенно',
-        'Ставьте цели с конкретным сроком — так проще подобрать инструменты',
-        'Избегайте решений на эмоциях после просадок рынка',
-      ],
-    };
-  }
-
-  return {
-    title: 'Консервативный',
-    description: 'Для вас сохранность капитала важнее доходности',
-    recommendations: [
-      'Выстраивайте защитные стратегии и планируйте вдолгую',
-      'Отдавайте приоритет инструментам с предсказуемой доходностью',
-      'Сформируйте подушку безопасности на 6 месяцев расходов',
-      'Защищайте капитал от инфляции — она главный риск для этого профиля',
-    ],
-  };
-};
 
 interface TestComponentProps {
   questions: Question[];
@@ -185,7 +122,9 @@ const TestComponent: React.FC<TestComponentProps> = ({
       score,
       totalQuestions: questions.length,
       percentage,
-      ...getRiskProfile(percentage),
+      // Варианты ответа упорядочены от осторожного к рискованному, и correctAnswer —
+      // самый рискованный: доля таких ответов и есть готовность к риску.
+      ...riskProfileByPercentage(percentage),
     };
 
     setResult(testResult);
@@ -215,7 +154,7 @@ const TestComponent: React.FC<TestComponentProps> = ({
           <View className="px-6 py-8">
             <View className="items-center mb-8">
               <Text className={`${textSecondaryColor} mb-2 font-['SFProDisplayRegular']`}>Ваш тип инвестора</Text>
-              <Text className={`${textColor} text-4xl font-bold mb-2 font-['SFProDisplaySemiBold']`}>
+              <Text className={`${textColor} text-3xl font-bold mb-2 text-center font-['SFProDisplaySemiBold']`}>
                 {result.title}
               </Text>
               <Text className={`${textBodyColor} font-['SFProDisplayRegular']`}>
@@ -231,6 +170,20 @@ const TestComponent: React.FC<TestComponentProps> = ({
                 размер подушки безопасности.
               </Text>
             </View>
+
+            <View className={`${cardBgColor} rounded-2xl p-6 mb-6`}>
+              <Text className={`${textColor} text-base mb-2 font-['SFProDisplaySemiBold']`}>
+                Рекомендуемое распределение
+              </Text>
+              <AllocationBar protectiveShare={result.protectiveShare} />
+              <Text className={`${textBodyColor} text-sm leading-6 mt-3 font-['SFProDisplayRegular']`}>
+                {allocationText(result)}
+              </Text>
+            </View>
+
+            <Text className={`${textSecondaryColor} text-sm italic mb-6 font-['SFProDisplayRegular']`}>
+              ФинГид: «{FINGUIDE_RISK_TIP}»
+            </Text>
 
             <View className="space-y-4">
               {result.recommendations.map((text, index) => (
@@ -336,5 +289,19 @@ const TestComponent: React.FC<TestComponentProps> = ({
     </SafeAreaView>
   );
 };
+
+/** Полоса «защита / рост» для распределения портфеля. */
+export const AllocationBar = ({ protectiveShare }: { protectiveShare: number }) => (
+  <View>
+    <View className="flex-row h-3 rounded-full overflow-hidden">
+      <View style={{ flex: protectiveShare, backgroundColor: '#3B82F6' }} />
+      <View style={{ flex: 100 - protectiveShare, backgroundColor: '#4CAF50' }} />
+    </View>
+    <View className="flex-row justify-between mt-1">
+      <Text className="text-xs text-[#3B82F6] font-['SFProDisplayRegular']">Защита {protectiveShare}%</Text>
+      <Text className="text-xs text-[#4CAF50] font-['SFProDisplayRegular']">Рост {100 - protectiveShare}%</Text>
+    </View>
+  </View>
+);
 
 export default TestComponent;

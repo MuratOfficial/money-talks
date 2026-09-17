@@ -10,6 +10,7 @@ import useFinancialStore from '@/hooks/useStore';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { FINGUIDE_RISK_TIP, RISK_PROFILES, allocationText, riskProfileByPercentage } from '@/constants/riskProfiles';
 
 interface AccordionItem {
   id: string;
@@ -101,7 +102,18 @@ const InvestmentsPage: React.FC = () => {
     };
 
 
+  // Профиль пересчитываем по проценту: у прошедших тест раньше мог
+  // сохраниться «Сбалансированный» из прежней шкалы на четыре профиля.
+  const currentProfile = riskProfile ? riskProfileByPercentage(riskProfile.percentage) : null;
+
   const accordionData: AccordionItem[] = [
+    ...(currentProfile
+      ? [{
+          id: 'my-profile',
+          title: `Рекомендации для профиля «${currentProfile.title}»`,
+          content: `Распределение портфеля: ${allocationText(currentProfile)}.\n\n${currentProfile.recommendations.map((r) => `• ${r}`).join('\n')}\n\nФинГид: «${FINGUIDE_RISK_TIP}»`,
+        }]
+      : []),
     {
       id: '1',
       title: 'Риск-профиль инвестора',
@@ -110,7 +122,7 @@ const InvestmentsPage: React.FC = () => {
     {
       id: '2',
       title: 'Виды риск-профилей',
-      content: 'Консервативный - минимальные риски, небольшая доходность. Умеренный - сбалансированное соотношение риска и доходности. Агрессивный - высокие риски ради высокой потенциальной доходности.'
+      content: RISK_PROFILES.map((p) => `${p.title} — ${p.description.charAt(0).toLowerCase()}${p.description.slice(1)}.\nПортфель: ${allocationText(p)}.`).join('\n\n')
     },
     {
       id: '3',
@@ -135,7 +147,9 @@ const InvestmentsPage: React.FC = () => {
   const isExpanded = (itemId: string) => expandedItems.includes(itemId);
 
   const handleOpenBrokerCheck = async () => {
-    const url = 'https://data.egov.kz/';
+    // Агентство РК по регулированию и развитию финансового рынка (АРРФР):
+    // реестр лицензий и предупреждения о нелицензированных компаниях.
+    const url = 'https://www.gov.kz/memleket/entities/ardfm';
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {
@@ -221,7 +235,7 @@ const InvestmentsPage: React.FC = () => {
                   >
                     <MaterialIcons name="open-in-new" size={20} color="white" style={{ marginRight: 8 }} />
                     <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
-                      Проверить брокера в реестре РК
+                      Проверить брокера на сайте АРРФР
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -241,7 +255,10 @@ const InvestmentsPage: React.FC = () => {
                 Ваш тип инвестора
               </Text>
               <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
-                {riskProfile.title}
+                {currentProfile?.title}
+              </Text>
+              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+                Защита {currentProfile?.protectiveShare}% · Рост {100 - (currentProfile?.protectiveShare ?? 0)}%
               </Text>
             </View>
             <Text className="text-[#4CAF50] text-lg font-['SFProDisplaySemiBold']">

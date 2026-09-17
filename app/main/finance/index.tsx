@@ -1,8 +1,9 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import { Href, useRouter } from 'expo-router';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import useFinancialStore from '@/hooks/useStore';
 import AnimatedAssistant from '@/app/components/AnimatedAssistant';
+import { IDLE_TIP, financeTip } from '@/utils/finGuideTips';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
 import {
@@ -60,7 +61,7 @@ const FinanceCard: React.FC<FinanceCardProps & { isDark: boolean }> = ({ title, 
 
 const FinanceApp: React.FC = () => {
   const router = useRouter();
-  const { theme, incomes, expences, actives, passives } = useFinancialStore();
+  const { theme, incomes, expences, actives, passives, formatAmount, setCurrentAsset } = useFinancialStore();
   
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -68,20 +69,50 @@ const FinanceApp: React.FC = () => {
   const cardBgColor = isDark ? 'bg-white/15' : 'bg-gray-100';
   const cardTextColor = isDark ? 'text-gray-50' : 'text-gray-900';
 
+  // ФинГид: подсказка зависит от того, что уже заполнено (сценарии из ТЗ).
   const [showAssistant, setShowAssistant] = useState(false);
+  const [idle, setIdle] = useState(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tip = idle ? IDLE_TIP : financeTip({ incomes, expences, actives, passives }, formatAmount);
 
   useEffect(() => {
-    // Проверяем, есть ли пустые категории
-    const hasEmptyData = !incomes.length || !expences.length || !actives.length || !passives.length;
-    
-    if (hasEmptyData) {
-        // Показываем ассистента с небольшой задержкой для плавности
-        const timer = setTimeout(() => setShowAssistant(true), 1500);
-        return () => clearTimeout(timer);
-    } else {
-        setShowAssistant(false);
-    }
-  }, [incomes, expences, actives, passives]);
+    // Пока есть пустые разделы — ФинГид сам подсказывает, что внести дальше.
+    // Когда всё заполнено, он остаётся свёрнутым: открыть можно нажатием.
+    const hasEmpty = !incomes.length || !expences.length || !actives.length || !passives.length;
+    if (!hasEmpty) return;
+    const timer = setTimeout(() => setShowAssistant(true), 1500);
+    return () => clearTimeout(timer);
+  }, [incomes.length, expences.length, actives.length, passives.length]);
+
+  // ТЗ: «если в течение 30 секунд нет действия» — ФинГид сам предлагает начать.
+  const restartIdleTimer = useCallback(() => {
+    if (idleTimer.current) clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => {
+      setIdle(true);
+      setShowAssistant(true);
+    }, 30_000);
+  }, []);
+
+  useEffect(() => {
+    restartIdleTimer();
+    return () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+    };
+  }, [restartIdleTimer]);
+
+  const closeAssistant = () => {
+    setShowAssistant(false);
+    setIdle(false);
+    restartIdleTimer();
+  };
+
+  const runTipAction = (route: string) => {
+    closeAssistant();
+    // Формы добавления открываются в режиме редактирования, если в сторе
+    // остался выбранный ранее элемент.
+    setCurrentAsset(null);
+    router.replace(route as Href);
+  };
 
   const financeItems:FinanceCardProps[] = [
     {
@@ -112,7 +143,7 @@ const FinanceApp: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
+    <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`} onTouchStart={restartIdleTimer}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
  
    
@@ -140,8 +171,14 @@ const FinanceApp: React.FC = () => {
 
       <AnimatedAssistant
         visible={showAssistant}
-        onClose={() => setShowAssistant(false)}
-        message="Твои финансы — как система координат. Введи доходы, расходы, активы и пассивы — и мы покажем тебе, где ты находишься, и куда идти дальше."
+        message={tip.message}
+        mood={tip.mood}
+        action={tip.action ? { label: tip.action.label, onPress: () => runTipAction(tip.action!.route) } : undefined}
+        onClose={closeAssistant}
+        onOpen={() => {
+          setShowAssistant(true);
+          restartIdleTimer();
+        }}
       />
     </SafeAreaView>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -38,6 +38,7 @@ const AddWalletScreen = () => {
   const [selectedType, setSelectedType] = useState(walletTypes[0]);
   const [amount, setAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState('Тенге ₸');
+  const [includeInBalance, setIncludeInBalance] = useState(true);
 
   const isDark = theme === 'dark';
   const bgColor = isDark ? 'bg-black' : 'bg-white';
@@ -56,6 +57,7 @@ const AddWalletScreen = () => {
       if (wallet) {
         setCardName(wallet.name);
         setAmount(wallet.summ.toString());
+        setIncludeInBalance(!wallet.excludeFromBalance);
 
         // Найти тип кошелька
         const foundType = walletTypes.find(t => t.id === wallet.type);
@@ -81,6 +83,7 @@ const AddWalletScreen = () => {
       currency: selectedCurrency[selectedCurrency.length - 1],
       icon: selectedType.icon,
       color: selectedType.color,
+      excludeFromBalance: !includeInBalance,
     };
 
     if (isEditing) {
@@ -217,6 +220,24 @@ const AddWalletScreen = () => {
               {/* Empty space for layout */}
             </View>
           </View>
+        </View>
+
+        {/* Include in balance */}
+        <View className={`${cardBgColor} rounded-xl px-4 py-4 mb-8 flex-row items-center justify-between`}>
+          <View className="flex-1 mr-3">
+            <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
+              Учитывать в балансе
+            </Text>
+            <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mt-1`}>
+              Выключите, чтобы счёт остался в кошельке, но не входил в общую сумму
+            </Text>
+          </View>
+          <Switch
+            value={includeInBalance}
+            onValueChange={setIncludeInBalance}
+            trackColor={{ false: '#767577', true: '#4CAF50' }}
+            thumbColor={includeInBalance ? '#ffffff' : '#f4f3f4'}
+          />
         </View>
       </ScrollView>
       </FadeInView>

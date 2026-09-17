@@ -3,14 +3,36 @@ import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import useFinancialStore, { Goal } from '@/hooks/useStore';
+import useFinancialStore, { Goal, GoalPriority } from '@/hooks/useStore';
 import TopUpModal from '@/app/components/TopUpModal';
 import CircularProgress from '../lfp/components/CircularProgress';
 import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import InfoModal from '@/app/components/HintWithChat';
+import FinGuidePointer from '@/app/components/FinGuidePointer';
+import { useHintPointer } from '@/hooks/useHintPointer';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
+import { monthNameToIndex } from '@/hooks/pdf/pdfCalculations';
+import { ANALYSIS_TOOLS, completedToolsCount } from '@/constants/goalAnalysis';
+
+const PRIORITY_ORDER: Record<GoalPriority, number> = { high: 0, medium: 1, low: 2 };
+
+const PRIORITY_BADGE: Record<GoalPriority, { label: string; color: string }> = {
+  high: { label: 'Высокий приоритет', color: '#EF4444' },
+  medium: { label: 'Средний приоритет', color: '#F59E0B' },
+  low: { label: 'Низкий приоритет', color: '#9CA3AF' },
+};
+
+const SORT_OPTIONS = ['По дате', 'По %', 'По приоритету'];
+
+/** Срок цели как timestamp; цели без полного срока — в конец списка. */
+const goalDeadline = (goal: Goal): number => {
+  const year = parseInt(goal.timeframe?.year, 10);
+  if (isNaN(year)) return Number.MAX_SAFE_INTEGER;
+  const day = parseInt(goal.timeframe.day, 10);
+  return new Date(year, monthNameToIndex(goal.timeframe.month), isNaN(day) ? 1 : day).getTime();
+};
 
 const GoalsScreen = () => {
   const router = useRouter();
@@ -54,9 +76,17 @@ const GoalsScreen = () => {
       const openModal = () => setModalVisible(true);
       const closeModal = () => setModalVisible(false);
 
+      // Целей ещё нет — ФинГид показывает на кнопку «Подсказки».
+      const hintPointer = useHintPointer(goals.length === 0 && !loading);
+
       const handleEdit = (id:string) =>{
         pickEditGoal(id);
         router.push("/main/goals/add-goal")
+      }
+
+      const handleTools = (id: string) => {
+        pickEditGoal(id);
+        router.push("/main/goals/tools")
       }
 
       const handleTopUp = (id:string, title: string) => {
@@ -116,11 +146,15 @@ const GoalsScreen = () => {
       case 'По %':
         return sortedGoals.sort((a, b) => b.progress! - a.progress!);
       case 'По дате':
-        return sortedGoals.sort((a, b) => {
-          const dateA = new Date(Number(a.timeframe.year), Number(a.timeframe.day));
-          const dateB = new Date(Number(b.timeframe.year), Number(b.timeframe.day));
-          return dateA.getTime() - dateB.getTime();
-        });
+        // Месяц хранится названием («Март»); раньше вместо месяца в дату
+        // подставлялся день, и сортировка внутри года была случайной.
+        return sortedGoals.sort((a, b) => goalDeadline(a) - goalDeadline(b));
+      case 'По приоритету':
+        return sortedGoals.sort(
+          (a, b) =>
+            PRIORITY_ORDER[a.priority ?? 'medium'] - PRIORITY_ORDER[b.priority ?? 'medium'] ||
+            goalDeadline(a) - goalDeadline(b)
+        );
       default:
         return sortedGoals;
     }
@@ -209,37 +243,24 @@ useEffect(() => {
 
           {/* Sort Options */}
           <View className="mb-6">
-            <TouchableOpacity
-              onPress={() => setSelectedSort('По дате')}
-              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={Opacity.press}
-            >
-              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
-                По дате
-              </Text>
-              
-              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
-                {selectedSort === 'По дате' && (
-                  <View className={`w-3 h-3 rounded-full ${isDark ? 'bg-white' : 'bg-gray-900'}`} />
-                )}
-              </View>
-            </TouchableOpacity>
+            {SORT_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => setSelectedSort(option)}
+                className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
+                activeOpacity={Opacity.press}
+              >
+                <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
+                  {option}
+                </Text>
 
-            <TouchableOpacity
-              onPress={() => setSelectedSort('По %')}
-              className={`${buttonBgColor} rounded-xl px-4 py-4 mb-3 flex-row items-center justify-between`}
-              activeOpacity={Opacity.press}
-            >
-              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
-                По %
-              </Text>
-              
-              <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
-                {selectedSort === 'По %' && (
-                  <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
-                )}
-              </View>
-            </TouchableOpacity>
+                <View className={`w-6 h-6 rounded-full border-2 ${borderColor} items-center justify-center`}>
+                  {selectedSort === option && (
+                    <View className="w-3 h-3 rounded-full bg-[#4CAF50]" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Select Button */}
@@ -326,19 +347,32 @@ useEffect(() => {
               Собрано {goal.collected ?? 0} из {goal.amount}
             </Text>
 
-            {/* Бейдж с процентом прогресса */}
-            <View className="mt-2">
-              <View 
+            {/* Бейджи: прогресс и приоритет */}
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              <View
                 className="self-start px-3 py-1 rounded-full"
                 style={{ backgroundColor: colors.accent + '20' }}
               >
-                <Text 
+                <Text
                   className="text-xs font-['SFProDisplaySemibold']"
                   style={{ color: colors.accent }}
                 >
                   {progress.toFixed(0)}% выполнено
                 </Text>
               </View>
+              {goal.priority && (
+                <View
+                  className="self-start px-3 py-1 rounded-full"
+                  style={{ backgroundColor: PRIORITY_BADGE[goal.priority].color + '20' }}
+                >
+                  <Text
+                    className="text-xs font-['SFProDisplaySemibold']"
+                    style={{ color: PRIORITY_BADGE[goal.priority].color }}
+                  >
+                    {PRIORITY_BADGE[goal.priority].label}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
           
@@ -368,7 +402,24 @@ useEffect(() => {
             <Ionicons name="pencil" size={16} color={iconColor} />
           </TouchableOpacity>
         </View>
-        
+
+        {/* Проработка цели: 5 Почему / SMARTER / Квадрат Декарта */}
+        <TouchableOpacity
+          onPress={() => handleTools(goal.id)}
+          activeOpacity={Opacity.press}
+          className={`mt-3 ${buttonBgColor} rounded-xl py-3 px-4 flex-row items-center justify-between`}
+        >
+          <View className="flex-row items-center">
+            <Ionicons name="bulb-outline" size={16} color="#4CAF50" />
+            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] ml-2`}>
+              Проверить истинность цели
+            </Text>
+          </View>
+          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+            {completedToolsCount(goal.analysis)}/{ANALYSIS_TOOLS.length}
+          </Text>
+        </TouchableOpacity>
+
         <TopUpModal
           visible={showTopUpModal}
           onClose={() => setShowTopUpModal(false)}
@@ -408,7 +459,7 @@ useEffect(() => {
           Цели
         </Text>
         
-        <TouchableOpacity className="p-2" onPress={openModal}>
+        <TouchableOpacity ref={hintPointer.targetRef} className="p-2" onPress={openModal}>
           <Ionicons name="information-circle-outline" size={24} color={iconColor} />
         </TouchableOpacity>
       </View>
@@ -487,7 +538,18 @@ useEffect(() => {
         enableChatGPT={true}
       />
 
-      
+      {hintPointer.target && (
+        <FinGuidePointer
+          visible={hintPointer.visible}
+          target={hintPointer.target}
+          message="Целей пока нет. Загляни в подсказки: там про SMART-цели и видео, а ещё можно спросить меня в чате."
+          onPressTarget={() => {
+            hintPointer.hide();
+            openModal();
+          }}
+          onClose={hintPointer.hide}
+        />
+      )}
     </SafeAreaView>
   );
 };

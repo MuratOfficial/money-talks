@@ -1,13 +1,11 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StatusBar,
   ScrollView,
-
-  TouchableWithoutFeedback,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,9 +15,15 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
 import { fetchTips, getCachedTips, Tip } from '@/services/api';
 import InfoModal from './HintWithChat';
-import TutorialTooltip from './TutorialTooltip';
+import FinGuidePointer from './FinGuidePointer';
+import { useHintPointer } from '@/hooks/useHintPointer';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import { RecordKind, categoryLabel } from '@/constants/categories';
+import MonthlyTrends from './MonthlyTrends';
+
+/** Разделы, записи которых делятся на категории. */
+const CATEGORY_KIND: Record<string, RecordKind> = { incomes: 'income', expenses: 'expence' };
 import FadeInView from './FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 
@@ -80,43 +84,12 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const [tips, setTips] = useState<Tip[]>(getCachedTips(tipsPage) || []);
   const [loading, setLoading] = useState(getCachedTips(tipsPage) === null);
 
-  const [showTooltip, setShowTooltip] = useState(false);
-  // Реальные координаты кнопки подсказок. Раньше они были захардкожены, из-за
-  // чего стрелка указывала мимо кнопки, а с включённым edge-to-edge (Android 15+)
-  // подсказка уехала ещё выше: Modal рисуется во всё окно, включая зону
-  // статус-бара, и жёсткие координаты перестали совпадать с видимым хедером.
-  const hintButtonRef = useRef<View>(null);
-  const [hintButtonRect, setHintButtonRect] = useState<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null>(null);
-
-useEffect(() => {
-  if (!assets || assets.length === 0 ) {
-    const timer = setTimeout(() => {
-      // measureInWindow даёт координаты в системе окна — ровно в ней же
-      // позиционируется полноэкранный Modal подсказки.
-      hintButtonRef.current?.measureInWindow((x, y, width, height) => {
-        if (width > 0 && height > 0) {
-          setHintButtonRect({ x, y, width, height });
-          setShowTooltip(true);
-        }
-      });
-    }, 500);
-    return () => clearTimeout(timer);
-  }
-}, [assets]);
-
-  const tooltipText = 'Не знаете, что делать? Нажмите, здесь есть подсказки!';
-  const tooltipDuration = 4000;
-
-  const handleTooltipClose = () => {
-  
-      setShowTooltip(false);
-    
-  };
+  // Пустой раздел — ФинГид показывает на кнопку «Подсказки». В «Анализе»
+  // своих записей нет, поэтому смотрим, пусты ли все разделы, из которых он строится.
+  const isEmpty = isAnalyze
+    ? !analyzeList || analyzeList.every((section) => section.item.length === 0)
+    : !assets || assets.length === 0;
+  const hintPointer = useHintPointer(isEmpty && !loading);
 
 
   useEffect(() => {
@@ -258,7 +231,6 @@ useEffect(() => {
   }
 
   return (
-     <TouchableWithoutFeedback onPress={() => showTooltip && handleTooltipClose()}>
           <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
       
@@ -277,7 +249,7 @@ useEffect(() => {
             <Ionicons name="pie-chart-outline" size={20} color={iconColor} />
           </TouchableOpacity>}
           
-          <TouchableOpacity ref={hintButtonRef} className="p-2" onPress={openModal}>
+          <TouchableOpacity ref={hintPointer.targetRef} className="p-2" onPress={openModal}>
             <Ionicons name="information-circle-outline" size={24} color={iconColor} />
           </TouchableOpacity>
         </View>
@@ -404,6 +376,12 @@ useEffect(() => {
                   <Text className={`${textColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
                     {asset.name}
                   </Text>
+
+                  {asset.category && tipsPage && CATEGORY_KIND[tipsPage] && (
+                    <Text className={`${textSecondaryColor} text-xs mb-1 font-['SFProDisplayRegular']`}>
+                      {categoryLabel(CATEGORY_KIND[tipsPage], asset)}
+                    </Text>
+                  )}
 
                   {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
                     Доходность {asset.yield}%
@@ -555,6 +533,8 @@ useEffect(() => {
                   </View>
 
             </View>
+
+          <MonthlyTrends />
        
         
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
@@ -618,18 +598,19 @@ useEffect(() => {
           
           />
 
-           {hintButtonRect && (
-        <TutorialTooltip
-          visible={showTooltip}
-          text={tooltipText}
-          position={hintButtonRect}
-          autoCloseDuration={tooltipDuration}
-          onClose={handleTooltipClose}
+      {hintPointer.target && (
+        <FinGuidePointer
+          visible={hintPointer.visible}
+          target={hintPointer.target}
+          message="Здесь пока пусто. Не знаешь, с чего начать? Загляни в подсказки — там объяснения и видео, а вопросы можно задать мне в чате."
+          onPressTarget={() => {
+            hintPointer.hide();
+            openModal();
+          }}
+          onClose={hintPointer.hide}
         />
       )}
-      
     </SafeAreaView>
-     </TouchableWithoutFeedback>
 
   );
 };

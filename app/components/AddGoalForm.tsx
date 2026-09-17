@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from './Drawer';
-import useFinancialStore, { convertFormDataToGoal, Goal } from '@/hooks/useStore';
+import useFinancialStore, { convertFormDataToGoal, GoalPriority } from '@/hooks/useStore';
 import { goalFormSchema, firstError } from '@/validation/forms';
 import { recalculateMonthlyInvestment } from '@/hooks/pdf/pdfCalculations';
 import { Alert } from 'react-native';
@@ -34,7 +34,27 @@ interface GoalData {
   inflationRate: string;
   returnRate: string;
   monthlyInvestment: string;
+  priority: GoalPriority;
 }
+
+type GoalType = GoalData['type'];
+
+/** Готовые цели из ТЗ: подставляют название и типичный срок. */
+const PRESET_GOALS: { name: string; type: GoalType; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
+  { name: 'Подушка безопасности', type: 'short', icon: 'shield-checkmark-outline' },
+  { name: 'Отпуск / Поездка', type: 'short', icon: 'airplane-outline' },
+  { name: 'Квартира / Дом', type: 'medium', icon: 'home-outline' },
+  { name: 'Образование', type: 'long', icon: 'school-outline' },
+  { name: 'Пассивный доход', type: 'long', icon: 'cash-outline' },
+];
+
+const PRIORITIES: { key: GoalPriority; label: string }[] = [
+  { key: 'high', label: 'Высокий' },
+  { key: 'medium', label: 'Средний' },
+  { key: 'low', label: 'Низкий' },
+];
+
+const formatMoney = (value: number) => value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
 const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }) => {
   const { addGoal, updateGoal, getGoalById, theme, currentGoalType } = useFinancialStore();
@@ -73,6 +93,7 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
     inflationRate: '',
     returnRate: '',
     monthlyInvestment: '',
+    priority: 'medium',
   });
 
   const [showDrawerDay, setShowDrawerDay] = useState(false);
@@ -143,21 +164,41 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ onClose, onSave, editGoalId }
 
   const years: string[] = getYearsForGoalType(formData.type);
 
-  // Функция для расчета monthlyInvestment
-const calculateMonthlyInvestment = () => {
+  // Ежемесячный взнос: при инвестировании (с доходностью) или при простом
+  // накоплении «в сейфе» (доходность 0). ТЗ требует показывать оба варианта,
+  // чтобы была видна выгода инвестирования.
+const calculateMonthly = (withReturn: boolean): number | null => {
   const amount = parseFloat(formData.amount.replace(/\s/g, ''));
   const inflationRate = parseFloat(formData.inflationRate);
-  const returnRate = parseFloat(formData.returnRate);
+  const returnRate = withReturn ? parseFloat(formData.returnRate) : 0;
 
   if (isNaN(amount) || isNaN(inflationRate) || totalMonthsLeft <= 0) {
-    return '';
+    return null;
   }
 
   // Аннуитетная формула с учётом инфляции и ожидаемой доходности (единый источник расчёта)
-  const result = recalculateMonthlyInvestment(amount, inflationRate, returnRate, totalMonthsLeft, 0);
+  return recalculateMonthlyInvestment(amount, inflationRate, returnRate, totalMonthsLeft, 0);
+};
 
-  // Форматируем результат с разделением тысяч
-  return result.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const calculateMonthlyInvestment = () => {
+  const result = calculateMonthly(true);
+  return result === null ? '' : formatMoney(result);
+};
+
+const monthlySaving = calculateMonthly(false);
+const monthlyInvesting = calculateMonthly(true);
+const currencySign = formData.currency === 'USD' ? '$' : '₸';
+// Разница заметна, только если указана доходность выше нуля.
+const investingBenefit =
+  monthlySaving !== null && monthlyInvesting !== null && monthlySaving - monthlyInvesting >= 0.01
+    ? monthlySaving - monthlyInvesting
+    : null;
+
+const applyPreset = (preset: (typeof PRESET_GOALS)[number]) => {
+  setFormData((prev) => ({ ...prev, name: preset.name, type: preset.type }));
+  // Годы в списке зависят от типа цели — выбранный ранее год может не подойти.
+  setSelectedSortYear('Год');
+  setTotalMonthsLeft(0);
 };
 
 // Эффект для автоматического пересчета monthlyInvestment
@@ -181,6 +222,7 @@ useEffect(() => {
         inflationRate: existingGoal.inflationRate,
         returnRate: existingGoal.returnRate,
         monthlyInvestment: existingGoal.monthlyInvestment,
+        priority: existingGoal.priority ?? 'medium',
       });
       setSelectedSortDay(existingGoal.timeframe.day);
       setSelectedSortMonth(existingGoal.timeframe.month);
@@ -296,6 +338,33 @@ const handleSortSelectYear = (value: string) => {
       <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 py-2">
+          {/* Preset goals — only when creating */}
+          {!editGoalId && (
+            <View className="mb-6">
+              <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
+                Выбрать из готовых целей
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {PRESET_GOALS.map((preset) => {
+                  const selected = formData.name === preset.name;
+                  return (
+                    <TouchableOpacity
+                      key={preset.name}
+                      onPress={() => applyPreset(preset)}
+                      className={`flex-row items-center px-4 py-3 mr-2 rounded-2xl border ${
+                        selected ? `${cardBgColor} border-[#4CAF50]` : `${inactiveCardBgColor} ${inactiveBorderColor}`
+                      }`}
+                      activeOpacity={Opacity.press}
+                    >
+                      <Ionicons name={preset.icon} size={16} color={selected ? '#4CAF50' : iconColor} />
+                      <Text className={`${textColor} ml-2 font-['SFProDisplayRegular']`}>{preset.name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+
           {/* Goal Name */}
           <View className="mb-6">
             <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
@@ -353,6 +422,32 @@ const handleSortSelectYear = (value: string) => {
             </View>
           </View>
 
+          {/* Priority */}
+          <View className="mb-6">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
+              Приоритет
+            </Text>
+            <View className="flex-row gap-2">
+              {PRIORITIES.map((p) => {
+                const selected = formData.priority === p.key;
+                return (
+                  <TouchableOpacity
+                    key={p.key}
+                    onPress={() => setFormData({ ...formData, priority: p.key })}
+                    className={`flex-1 py-3 rounded-2xl border items-center ${
+                      selected ? 'bg-[#4CAF50] border-[#4CAF50]' : `${inactiveCardBgColor} ${inactiveBorderColor}`
+                    }`}
+                    activeOpacity={Opacity.press}
+                  >
+                    <Text className={`${selected ? 'text-white' : textColor} font-['SFProDisplayRegular']`}>
+                      {p.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
           {/* Timeframe */}
           <View className="mb-6">
             <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
@@ -407,6 +502,11 @@ const handleSortSelectYear = (value: string) => {
                 </TouchableOpacity>
               ))}
             </View>
+            <Text className={`${textSecondaryColor} text-xs mt-2 leading-5 font-['SFProDisplayRegular']`}>
+              {formData.type === 'short'
+                ? 'Цель до 1 года — копите в валюте, в которой будете делать покупку.'
+                : 'Для средне- и долгосрочной цели удобнее копить в долларах как в более твёрдой валюте.'}
+            </Text>
           </View>
 
           {/* Amount */}
@@ -454,6 +554,18 @@ const handleSortSelectYear = (value: string) => {
             />
           </View>
 
+          {/* Monthly Saving (without investing) */}
+          <View className="mb-6">
+            <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
+              Расчет накоплений (копим без инвестирования)
+            </Text>
+            <Text
+              className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
+            >
+              {monthlySaving !== null ? `${formatMoney(monthlySaving)} ${currencySign} в месяц` : 'Н/о'}
+            </Text>
+          </View>
+
           {/* Monthly Investment */}
           <View className="mb-6">
             <Text className={`${textColor} text-base mb-3 font-['SFProDisplayRegular']`}>
@@ -462,10 +574,15 @@ const handleSortSelectYear = (value: string) => {
             <Text
               className={`${inputBgColor} ${inputTextColor} px-4 py-4 rounded-2xl border ${inactiveBorderColor} font-['SFProDisplayRegular']`}
             >
-              {formData.monthlyInvestment 
-                ? `${formData.monthlyInvestment} ${formData.currency === 'USD' ? '$' : '₸'}` 
+              {formData.monthlyInvestment
+                ? `${formData.monthlyInvestment} ${currencySign} в месяц`
                 : "Н/о"}
             </Text>
+            {investingBenefit !== null && (
+              <Text className="text-[#4CAF50] text-sm mt-2 font-['SFProDisplayRegular']">
+                При инвестировании откладывать нужно на {formatMoney(investingBenefit)} {currencySign} в месяц меньше
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
