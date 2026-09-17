@@ -1,9 +1,16 @@
 import {
   EXPENSE_CATEGORIES,
-  groupExpensesByCategory,
-  resolveExpenseCategory,
-  resolveExpenseSubcategory,
-} from '@/constants/expenseCategories';
+  INCOME_CATEGORIES,
+  RecordKind,
+  categoryLabel,
+  groupByCategory,
+  resolveCategory,
+  resolveSubcategory,
+} from '@/constants/categories';
+
+const resolveExpenseCategory = (asset: Parameters<typeof resolveCategory>[1]) => resolveCategory('expence', asset);
+const resolveExpenseSubcategory = (asset: Parameters<typeof resolveSubcategory>[1]) => resolveSubcategory('expence', asset);
+const groupExpensesByCategory = (assets: Asset[]) => groupByCategory('expence', assets);
 import type { Asset } from '@/hooks/store/types';
 
 const expense = (fields: Partial<Asset>): Asset => ({ id: Math.random().toString(), name: 'x', amount: 0, ...fields });
@@ -33,8 +40,10 @@ describe('resolveExpenseCategory', () => {
   });
 
   it('id категорий уникальны', () => {
-    const ids = EXPENSE_CATEGORIES.map((c) => c.id);
-    expect(new Set(ids).size).toBe(ids.length);
+    for (const list of [EXPENSE_CATEGORIES, INCOME_CATEGORIES]) {
+      const ids = list.map((c) => c.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
   });
 
   it('неизвестное — в «Прочее»', () => {
@@ -61,6 +70,36 @@ describe('groupExpensesByCategory', () => {
       { name: 'Доставка еды', amount: 300 },
       { name: 'Продукты', amount: 150 },
       { name: 'Без подкатегории', amount: 20 },
+    ]);
+  });
+});
+
+describe('категории доходов', () => {
+  const kind: RecordKind = 'income';
+
+  it('ни один значок из прежнего набора доходов не теряется в «Прочее»', () => {
+    const oldIcons = ['cash', 'laptop', 'home', 'trending-up', 'gift', 'wallet', 'library-books', 'account-balance', 'card',
+      'attach-money', 'logo-bitcoin', 'stats-chart', 'business', 'star'];
+    for (const icon of oldIcons) {
+      expect([icon, resolveCategory(kind, { icon }).id]).not.toEqual([icon, 'other']);
+    }
+  });
+
+  it('одна и та же иконка у доходов и расходов значит разное', () => {
+    expect(categoryLabel('income', { icon: 'home' })).toBe('Аренда');
+    expect(categoryLabel('expence', { icon: 'home' })).toBe('Кредиты · Ипотека');
+    expect(categoryLabel('income', { icon: 'logo-bitcoin' })).toBe('Инвестиции · Криптовалюта');
+  });
+
+  it('группирует доходы по источникам', () => {
+    const result = groupByCategory(kind, [
+      { id: '1', name: 'ЗП', amount: 500, category: 'salary' },
+      { id: '2', name: 'Дивиденды', amount: 50, category: 'investments', subcategory: 'dividends' },
+      { id: '3', name: 'Старый', amount: 30, icon: 'account-balance' },
+    ]);
+    expect(result.map((g) => [g.category.name, g.amount])).toEqual([
+      ['Зарплата', 500],
+      ['Инвестиции', 80],
     ]);
   });
 });

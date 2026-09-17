@@ -13,7 +13,7 @@ import { Href, useRouter } from 'expo-router';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
-import { groupExpensesByCategory } from '@/constants/expenseCategories';
+import { RecordKind, groupByCategory } from '@/constants/categories';
 
 interface ExpenseCategory {
   id: string;
@@ -34,11 +34,11 @@ interface PieSegment {
 interface ChartScreenProps {
     backLink?:Href;
     assets: Asset[] | null
-    /** Сложить расходы по категориям из ТЗ вместо отдельных записей. */
-    groupByCategory?: boolean
+    /** Сложить записи по категориям (доходов или расходов) вместо отдельных строк. */
+    categoryKind?: RecordKind
 }
 
-const ChartScreen = ({backLink, assets, groupByCategory}:ChartScreenProps) => {
+const ChartScreen = ({backLink, assets, categoryKind}:ChartScreenProps) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<DateFilterType>('За месяц');
   const {currency, theme} = useFinancialStore();  
@@ -74,9 +74,9 @@ const ChartScreen = ({backLink, assets, groupByCategory}:ChartScreenProps) => {
         const total = filteredAssets.reduce((sum, item) => sum + item.amount, 0);
         setTotalAmount(total);
 
-        if (groupByCategory) {
+        if (categoryKind) {
           setExpenseData(
-            groupExpensesByCategory(filteredAssets).map((g) => ({
+            groupByCategory(categoryKind, filteredAssets).map((g) => ({
               id: g.category.id,
               name: g.category.name,
               amount: g.amount,
@@ -101,7 +101,7 @@ const ChartScreen = ({backLink, assets, groupByCategory}:ChartScreenProps) => {
           ))
         )
       }
-    }, [assets, selectedPeriod, groupByCategory])
+    }, [assets, selectedPeriod, categoryKind])
 
   const chartData: PieSegment[]|undefined = expenseData?.map(item => ({
     value: item.amount,

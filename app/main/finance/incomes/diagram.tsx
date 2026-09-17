@@ -10,7 +10,7 @@ const DiagramIncomeScreen: React.FC = () => {
 
 
   return (
-      <ChartScreen assets={incomes} backLink={'/main/finance/incomes/main'}/>
+      <ChartScreen assets={incomes} backLink={'/main/finance/incomes/main'} categoryKind="income"/>
   );
 };
 

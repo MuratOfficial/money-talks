@@ -20,14 +20,10 @@ import InfoModal from './HintWithChat';
 import TutorialTooltip from './TutorialTooltip';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
-import { resolveExpenseCategory, resolveExpenseSubcategory } from '@/constants/expenseCategories';
+import { RecordKind, categoryLabel } from '@/constants/categories';
 
-/** «Еда · Доставка еды» — подпись категории под названием расхода. */
-const expenseCategoryLabel = (asset: Asset) => {
-  const category = resolveExpenseCategory(asset);
-  const sub = resolveExpenseSubcategory(asset);
-  return sub ? `${category.name} · ${sub.name}` : category.name;
-};
+/** Разделы, записи которых делятся на категории. */
+const CATEGORY_KIND: Record<string, RecordKind> = { incomes: 'income', expenses: 'expence' };
 import FadeInView from './FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 
@@ -413,9 +409,9 @@ useEffect(() => {
                     {asset.name}
                   </Text>
 
-                  {asset.category && (
+                  {asset.category && tipsPage && CATEGORY_KIND[tipsPage] && (
                     <Text className={`${textSecondaryColor} text-xs mb-1 font-['SFProDisplayRegular']`}>
-                      {expenseCategoryLabel(asset)}
+                      {categoryLabel(CATEGORY_KIND[tipsPage], asset)}
                     </Text>
                   )}
 
