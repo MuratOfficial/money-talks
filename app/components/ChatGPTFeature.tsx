@@ -182,10 +182,10 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
         >
           {/* Header */}
           <View style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}>
-            <View className="items-center pt-2">
-              <View className={`w-10 h-1 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`} />
+            <View style={{ alignItems: 'center', paddingTop: 8 }}>
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#D1D5DB' }} />
             </View>
-            <View className="flex-row items-center px-4 pt-2 pb-3">
+            <View style={styles.headerRow}>
               <View
                 style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: c.avatar, overflow: 'hidden', alignItems: 'center' }}
               >
@@ -193,21 +193,19 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                   <FinGuide size={38} mood={isLoading ? 'thinking' : 'happy'} />
                 </View>
               </View>
-              <View className="flex-1 ml-3">
-                <Text style={{ color: c.text }} className="text-base font-['SFProDisplaySemiBold']">
-                  ФинГид
-                </Text>
-                <View className="flex-row items-center">
-                  <View className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: Colors.primary }} />
-                  <Text style={{ color: c.muted }} className="text-xs font-['SFProDisplayRegular']" numberOfLines={1}>
+              <View style={styles.headerTexts}>
+                <Text style={[styles.headerTitle, { color: c.text }]}>ФинГид</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                  <View style={styles.onlineDot} />
+                  <Text style={[styles.headerStatus, { color: c.muted }]} numberOfLines={1}>
                     {isLoading ? 'печатает…' : `ИИ-помощник · ${title}`}
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity onPress={confirmClear} activeOpacity={Opacity.press} className="p-2" disabled={messages.length === 0}>
+              <TouchableOpacity onPress={confirmClear} activeOpacity={Opacity.press} style={{ padding: 8 }} disabled={messages.length === 0}>
                 <Ionicons name="trash-outline" size={20} color={messages.length ? c.muted : c.border} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleClose} activeOpacity={Opacity.press} className="p-2 -mr-2">
+              <TouchableOpacity onPress={handleClose} activeOpacity={Opacity.press} style={{ padding: 8 }}>
                 <Ionicons name="close" size={24} color={c.text} />
               </TouchableOpacity>
             </View>
@@ -216,8 +214,8 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           {/* Messages */}
           <ScrollView
             ref={scrollViewRef}
-            className="flex-1"
-            contentContainerStyle={{ padding: 16, flexGrow: 1 }}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16, flexGrow: 1 }}
             onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -225,22 +223,19 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             {messages.length === 0 && !isLoading && (
               <FadeInView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 24 }} offset={16}>
                 <FinGuide size={110} mood="happy" wave />
-                <Text style={{ color: c.text }} className="text-center text-xl mt-4 mb-1 font-['SFProDisplaySemiBold']">
-                  Привет! Я ФинГид 👋
-                </Text>
-                <Text style={{ color: c.muted }} className="text-center text-sm px-6 leading-5 font-['SFProDisplayRegular']">
+                <Text style={[styles.greeting, { color: c.text }]}>Привет! Я ФинГид 👋</Text>
+                <Text style={[styles.greetingHint, { color: c.muted }]}>
                   Спрашивай всё о теме «{title}» — объясню простыми словами
                 </Text>
-                <View className="flex-row flex-wrap justify-center mt-5">
+                <View style={styles.chipsRow}>
                   {SUGGESTIONS.map((s, i) => (
                     <FadeInView key={s} delay={200 + i * 80} offset={8}>
                       <TouchableOpacity
                         onPress={() => sendMessage(s)}
                         activeOpacity={Opacity.press}
-                        className="rounded-full px-3.5 py-2 m-1"
-                        style={{ backgroundColor: c.chip, borderWidth: 1, borderColor: 'rgba(76,175,80,0.35)' }}
+                        style={[styles.chip, { backgroundColor: c.chip }]}
                       >
-                        <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">{s}</Text>
+                        <Text style={styles.chipText}>{s}</Text>
                       </TouchableOpacity>
                     </FadeInView>
                   ))}
@@ -251,26 +246,22 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             {messages.map((message) =>
               message.isUser ? (
                 <FadeInView key={message.id} offset={10} duration={220} style={{ alignItems: 'flex-end', marginBottom: 12 }}>
-                  <View className="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-br-md" style={{ backgroundColor: Colors.primary }}>
-                    <Text className="text-white text-sm leading-5 font-['SFProDisplayRegular']">{message.text}</Text>
-                    <Text className="text-white/70 text-[10px] mt-1 self-end font-['SFProDisplayRegular']">
-                      {formatTime(message.timestamp)}
-                    </Text>
+                  <View style={styles.userBubble}>
+                    <Text style={styles.userText}>{message.text}</Text>
+                    <Text style={[styles.time, styles.userTime]}>{formatTime(message.timestamp)}</Text>
                   </View>
                 </FadeInView>
               ) : (
                 <FadeInView key={message.id} offset={10} duration={260} style={styles.botRow}>
                   <BotAvatar background={c.avatar} failed={!!message.failedQuestion} />
                   <View
-                    className="max-w-[78%] ml-2 px-3.5 pt-2.5 pb-2 rounded-2xl rounded-bl-md"
-                    style={{
-                      backgroundColor: message.failedQuestion ? (isDark ? '#2A1A1A' : '#FEF2F2') : c.botBubble,
-                    }}
+                    style={[
+                      styles.botBubble,
+                      { backgroundColor: message.failedQuestion ? (isDark ? '#2A1A1A' : '#FEF2F2') : c.botBubble },
+                    ]}
                   >
                     {message.failedQuestion ? (
-                      <Text style={{ color: c.text }} className="text-sm leading-5 font-['SFProDisplayRegular']">
-                        {message.text}
-                      </Text>
+                      <Text style={[styles.bodyText, { color: c.text }]}>{message.text}</Text>
                     ) : (
                       <Markdown style={markdownStyles({ isDark, compact: true })}>{message.text}</Markdown>
                     )}
@@ -278,16 +269,13 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                       <TouchableOpacity
                         onPress={() => sendMessage(message.failedQuestion)}
                         activeOpacity={Opacity.press}
-                        className="flex-row items-center self-start mt-2 rounded-xl px-3 py-1.5"
-                        style={{ backgroundColor: Colors.primary }}
+                        style={styles.retry}
                       >
                         <Ionicons name="refresh" size={13} color="#FFFFFF" />
-                        <Text className="text-white text-xs ml-1 font-['SFProDisplaySemiBold']">Повторить</Text>
+                        <Text style={styles.retryLabel}>Повторить</Text>
                       </TouchableOpacity>
                     )}
-                    <Text style={{ color: c.muted }} className="text-[10px] mt-0.5 font-['SFProDisplayRegular']">
-                      {formatTime(message.timestamp)}
-                    </Text>
+                    <Text style={[styles.time, { color: c.muted }]}>{formatTime(message.timestamp)}</Text>
                   </View>
                 </FadeInView>
               )
@@ -296,7 +284,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             {isLoading && (
               <FadeInView offset={10} duration={220} style={styles.botRow}>
                 <BotAvatar background={c.avatar} thinking />
-                <View className="ml-2 px-4 py-3.5 rounded-2xl rounded-bl-md" style={{ backgroundColor: c.botBubble }}>
+                <View style={[styles.typingBubble, { backgroundColor: c.botBubble }]}>
                   <TypingDots color={Colors.primary} />
                 </View>
               </FadeInView>
@@ -304,18 +292,14 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           </ScrollView>
 
           {/* Input */}
-          <View
-            className="px-4 pt-3"
-            style={{ paddingBottom: 12 + insets.bottom, borderTopWidth: 1, borderTopColor: c.border, backgroundColor: c.header }}
-          >
-            <View className="flex-row items-end rounded-3xl pl-4 pr-1.5 py-1.5" style={{ backgroundColor: c.input }}>
+          <View style={[styles.inputBar, { paddingBottom: 12 + insets.bottom, borderTopColor: c.border, backgroundColor: c.header }]}>
+            <View style={[styles.inputRow, { backgroundColor: c.input }]}>
               <TextInput
                 value={inputText}
                 onChangeText={setInputText}
                 placeholder="Спроси ФинГида…"
                 placeholderTextColor={c.muted}
-                style={{ color: c.text, maxHeight: 110, paddingTop: 8, paddingBottom: 8 }}
-                className="flex-1 text-base font-['SFProDisplayRegular']"
+                style={[styles.input, { color: c.text }]}
                 multiline
                 maxLength={500}
                 onSubmitEditing={() => sendMessage()}
@@ -324,9 +308,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
               />
               <SendButton enabled={canSend} onPress={() => sendMessage()} disabledColor={isDark ? '#374151' : '#D1D5DB'} />
             </View>
-            <Text style={{ color: c.muted }} className="text-[11px] text-center mt-2 font-['SFProDisplayRegular']">
-              ФинГид может ошибаться. Проверяй важную информацию.
-            </Text>
+            <Text style={[styles.note, { color: c.muted }]}>ФинГид может ошибаться. Проверяй важную информацию.</Text>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
@@ -363,7 +345,7 @@ const TypingDots = ({ color }: { color: string }) => {
   }, [dots]);
 
   return (
-    <View className="flex-row items-center" style={{ height: 12 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', height: 12 }}>
       {dots.map((dot, i) => (
         <Animated.View
           key={i}
@@ -412,8 +394,68 @@ const SendButton = ({ enabled, onPress, disabledColor }: { enabled: boolean; onP
   );
 };
 
+// Отступы и типографика заданы числами: текст в пузырях, кнопках и поле ввода
+// не должен прижиматься к границе, поэтому не полагаемся на обработку классов.
 const styles = StyleSheet.create({
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 12 },
+  headerTexts: { flex: 1, marginLeft: 12, marginRight: 8 },
+  headerTitle: { fontSize: 16, fontFamily: 'SFProDisplaySemiBold' },
+  headerStatus: { flex: 1, fontSize: 12, fontFamily: 'SFProDisplayRegular' },
+  onlineDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6, backgroundColor: Colors.primary },
+
+  greeting: { fontSize: 20, textAlign: 'center', marginTop: 16, marginBottom: 6, fontFamily: 'SFProDisplaySemiBold' },
+  greetingHint: { fontSize: 14, lineHeight: 20, textAlign: 'center', paddingHorizontal: 24, fontFamily: 'SFProDisplayRegular' },
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20, paddingHorizontal: 12 },
+  chip: { borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10, margin: 5, borderWidth: 1, borderColor: 'rgba(76,175,80,0.35)' },
+  chipText: { color: Colors.primary, fontSize: 14, fontFamily: 'SFProDisplayRegular' },
+
   botRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 12 },
+  userBubble: {
+    maxWidth: '82%',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 18,
+    borderBottomRightRadius: 6,
+    backgroundColor: Colors.primary,
+  },
+  userText: { color: '#FFFFFF', fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+  userTime: { color: 'rgba(255,255,255,0.75)', alignSelf: 'flex-end' },
+  botBubble: {
+    maxWidth: '80%',
+    marginLeft: 8,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 10,
+    borderRadius: 18,
+    borderBottomLeftRadius: 6,
+  },
+  bodyText: { fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+  time: { fontSize: 10, marginTop: 4, fontFamily: 'SFProDisplayRegular' },
+  retry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+  },
+  retryLabel: { color: '#FFFFFF', fontSize: 12, marginLeft: 6, fontFamily: 'SFProDisplaySemiBold' },
+  typingBubble: { marginLeft: 8, paddingHorizontal: 18, paddingVertical: 16, borderRadius: 18, borderBottomLeftRadius: 6 },
+
+  inputBar: { paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1 },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', borderRadius: 26, paddingLeft: 16, paddingRight: 6, paddingVertical: 6 },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    maxHeight: 110,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 10,
+    fontFamily: 'SFProDisplayRegular',
+  },
+  note: { fontSize: 11, textAlign: 'center', marginTop: 8, fontFamily: 'SFProDisplayRegular' },
 });
 
 export default ChatGPTFeature;

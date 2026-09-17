@@ -39,6 +39,10 @@ interface InfoModalProps {
 const { height: screenHeight } = Dimensions.get('window');
 const height = screenHeight * 0.8;
 
+const styles = StyleSheet.create({
+  block: { marginTop: 24, paddingTop: 16, borderTopWidth: 1 },
+});
+
 const InfoModal: React.FC<InfoModalProps> = ({
   visible,
   onClose,
@@ -90,10 +94,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
   }, [visible]);
 
   const isDark = theme === 'dark';
-  const textColor = isDark ? 'text-white' : 'text-gray-900';
-  const textSecondaryColor = isDark ? '#D1D5DB' : '#374151';
-  const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
-  const handleBarColor = isDark ? 'bg-gray-600' : 'bg-gray-400';
+  const dividerColor = isDark ? '#374151' : '#D1D5DB';
   const iconColor = isDark ? 'white' : '#11181C';
   const askCard = cardPalette(isDark);
 
@@ -133,12 +134,12 @@ const InfoModal: React.FC<InfoModalProps> = ({
       animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-end">
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Animated.View
           style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}
         >
           <TouchableOpacity
-            className="flex-1"
+            style={{ flex: 1 }}
             activeOpacity={1}
             onPress={onClose}
           />
@@ -155,19 +156,35 @@ const InfoModal: React.FC<InfoModalProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}>
           {/* Drag Indicator */}
-          <View className="items-center py-2">
-            <View className={`w-10 h-1 ${handleBarColor} rounded-full`} />
+          <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+            <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#9CA3AF' }} />
           </View>
 
           {/* Header */}
-          <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
-            <TouchableOpacity onPress={onClose}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: dividerColor,
+            }}
+          >
+            <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
               <Ionicons name="close" size={24} color={iconColor} />
             </TouchableOpacity>
             {/* Заголовки подсказок приходят из БД и бывают длинными: без flex-1
                 они выдавливали кнопки из шапки. */}
             <Text
-              className={`${textColor} flex-1 mx-3 text-center text-base font-semibold font-['SFProDisplaySemiBold']`}
+              style={{
+                flex: 1,
+                marginHorizontal: 12,
+                textAlign: 'center',
+                fontSize: 16,
+                color: isDark ? '#FFFFFF' : '#11181C',
+                fontFamily: 'SFProDisplaySemiBold',
+              }}
               numberOfLines={2}
             >
               {title}
@@ -180,8 +197,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
               >
                 <TouchableOpacity
                   onPress={handleChatPress}
-                  className="p-2 rounded-full"
-                  style={{ backgroundColor: Colors.primary }}
+                  style={{ padding: 9, borderRadius: 999, backgroundColor: Colors.primary }}
                   activeOpacity={Opacity.press}
                   accessibilityLabel="Спросить ФинГида"
                 >
@@ -189,30 +205,29 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 </TouchableOpacity>
               </Animated.View>
             )}
-            {!enableChatGPT && <View className="w-6" />}
+            {!enableChatGPT && <View style={{ width: 24 }} />}
           </View>
 
           <ScrollView 
-            style={{ maxHeight: height }}
+            style={{ maxHeight: height, marginBottom: 16 }}
             showsVerticalScrollIndicator={true}
-            className="mb-4"
             contentContainerStyle={{ paddingBottom: 10 }}
           >
-            <View className="p-4">
+            <View style={{ padding: 16 }}>
               {/* Показываем Markdown только если есть контент */}
               {safeContent ? (
                 <Markdown style={markdownStyles({ isDark })}>
                   {safeContent}
                 </Markdown>
               ) : (
-                <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-center py-4`}>
+                <Text style={{ color: askCard.muted, textAlign: 'center', paddingVertical: 16, fontFamily: 'SFProDisplayRegular' }}>
                   Нет доступного контента
                 </Text>
               )}
 
               {/* Видеоурок: встроенный плеер (приоритетно) или ссылка-фолбэк */}
               {videoUrl ? (
-                <View className={`mt-6 pt-4 border-t ${borderColor}`}>
+                <View style={[styles.block, { borderTopColor: dividerColor }]}>
                   <VideoHintPlayer
                     uri={videoUrl}
                     title={videoTitle || linkText || 'Видеоурок'}
@@ -220,18 +235,24 @@ const InfoModal: React.FC<InfoModalProps> = ({
                   />
                 </View>
               ) : linkUrl ? (
-                <View className={`mt-6 pt-4 border-t ${borderColor}`}>
-                  <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mb-3`}>
+                <View style={[styles.block, { borderTopColor: dividerColor }]}>
+                  <Text style={{ color: askCard.muted, fontSize: 14, marginBottom: 12, fontFamily: 'SFProDisplayRegular' }}>
                     Ссылка на видеоурок:
                   </Text>
 
                   <TouchableOpacity
                     onPress={handleLinkPress}
-                    className={`flex-row items-center p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg`}
-                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: 12,
+                      borderRadius: 12,
+                      backgroundColor: isDark ? '#374151' : '#E5E7EB',
+                    }}
+                    activeOpacity={Opacity.press}
                   >
                     <Ionicons name="link" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
-                    <Text className="text-blue-400 text-sm ml-2 flex-1" numberOfLines={1}>
+                    <Text style={{ flex: 1, marginHorizontal: 8, fontSize: 14, color: Colors.primary, fontFamily: 'SFProDisplayRegular' }} numberOfLines={1}>
                       {linkText || linkUrl}
                     </Text>
                     <Ionicons name="chevron-forward" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
@@ -243,17 +264,27 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 <TouchableOpacity
                   onPress={handleChatPress}
                   activeOpacity={Opacity.press}
-                  className="mt-6 flex-row items-center rounded-2xl p-3"
-                  style={{ backgroundColor: askCard.background, borderWidth: 1, borderColor: askCard.border }}
+                  style={{
+                    marginTop: 24,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderRadius: 16,
+                    padding: 14,
+                    backgroundColor: askCard.background,
+                    borderWidth: 1,
+                    borderColor: askCard.border,
+                  }}
                 >
                   <FinGuide size={48} mood="thinking" />
-                  <View className="flex-1 ml-3">
-                    <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold']`}>Остались вопросы?</Text>
-                    <Text style={{ color: askCard.muted }} className="text-xs mt-0.5 font-['SFProDisplayRegular']">
+                  <View style={{ flex: 1, marginLeft: 12, marginRight: 10 }}>
+                    <Text style={{ color: isDark ? '#FFFFFF' : '#11181C', fontSize: 14, fontFamily: 'SFProDisplaySemiBold' }}>
+                      Остались вопросы?
+                    </Text>
+                    <Text style={{ color: askCard.muted, fontSize: 12, lineHeight: 17, marginTop: 2, fontFamily: 'SFProDisplayRegular' }}>
                       Спроси ФинГида — объясню простыми словами
                     </Text>
                   </View>
-                  <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: Colors.primary }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary }}>
                     <Ionicons name="chatbubbles" size={16} color="#FFFFFF" />
                   </View>
                 </TouchableOpacity>

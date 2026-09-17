@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity, View, ViewStyle, StyleProp } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle, StyleProp } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
@@ -21,8 +21,9 @@ interface FinGuideCardProps {
 
 /**
  * Карточка ФинГида в том же стиле, что баннер челленджей на главной:
- * персонаж слева, заголовок и текст справа. Фон и рамка заданы явно, чтобы
- * карточка не сливалась ни с белым экраном, ни с серыми плитками под ней.
+ * персонаж слева, заголовок и текст справа. Отступы, фон и рамка заданы
+ * числами, а не классами: карточка не должна ни сливаться с фоном экрана,
+ * ни прижимать текст к своей границе.
  */
 const FinGuideCard: React.FC<FinGuideCardProps> = ({
   message,
@@ -41,41 +42,27 @@ const FinGuideCard: React.FC<FinGuideCardProps> = ({
   return (
     <View
       style={[
+        styles.card,
         {
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 12,
-          paddingRight: onClose ? 34 : 12,
-          borderRadius: 16,
-          borderWidth: 1,
+          // Справа оставляем место под крестик, чтобы текст не заходил под него.
+          paddingRight: onClose ? 44 : PADDING,
           backgroundColor: palette.background,
           borderColor: palette.border,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 6 },
           shadowOpacity: isDark ? 0.4 : 0.12,
-          shadowRadius: 14,
-          elevation: 8,
         },
         style,
       ]}
     >
       {showGuide && <FinGuide size={guideSize} mood={mood} wave={wave} />}
 
-      <View className={`flex-1 ${showGuide ? 'ml-3' : ''}`}>
-        <Text className="text-[#4CAF50] text-xs mb-0.5 font-['SFProDisplaySemiBold']">{title}</Text>
-        <Text style={{ color: palette.text }} className="text-sm leading-5 font-['SFProDisplayRegular']">
-          {message}
-        </Text>
+      <View style={[styles.content, showGuide && { marginLeft: 12 }]}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={[styles.message, { color: palette.text }]}>{message}</Text>
 
         {action && (
-          <TouchableOpacity
-            onPress={action.onPress}
-            activeOpacity={Opacity.press}
-            className="mt-2.5 rounded-xl py-2 px-3.5 self-start flex-row items-center"
-            style={{ backgroundColor: Colors.primary }}
-          >
-            <Text className="text-white text-xs mr-1 font-['SFProDisplaySemiBold']">{action.label}</Text>
-            <Ionicons name="arrow-forward" size={12} color="#FFFFFF" />
+          <TouchableOpacity onPress={action.onPress} activeOpacity={Opacity.press} style={styles.action}>
+            <Text style={styles.actionLabel}>{action.label}</Text>
+            <Ionicons name="arrow-forward" size={13} color="#FFFFFF" />
           </TouchableOpacity>
         )}
       </View>
@@ -85,17 +72,8 @@ const FinGuideCard: React.FC<FinGuideCardProps> = ({
           onPress={onClose}
           activeOpacity={Opacity.press}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: palette.closeBackground,
-          }}
+          accessibilityLabel="Закрыть подсказку"
+          style={[styles.close, { backgroundColor: palette.closeBackground }]}
         >
           <Ionicons name="close" size={14} color={palette.muted} />
         </TouchableOpacity>
@@ -103,6 +81,46 @@ const FinGuideCard: React.FC<FinGuideCardProps> = ({
     </View>
   );
 };
+
+const PADDING = 14;
+
+const styles = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: PADDING,
+    borderRadius: 16,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  content: { flex: 1 },
+  title: { color: Colors.primary, fontSize: 12, marginBottom: 3, fontFamily: 'SFProDisplaySemiBold' },
+  message: { fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+  action: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+  },
+  actionLabel: { color: '#FFFFFF', fontSize: 13, marginRight: 6, fontFamily: 'SFProDisplaySemiBold' },
+  close: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export const cardPalette = (isDark: boolean) =>
   isDark
