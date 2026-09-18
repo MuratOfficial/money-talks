@@ -3,6 +3,18 @@ import * as Sharing from 'expo-sharing';
 import { Alert } from 'react-native';
 import { PDFGeneratorOptions } from './pdf/pdfTypes';
 import { generateLFPHtmlContent } from './pdf/pdfGenerator';
+import { fetchAppSettings } from '@/services/api';
+
+/**
+ * Подпись внизу документа: берём актуальную из админки, а при любой проблеме
+ * с сетью — последнюю сохранённую или текст по умолчанию (fetchAppSettings
+ * ошибку наружу не отдаёт).
+ */
+const withFooterNote = async (options: PDFGeneratorOptions): Promise<PDFGeneratorOptions> => {
+    if (options.footerNote) return options;
+    const settings = await fetchAppSettings();
+    return { ...options, footerNote: settings.lfpPdfFooter };
+};
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,7 +41,7 @@ export const generateLFPPDFWithProgress = async (
         // Этап 2: Генерация HTML
         onMessageChange?.('Генерация HTML контента...');
         onProgressChange?.(25);
-        const htmlContent = generateLFPHtmlContent(options);
+        const htmlContent = generateLFPHtmlContent(await withFooterNote(options));
         await delay(800);
 
         // Этап 3: Создание PDF
@@ -97,7 +109,7 @@ export const printLFPPDFWithProgress = async (
         onProgressChange?.(20);
         await delay(500);
 
-        const htmlContent = generateLFPHtmlContent(options);
+        const htmlContent = generateLFPHtmlContent(await withFooterNote(options));
 
         onMessageChange?.('Отправка на печать...');
         onProgressChange?.(80);

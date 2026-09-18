@@ -1,7 +1,11 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 import { API_BASE_URL } from './apiConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStaticTips } from '@/constants/staticTips';
+import { AppSettings, DEFAULT_APP_SETTINGS, mergeAppSettings } from '@/constants/appSettings';
+import { APP_SETTINGS_KEY } from '@/constants/storageKeys';
+import { FALLBACK_PORTFOLIO_TEMPLATES, PortfolioTemplate } from '@/constants/portfolioTemplates';
 import { supabase } from '@/lib/supabase';
 
 // Базовый URL вычисляется в ./apiConfig:
@@ -247,6 +251,110 @@ export const fetchTips = async (page?: string, force = false): Promise<Tip[]> =>
     console.warn('fetchTips: используем статичные подсказки (fallback):', error);
     if (tipsCache[cacheKey]) return tipsCache[cacheKey].data;
     return getStaticTips(page);
+  }
+};
+
+// ========== Контент раздела «Инвестиции» ==========
+
+/** Брокер из справочника админки. */
+export interface Broker {
+  id: string;
+  name: string;
+  license?: string | null;
+  minAmount?: string | null;
+  commission?: string | null;
+  description?: string | null;
+  url?: string | null;
+}
+
+export interface InvestContent {
+  templates: PortfolioTemplate[];
+  brokers: Broker[];
+}
+
+let investCache: CacheEntry<InvestContent> | null = null;
+
+/** Синхронно вернуть уже загруженный контент инвестиций (или null). */
+export const getCachedInvestContent = (): InvestContent | null => (investCache ? investCache.data : null);
+
+/**
+ * Шаблоны портфелей и справочник брокеров.
+ *
+ * Шаблонов без сети всё равно не должно быть пусто — подставляем встроенные
+ * (constants/portfolioTemplates). Справочник брокеров придумывать нельзя,
+ * поэтому при ошибке он остаётся пустым, а экран показывает это честно.
+ */
+export const fetchInvestContent = async (force = false): Promise<InvestContent> => {
+  if (!force && isFresh(investCache)) {
+    return investCache!.data;
+  }
+
+  try {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/invest`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    const templates: PortfolioTemplate[] = Array.isArray(data?.templates) && data.templates.length > 0
+      ? data.templates
+      : FALLBACK_PORTFOLIO_TEMPLATES;
+    const brokers: Broker[] = Array.isArray(data?.brokers) ? data.brokers : [];
+
+    investCache = { data: { templates, brokers }, ts: Date.now() };
+    return investCache.data;
+  } catch (error) {
+    console.warn('fetchInvestContent: используем встроенные шаблоны:', error);
+    if (investCache) return investCache.data;
+    return { templates: FALLBACK_PORTFOLIO_TEMPLATES, brokers: [] };
+  }
+};
+
+// ========== Тексты из админки ==========
+
+/**
+ * Тексты приложения, которые правит админ (сейчас — подпись в PDF с ЛФП).
+ *
+ * Кэш двухслойный: в памяти на время сессии и в AsyncStorage между запусками.
+ * Выгрузка PDF не должна зависеть от сети, поэтому при любой ошибке отдаём
+ * последнее, что знаем, а если не знаем ничего — значения по умолчанию.
+ */
+let appSettingsCache: CacheEntry<AppSettings> | null = null;
+
+export const fetchAppSettings = async (force = false): Promise<AppSettings> => {
+  if (!force && isFresh(appSettingsCache)) {
+    return appSettingsCache!.data;
+  }
+
+  try {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/settings`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const settings = mergeAppSettings(await response.json());
+    appSettingsCache = { data: settings, ts: Date.now() };
+    // Сохраняем для офлайна; ошибку записи глотаем — это всего лишь кэш.
+    AsyncStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(settings)).catch(() => {});
+    return settings;
+  } catch (error) {
+    console.warn('fetchAppSettings: используем сохранённые тексты:', error);
+    if (appSettingsCache) return appSettingsCache.data;
+
+    try {
+      const stored = await AsyncStorage.getItem(APP_SETTINGS_KEY);
+      if (stored) {
+        const settings = mergeAppSettings(JSON.parse(stored));
+        appSettingsCache = { data: settings, ts: Date.now() };
+        return settings;
+      }
+    } catch {
+      /* кэш повреждён — ниже вернём умолчания */
+    }
+
+    return DEFAULT_APP_SETTINGS;
   }
 };
 

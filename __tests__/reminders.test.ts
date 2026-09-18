@@ -35,6 +35,21 @@ describe('planReminders', () => {
     expect(byKey(planReminders({ ...base, riskProfile: { title: 'x', percentage: 1, score: 1, totalQuestions: 1, completedAt: '' } }), 'risk-test')).toBeUndefined();
   });
 
+  it('зовёт перепройти тест через полгода после прошлого', () => {
+    const profile = (completedAt: string) => ({ title: 'x', percentage: 1, score: 1, totalQuestions: 1, completedAt });
+
+    // Тест пройден 1 сентября 2026 — напоминание через 182 дня, 2 марта.
+    const fresh = byKey(planReminders({ ...base, riskProfile: profile(new Date(2026, 8, 1).toISOString()) }), 'risk-retest');
+    expect(fresh?.date).toEqual(new Date(2027, 2, 2, 12));
+
+    // Полгода уже прошло — напоминаем завтра, а не задним числом.
+    const old = byKey(planReminders({ ...base, riskProfile: profile(new Date(2025, 0, 1).toISOString()) }), 'risk-retest');
+    expect(old?.date).toEqual(new Date(2026, 8, 18, 12));
+
+    // Без даты прохождения напоминать не о чем.
+    expect(byKey(planReminders({ ...base, riskProfile: profile('') }), 'risk-retest')).toBeUndefined();
+  });
+
   it('напоминает о челлендже накануне окончания', () => {
     const challenge = { def: { id: 'findetox', title: 'Финдетокс' }, status: 'active', current: 4, target: 7, daysLeft: 3 } as unknown as ChallengeProgress;
     expect(byKey(planReminders({ ...base, challenges: [challenge] }), 'challenge-findetox')?.date).toEqual(new Date(2026, 8, 19, 19));

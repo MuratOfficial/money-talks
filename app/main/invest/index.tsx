@@ -18,6 +18,39 @@ interface AccordionItem {
   content: string;
 }
 
+/** Подразделы «Инвестиций»: шаблоны портфелей, симулятор, словарь, брокеры. */
+const INVEST_SECTIONS: {
+  title: string;
+  subtitle: string;
+  icon: React.ComponentProps<typeof MaterialIcons>['name'];
+  route: string;
+}[] = [
+  {
+    title: 'Первые инвестиции',
+    subtitle: 'Готовые шаблоны портфелей',
+    icon: 'pie-chart',
+    route: '/main/invest/portfolios',
+  },
+  {
+    title: 'Симулятор',
+    subtitle: 'Что даст сумма в месяц',
+    icon: 'show-chart',
+    route: '/main/invest/simulator',
+  },
+  {
+    title: 'Словарь инвестора',
+    subtitle: 'Термины простыми словами',
+    icon: 'menu-book',
+    route: '/main/invest/glossary',
+  },
+  {
+    title: 'Выбор брокера',
+    subtitle: 'На что смотреть и где проверить',
+    icon: 'verified-user',
+    route: '/main/invest/brokers',
+  },
+];
+
 const InvestmentsPage: React.FC = () => {
   const { theme, riskProfile, setRiskProfile } = useFinancialStore();
 
@@ -200,6 +233,25 @@ const InvestmentsPage: React.FC = () => {
       {/* Content */}
       <FadeInView style={{ flex: 1 }}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        {/* Разделы блока «Первые инвестиции» из ТЗ */}
+        <View className="flex-row flex-wrap justify-between mb-3">
+          {INVEST_SECTIONS.map((section) => (
+            <TouchableOpacity
+              key={section.route}
+              onPress={() => router.push(section.route as any)}
+              activeOpacity={Opacity.press}
+              className={`${cardBgColor} rounded-xl p-4 mb-3`}
+              style={{ width: '48.5%' }}
+            >
+              <MaterialIcons name={section.icon} size={22} color="#4CAF50" />
+              <Text className={`${textColor} text-sm mt-2 font-['SFProDisplaySemiBold']`}>{section.title}</Text>
+              <Text className={`${textSecondaryColor} text-xs mt-1 leading-4 font-['SFProDisplayRegular']`}>
+                {section.subtitle}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {accordionData.map((item) => (
           <View key={item.id} className="mb-3">
             <TouchableOpacity

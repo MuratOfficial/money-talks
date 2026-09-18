@@ -28,6 +28,8 @@ export interface ReminderInput {
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** iOS хранит не больше 64 запланированных уведомлений на приложение. */
 export const MAX_REMINDERS = 20;
+/** Через столько дней после теста предлагаем пройти его заново. */
+const RISK_RETEST_DAYS = 182;
 
 const at = (base: Date, hour: number) => new Date(base.getFullYear(), base.getMonth(), base.getDate(), hour, 0, 0, 0);
 const addDays = (date: Date, days: number) => new Date(date.getTime() + days * DAY_MS);
@@ -128,6 +130,22 @@ export function planReminders({ incomes, expences, goals, riskProfile, challenge
       date: at(addDays(now, 2), 12),
       screen: '/main/invest',
     });
+  } else {
+    // Профиль меняется вместе с жизнью, поэтому раз в полгода зовём перепройти
+    // тест (ТЗ: «пуши на основе изменения риска»).
+    const completed = time(riskProfile.completedAt);
+    if (completed) {
+      let date = at(addDays(new Date(completed), RISK_RETEST_DAYS), 12);
+      // Полгода уже прошло — напомним завтра, а не в прошлом.
+      if (date.getTime() <= now.getTime()) date = at(addDays(now, 1), 12);
+      add({
+        key: 'risk-retest',
+        title: '🎯 Пора перепроверить риск-профиль',
+        body: 'С прошлого теста прошло полгода. Проверь, изменилось ли твоё отношение к риску.',
+        date,
+        screen: '/main/invest',
+      });
+    }
   }
 
   return reminders.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, MAX_REMINDERS);

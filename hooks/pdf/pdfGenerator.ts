@@ -1,6 +1,7 @@
 import { appStore } from '../useStore';
 import { PDFGeneratorOptions, FinancialSummary } from './pdfTypes';
 import { translations } from './pdfTranslations';
+import { DEFAULT_APP_SETTINGS } from '@/constants/appSettings';
 import {
     getBaseStyles,
     generateHeader,
@@ -9,18 +10,26 @@ import {
     generateFinancialTable,
     generateGoalsTable,
     generateSummary,
+    generateCrisisSection,
     generateFooter,
 } from './pdfTemplates';
+import { buildCrisisInput, buildStrategies, evaluateAllScenarios, hasCrisisData } from '@/utils/crisisScenarios';
+import { formatAmount } from './pdfCalculations';
 
 /**
  * Генерирует полный HTML контент для PDF документа
  */
 export const generateLFPHtmlContent = (options: PDFGeneratorOptions): string => {
-    const { personalFinancialPlan, language = 'ru', currency = '₸' } = options;
+    const {
+        personalFinancialPlan,
+        language = 'ru',
+        currency = '₸',
+        footerNote = DEFAULT_APP_SETTINGS.lfpPdfFooter,
+    } = options;
 
     // Получаем данные из store
     const storeState = appStore.getState();
-    const { goals, incomes, actives, passives, expences, user } = storeState;
+    const { goals, incomes, actives, passives, expences, wallets, user } = storeState;
 
     // Получаем переводы
     const t = translations[language];
@@ -45,6 +54,25 @@ export const generateLFPHtmlContent = (options: PDFGeneratorOptions): string => 
         netWorth: totalActives - totalPassives,
         monthlyBalance: totalIncomes - totalExpenses,
     };
+
+    // Кризисные сценарии: считаем по тем же данным, что и на экране ЛФП.
+    const crisisInput = buildCrisisInput({
+        incomes: incomes || [],
+        expences: expences || [],
+        passives: passives || [],
+        wallets: wallets || [],
+        currency,
+    });
+    const crisisResults = hasCrisisData(crisisInput) ? evaluateAllScenarios(crisisInput) : [];
+    // Советы даём под самый тяжёлый сценарий: у него запас времени минимальный.
+    const worstScenario = crisisResults.reduce<(typeof crisisResults)[number] | null>(
+        (worst, current) =>
+            worst === null || (current.monthsCovered ?? Infinity) < (worst.monthsCovered ?? Infinity) ? current : worst,
+        null
+    );
+    const crisisStrategies = worstScenario
+        ? buildStrategies(crisisInput, worstScenario, (value) => formatAmount(value, currency))
+        : [];
 
     // Генерация HTML
     return `
@@ -103,7 +131,9 @@ export const generateLFPHtmlContent = (options: PDFGeneratorOptions): string => 
           <!-- Итоговая сводка -->
           ${generateSummary(financialSummary, currency)}
           
-          ${generateFooter(personalFinancialPlan, t)}
+          ${crisisResults.length > 0 ? generateCrisisSection(crisisResults, crisisStrategies, currency) : ''}
+
+          ${generateFooter(personalFinancialPlan, t, footerNote)}
         </div>
       </div>
     </body>

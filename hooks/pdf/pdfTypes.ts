@@ -4,6 +4,11 @@ export interface PDFGeneratorOptions {
     personalFinancialPlan: PersonalFinancialPlan;
     currency?: string;
     language?: 'ru' | 'en' | 'kz';
+    /**
+     * Подпись внизу документа. Приходит из админки; если её не передали,
+     * подставляется текст по умолчанию (constants/appSettings).
+     */
+    footerNote?: string;
     onStatusChange?: (status: 'generating' | 'sharing' | 'success' | 'error') => void;
     onProgressChange?: (progress: number) => void;
     onMessageChange?: (message: string) => void;

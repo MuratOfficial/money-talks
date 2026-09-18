@@ -7,6 +7,7 @@ import Drawer from '@/app/components/Drawer';
 import useFinancialStore, { Goal } from '@/hooks/useStore';
 import DropdownButton from './components/DropdownButton';
 import GoalCard from './components/GoalCard';
+import CrisisScenarios from './components/CrisisScenarios';
 import PDFLoadingModal from './components/PDFLoadingComponent';
 import { useLFPExport } from '@/hooks/useLFPExport';
 import FadeInView from '@/app/components/FadeInView';
@@ -533,6 +534,9 @@ const PersonalFinancialPlanScreen = () => {
             </View>
           )}
         </View>
+
+        {/* ============== КРИЗИСНЫЕ СЦЕНАРИИ ============== */}
+        <CrisisScenarios />
 
         {/* ============== РИСК-ПРОФИЛЬ ============== */}
         <View className="mb-6">

@@ -1,5 +1,6 @@
 import { Asset, Goal, PersonalFinancialPlan } from '../useStore';
 import { Translations, FinancialSummary } from './pdfTypes';
+import { formatMonths, type CrisisStrategy, type ScenarioResult } from '@/utils/crisisScenarios';
 import {
     formatAmount,
     formatDate,
@@ -110,6 +111,15 @@ export const getBaseStyles = (): string => `
     text-align: center;
     color: #666;
     font-size: 12px;
+  }
+
+  .footer-note {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e0e0e0;
+    color: #444;
+    font-size: 12px;
+    line-height: 1.6;
   }
 `;
 
@@ -365,12 +375,91 @@ export const generateSummary = (summary: FinancialSummary, currency: string): st
 `;
 
 /**
- * Шаблон футера
+ * Кризисные сценарии: как меняется план, если доход упадёт или расходы
+ * вырастут, и что с этим делать (ТЗ, раздел ЛФП).
  */
-export const generateFooter = (plan: PersonalFinancialPlan, t: Translations): string => `
+export const generateCrisisSection = (
+    results: ScenarioResult[],
+    strategies: CrisisStrategy[],
+    currency: string
+): string => `
+  <div style="page-break-before: always; margin-top: 60px;">
+    <div class="section-title" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 15px 25px; margin: 0 -40px 30px -40px; text-align: center; font-size: 22px;">
+      КРИЗИСНЫЕ СЦЕНАРИИ
+    </div>
+
+    <p style="color: #555; font-size: 13px; margin-bottom: 18px;">
+      Расчёт показывает, что произойдёт с бюджетом при падении дохода или росте расходов
+      и на сколько месяцев хватит денег на счетах.
+    </p>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+      <thead>
+        <tr style="background: #f1f5f9;">
+          <th style="text-align: left; padding: 10px; border: 1px solid #e2e8f0;">Сценарий</th>
+          <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0;">Доход</th>
+          <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0;">Расходы</th>
+          <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0;">Дельта</th>
+          <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0;">Хватит на</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${results
+            .map(
+                (r) => `
+        <tr>
+          <td style="padding: 10px; border: 1px solid #e2e8f0;">${escapeHtml(r.scenario.title)}</td>
+          <td style="padding: 10px; border: 1px solid #e2e8f0; text-align: right;">${formatAmount(r.income, currency)}</td>
+          <td style="padding: 10px; border: 1px solid #e2e8f0; text-align: right;">${formatAmount(r.expense, currency)}</td>
+          <td style="padding: 10px; border: 1px solid #e2e8f0; text-align: right; color: ${r.delta >= 0 ? '#059669' : '#dc2626'};">${formatAmount(r.delta, currency)}</td>
+          <td style="padding: 10px; border: 1px solid #e2e8f0; text-align: right;">${r.monthsCovered === null ? 'дефицита нет' : `${formatMonths(r.monthsCovered)} мес.`}</td>
+        </tr>`
+            )
+            .join('')}
+      </tbody>
+    </table>
+
+    ${strategies.length > 0
+            ? `
+    <div style="margin-top: 26px;">
+      <div style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 12px;">
+        Что делать при худшем сценарии
+      </div>
+      ${strategies
+                .map(
+                    (strategy) => `
+      <div style="margin-bottom: 12px; padding: 12px 14px; background: #f8fafc; border-left: 3px solid #0ea5e9; border-radius: 4px;">
+        <div style="font-weight: 600; color: #0f172a; margin-bottom: 4px;">${escapeHtml(strategy.title)}</div>
+        <div style="color: #475569; font-size: 12px; line-height: 1.6;">${escapeHtml(strategy.detail)}</div>
+      </div>`
+                )
+                .join('')}
+    </div>`
+            : ''}
+  </div>
+`;
+
+/**
+ * Текст из админки попадает в HTML как есть, поэтому спецсимволы экранируем,
+ * а переносы строк превращаем в <br> — иначе подпись склеится в одну строку.
+ */
+const escapeHtml = (text: string): string =>
+    text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+const multiline = (text: string): string => escapeHtml(text).replace(/\n/g, '<br>');
+
+/**
+ * Шаблон футера. `note` — подпись, которую админ правит в панели
+ * (см. constants/appSettings: DEFAULT_APP_SETTINGS.lfpPdfFooter).
+ */
+export const generateFooter = (plan: PersonalFinancialPlan, t: Translations, note: string): string => `
   <div class="footer">
     <p><strong>${t.createdDate}:</strong> ${plan.createdAt instanceof Date ? plan.createdAt.toLocaleDateString('ru-RU') : new Date(plan.createdAt).toLocaleDateString('ru-RU')}</p>
     <p><strong>${t.updatedDate}:</strong> ${plan.updatedAt instanceof Date ? plan.updatedAt.toLocaleDateString('ru-RU') : new Date(plan.updatedAt).toLocaleDateString('ru-RU')}</p>
-    <p style="margin-top: 10px; font-style: italic;">Создано с помощью приложения Money Talks</p>
+    <div class="footer-note">${multiline(note)}</div>
   </div>
 `;
