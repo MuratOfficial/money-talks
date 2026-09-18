@@ -22,7 +22,7 @@ import { ChatGPTMessage, sendChatGPTMessage } from '@/services/api';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
 import { markdownStyles } from '@/constants/markdown';
-import { useSheetDrag } from '@/hooks/useSheetDrag';
+import SheetGrabber from './SheetGrabber';
 import FinGuide from './FinGuide';
 import FadeInView from './FadeInView';
 
@@ -91,11 +91,9 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
   useEffect(() => {
     if (visible) {
       setRendered(true);
-      // JS-драйвер: тем же значением двигает лист жест (setValue), а на
-      // нативном драйвере такие сдвиги на Android не применялись.
-      Animated.timing(translateY, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
+      Animated.timing(translateY, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
     } else {
-      Animated.timing(translateY, { toValue: screenHeight, duration: 240, easing: Easing.in(Easing.cubic), useNativeDriver: false }).start(
+      Animated.timing(translateY, { toValue: screenHeight, duration: 240, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(
         ({ finished }) => finished && setRendered(false)
       );
     }
@@ -155,8 +153,6 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
     onClose();
   };
 
-  // Свайп вниз по шапке закрывает чат — так же, как кнопка «крестик».
-  const dragHandlers = useSheetDrag({ translateY, onClose: handleClose });
 
   const confirmClear = () => {
     if (messages.length === 0) return;
@@ -196,15 +192,9 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             transform: [{ translateY }],
           }}
         >
-          {/* Шапка — она же зона для свайпа вниз */}
-          <View
-            {...dragHandlers}
-            collapsable={false}
-            style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}
-          >
-            <View style={{ alignItems: 'center', paddingTop: 8 }}>
-              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#D1D5DB' }} />
-            </View>
+          {/* Шапка: свайп вниз и нажатие по ручке закрывают чат */}
+          <View style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}>
+            <SheetGrabber translateY={translateY} onClose={handleClose}>
             <View style={styles.headerRow}>
               <View
                 style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: c.avatar, overflow: 'hidden', alignItems: 'center' }}
@@ -229,6 +219,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
                 <Ionicons name="close" size={24} color={c.text} />
               </TouchableOpacity>
             </View>
+            </SheetGrabber>
           </View>
 
           {/* Messages */}

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
+import SheetGrabber from './SheetGrabber';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android') {
@@ -168,16 +169,18 @@ const AdviceAccordionModal: React.FC<AdviceAccordionModalProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}
         >
-          {/* Header */}
-          <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons name="chevron-back" size={24} color={iconColor} />
-            </TouchableOpacity>
-            <Text className={`${textColor} text-lg font-semibold font-['SFProDisplaySemibold']`}>
-              {title}
-            </Text>
-            <View className="w-6" />
-          </View>
+          {/* Ручка и шапка: свайп вниз и нажатие закрывают шторку */}
+          <SheetGrabber translateY={translateY} onClose={onClose}>
+            <View className={`flex-row items-center justify-between p-4 border-b ${borderColor}`}>
+              <TouchableOpacity onPress={onClose}>
+                <Ionicons name="chevron-back" size={24} color={iconColor} />
+              </TouchableOpacity>
+              <Text className={`${textColor} text-lg font-semibold font-['SFProDisplaySemibold']`}>
+                {title}
+              </Text>
+              <View className="w-6" />
+            </View>
+          </SheetGrabber>
 
           {/* Accordion Content */}
           <ScrollView 

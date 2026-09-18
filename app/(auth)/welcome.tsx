@@ -134,6 +134,7 @@ export default function WelcomeScreen() {
       <Animated.View style={[styles.slide, { width, height, opacity }]}>
         {/* Текст длинный, а экраны бывают маленькие — слайд прокручивается. */}
         <ScrollView
+          style={{ width }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.slideContent,
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   slide: {
-    alignItems: 'center',
+    overflow: 'hidden',
   },
   slideContent: {
     flexGrow: 1,

@@ -17,7 +17,7 @@ import Markdown from 'react-native-markdown-display';
 import ChatGPTFeature from './ChatGPTFeature';
 import VideoHintPlayer from './VideoHintPlayer';
 import useFinancialStore from '@/hooks/useStore';
-import { useSheetDrag } from '@/hooks/useSheetDrag';
+import SheetGrabber from './SheetGrabber';
 import { Colors, Opacity } from '@/constants/design';
 import { markdownStyles } from '@/constants/markdown';
 import FinGuide from './FinGuide';
@@ -78,24 +78,20 @@ const InfoModal: React.FC<InfoModalProps> = ({
         toValue: 0,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        // JS-драйвер: тем же значением двигает лист жест (setValue), а на
-        // нативном драйвере такие сдвиги на Android не применялись.
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(translateY, {
         toValue: screenHeight,
         duration: 250,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start(({ finished }) => {
         if (finished) setRendered(false);
       });
     }
   }, [visible]);
 
-  // Свайп вниз по шапке закрывает шторку.
-  const dragHandlers = useSheetDrag({ translateY, onClose });
 
   const isDark = theme === 'dark';
   const dividerColor = isDark ? '#374151' : '#D1D5DB';
@@ -163,12 +159,8 @@ const InfoModal: React.FC<InfoModalProps> = ({
             paddingTop: 24,
             paddingBottom: 16 + insets.bottom,
           }}>
-          {/* Ручка и шапка — зона для свайпа вниз */}
-          <View {...dragHandlers} collapsable={false}>
-          <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-            <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#9CA3AF' }} />
-          </View>
-
+          {/* Ручка и шапка: свайп вниз и нажатие закрывают шторку */}
+          <SheetGrabber translateY={translateY} onClose={onClose}>
           {/* Header */}
           <View
             style={{
@@ -216,7 +208,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             )}
             {!enableChatGPT && <View style={{ width: 24 }} />}
           </View>
-          </View>
+          </SheetGrabber>
 
           <ScrollView 
             style={{ flexShrink: 1, marginBottom: 16 }}

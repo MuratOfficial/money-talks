@@ -3,7 +3,7 @@ import {
   DEFAULT_CLOSE_DISTANCE,
   sheetDragOffset,
   shouldCloseSheet,
-} from '@/hooks/useSheetDrag';
+} from '@/utils/sheetDrag';
 
 describe('sheetDragOffset', () => {
   it('тянет лист вниз за пальцем', () => {

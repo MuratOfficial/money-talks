@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, Dimensions, Animated, Easing, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
-import { useSheetDrag } from '@/hooks/useSheetDrag';
+import SheetGrabber from './SheetGrabber';
 import { Opacity } from '@/constants/design';
 
 interface ConfirmationDrawerProps {
@@ -53,8 +53,6 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
     extrapolate: 'clamp',
   });
 
-  // Свайп вниз по шапке закрывает шторку.
-  const dragHandlers = useSheetDrag({ translateY, onClose });
 
   useEffect(() => {
     if (visible) {
@@ -63,16 +61,14 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
         toValue: 0,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        // JS-драйвер: тем же значением двигает лист жест (setValue), а на
-        // нативном драйвере такие сдвиги на Android не применялись.
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(translateY, {
         toValue: screenHeight,
         duration: 250,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start(({ finished }) => {
         if (finished) setRendered(false);
       });
@@ -117,11 +113,9 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}
         >
-          {/* Ручка и шапка — зона для свайпа вниз */}
-          <View {...dragHandlers} collapsable={false}>
-            <View className={`w-10 h-1 ${isDark ? 'bg-gray-600' : 'bg-gray-400'} rounded-full self-center mb-6`} />
-
-            <View className="flex-row items-center justify-between mb-6">
+          {/* Ручка и шапка: свайп вниз и нажатие закрывают шторку */}
+          <SheetGrabber translateY={translateY} onClose={onClose}>
+            <View className="flex-row items-center justify-between mb-6 mt-2">
               <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] flex-1`}>
                 {title}
               </Text>
@@ -133,7 +127,7 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
                 <MaterialIcons name="close" size={24} color={iconColor} />
               </TouchableOpacity>
             </View>
-          </View>
+          </SheetGrabber>
 
           {/* Action Buttons */}
           <View className="flex-row" style={{ gap: 12 }}>
