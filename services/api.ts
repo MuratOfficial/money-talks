@@ -108,6 +108,15 @@ export interface ChatGPTRequest {
   message: string;
   context?: string;
   conversationHistory?: ChatGPTMessage[];
+  /** Валюта пользователя — чтобы ИИ считал в ней, а не в рублях. */
+  currency?: string;
+}
+
+/** Расход вопросов к ИИ за сегодня. remaining === null — лимит не задан. */
+export interface ChatUsage {
+  used: number;
+  limit: number;
+  remaining: number | null;
 }
 
 export interface ChatGPTResponse {
@@ -241,6 +250,34 @@ export const fetchTips = async (page?: string, force = false): Promise<Tip[]> =>
   }
 };
 
+/**
+ * Сколько вопросов к ИИ осталось сегодня. Ошибку не пробрасываем: счётчик —
+ * приятная мелочь, из-за него чат открываться не должен.
+ */
+export const fetchChatUsage = async (): Promise<ChatUsage | null> => {
+  try {
+    const token = await getAccessToken();
+    if (!token) return null;
+
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/public/chat/usage`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (typeof data?.used !== 'number') return null;
+    return {
+      used: data.used,
+      limit: typeof data.limit === 'number' ? data.limit : 0,
+      remaining: typeof data.remaining === 'number' ? data.remaining : null,
+    };
+  } catch (error) {
+    console.warn('fetchChatUsage:', error);
+    return null;
+  }
+};
+
 export const sendChatGPTMessage = async (request: ChatGPTRequest): Promise<ChatGPTResponse> => {
   try {
     const token = await getAccessToken();
@@ -253,6 +290,7 @@ export const sendChatGPTMessage = async (request: ChatGPTRequest): Promise<ChatG
       body: JSON.stringify({
         message: request.message,
         context: request.context,
+        currency: request.currency,
         // Имя поля должно совпадать с тем, что ждёт сервер.
         conversationHistory: request.conversationHistory,
       }),

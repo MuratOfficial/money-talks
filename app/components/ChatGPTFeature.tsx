@@ -12,16 +12,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Keyboard,
   Pressable,
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
-import { ChatGPTMessage, sendChatGPTMessage } from '@/services/api';
+import { ChatGPTMessage, fetchChatUsage, sendChatGPTMessage } from '@/services/api';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
 import { markdownStyles } from '@/constants/markdown';
+import { plural } from '@/utils/plural';
 import SheetGrabber from './SheetGrabber';
 import FinGuide from './FinGuide';
 import FadeInView from './FadeInView';
@@ -77,12 +79,51 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
   const isDark = useFinancialStore((s) => s.theme) === 'dark';
+  const currency = useFinancialStore((s) => s.currency);
   const c = chatColors(isDark);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  /** Сколько вопросов осталось сегодня; null — лимит не задан или неизвестен. */
+  const [remaining, setRemaining] = useState<number | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Клавиатуру на Android разводим руками: KeyboardAvoidingView с edge-to-edge
+  // мерил высоту неверно и после закрытия клавиатуры оставлял пустое место.
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const show = Keyboard.addListener('keyboardDidShow', (event) => {
+      // Высота клавиатуры включает системную панель снизу, а её отступ у нас
+      // уже учтён — иначе панель ввода поднимется выше, чем нужно.
+      setKeyboardHeight(Math.max(event.endCoordinates.height - insets.bottom, 0));
+    });
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, [insets.bottom]);
+
+  // Закрыли шторку — сбрасываем сдвиг, чтобы при следующем открытии не осталось
+  // пустоты снизу.
+  useEffect(() => {
+    if (!visible) setKeyboardHeight(0);
+  }, [visible]);
+
+  // Остаток вопросов на сегодня узнаём при каждом открытии чата.
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    fetchChatUsage().then((usage) => {
+      if (!cancelled) setRemaining(usage?.remaining ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [visible]);
 
   // Шторка выезжает снизу, затемнение привязано к её позиции (как в HintWithChat).
   const translateY = useRef(new Animated.Value(screenHeight)).current;
@@ -122,11 +163,13 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
     setIsLoading(true);
 
     try {
-      const response = await sendChatGPTMessage({ message: text, context, conversationHistory });
+      const response = await sendChatGPTMessage({ message: text, context, conversationHistory, currency });
       setMessages((prev) => [...prev, { id: `${now + 1}`, text: response.response, isUser: false, timestamp: new Date() }]);
+      setRemaining((prev) => (prev === null ? null : Math.max(prev - 1, 0)));
     } catch (error) {
       console.error('ChatGPT Error:', error);
       const limitReached = error instanceof Error && /limit|429/i.test(error.message);
+      if (limitReached) setRemaining(0);
       setMessages((prev) => [
         // Вопрос остаётся в ленте; при повторе он заменится новой попыткой.
         ...prev.map((m) => (!limitReached && m.id === `${now}` ? { ...m, failed: true } : m)),
@@ -174,7 +217,12 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
       navigationBarTranslucent
       onRequestClose={handleClose}
     >
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <KeyboardAvoidingView
+        // На Android поведение отключено: высоту клавиатуры мы считаем сами,
+        // иначе после её закрытия снизу оставалась пустая полоса.
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1, justifyContent: 'flex-end' }}
+      >
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropOpacity }]}>
           <Pressable style={{ flex: 1 }} onPress={handleClose} />
         </Animated.View>
@@ -183,8 +231,11 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           style={{
             height: '88%',
             // Android: со statusBarTranslucent модалка занимает всё окно, поэтому
-            // сверху оставляем строку состояния свободной.
-            maxHeight: screenHeight - insets.top - 8,
+            // сверху оставляем строку состояния свободной. Открытая клавиатура
+            // не двигает лист вверх, а укорачивает его — тогда шапка остаётся
+            // на месте, а поле ввода оказывается прямо над клавиатурой.
+            marginBottom: keyboardHeight,
+            maxHeight: screenHeight - insets.top - 8 - keyboardHeight,
             backgroundColor: c.sheet,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
@@ -303,7 +354,16 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           </ScrollView>
 
           {/* Input */}
-          <View style={[styles.inputBar, { paddingBottom: 12 + insets.bottom, borderTopColor: c.border, backgroundColor: c.header }]}>
+          <View
+            style={[
+              styles.inputBar,
+              {
+                paddingBottom: 12 + (keyboardHeight > 0 ? 0 : insets.bottom),
+                borderTopColor: c.border,
+                backgroundColor: c.header,
+              },
+            ]}
+          >
             <View style={[styles.inputRow, { backgroundColor: c.input }]}>
               <TextInput
                 value={inputText}
@@ -319,6 +379,13 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
               />
               <SendButton enabled={canSend} onPress={() => sendMessage()} disabledColor={isDark ? '#374151' : '#D1D5DB'} />
             </View>
+            {remaining !== null && (
+              <Text style={[styles.note, { color: remaining === 0 ? '#EF4444' : c.muted }]}>
+                {remaining > 0
+                  ? `Осталось ${remaining} ${plural(remaining, ['вопрос', 'вопроса', 'вопросов'])} на сегодня`
+                  : 'Вопросы на сегодня закончились'}
+              </Text>
+            )}
             <Text style={[styles.note, { color: c.muted }]}>ФинГид может ошибаться. Проверяй важную информацию.</Text>
           </View>
         </Animated.View>
