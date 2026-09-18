@@ -13,6 +13,7 @@ import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 
 interface AddPassivesFormProps{
   backLink?: Href;
@@ -47,7 +48,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
     }, [currentAsset])
 
   const handleBack = () => {
-    router.replace(backLink || "/main/finance/passives/main")
+    goBack(backLink || "/main/finance/passives/main")
   };
 
   const handleAdd = () => {
@@ -76,7 +77,7 @@ const AddPassivesForm = ({backLink, name}:AddPassivesFormProps) => {
 
    
     
-   router.replace("/main/finance/passives/main")
+   goBack("/main/finance/passives/main")
     
   };
 

@@ -176,7 +176,7 @@ const ProfileScreen = () => {
       title: 'Достижения',
       icon: 'diamond-outline',
       hasArrow: true,
-      onPress: () => router.replace('/main/profile/achievements')
+      onPress: () => router.push('/main/profile/achievements')
     },
     {
       id: 'currency',
@@ -190,7 +190,7 @@ const ProfileScreen = () => {
       title: 'Документы',
       icon: 'document-outline',
       hasArrow: true,
-      onPress: () => router.replace('/main/profile/documents')
+      onPress: () => router.push('/main/profile/documents')
     },
     {
       id: 'faceid',
@@ -299,7 +299,7 @@ const ProfileScreen = () => {
           </Text>
           
           {/* Edit Button */}
-          <TouchableOpacity className="flex-row items-center" activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile/edit-profile')}>
+          <TouchableOpacity className="flex-row items-center" activeOpacity={Opacity.press} onPress={()=>router.push('/main/profile/edit-profile')}>
             <Text className="text-[#4CAF50] text-base font-['SFProDisplayRegular'] mr-1">
               Редактировать
             </Text>
@@ -309,7 +309,7 @@ const ProfileScreen = () => {
 
         {/* Уровень и монеты (ТЗ: прогресс-бар по уровням в профиле) */}
         <TouchableOpacity
-          onPress={() => router.replace('/main/profile/progress')}
+          onPress={() => router.push('/main/profile/progress')}
           activeOpacity={Opacity.press}
           className={`${cardBgColor} rounded-2xl p-4 mb-3 flex-row items-center`}
         >
@@ -331,7 +331,7 @@ const ProfileScreen = () => {
 
         {/* Финансовое здоровье (ТЗ: центральный элемент профиля) */}
         <TouchableOpacity
-          onPress={() => router.replace('/main/profile/health')}
+          onPress={() => router.push('/main/profile/health')}
           activeOpacity={Opacity.press}
           className={`${cardBgColor} rounded-2xl p-4 mb-6 flex-row items-center`}
         >

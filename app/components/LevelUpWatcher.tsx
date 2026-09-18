@@ -32,7 +32,7 @@ const LevelUpWatcher = () => {
   const close = (openProgress: boolean) => {
     if (shownLevel !== null) setLastSeenLevel(shownLevel);
     setShownLevel(null);
-    if (openProgress) router.replace('/main/profile/progress');
+    if (openProgress) router.push('/main/profile/progress');
   };
 
   const isDark = theme === 'dark';

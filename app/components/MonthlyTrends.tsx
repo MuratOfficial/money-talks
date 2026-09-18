@@ -257,7 +257,7 @@ const MonthlyTrends = () => {
       )}
 
       <TouchableOpacity
-        onPress={() => router.replace('/main/profile/health')}
+        onPress={() => router.push('/main/profile/health')}
         activeOpacity={Opacity.press}
         className="bg-[#4CAF50] rounded-xl py-3 items-center"
       >

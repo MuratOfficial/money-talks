@@ -16,7 +16,7 @@ import useFinancialStore from '@/hooks/useStore';
 async function unauthenticatedRoute(): Promise<Href> {
   try {
     const seen = await AsyncStorage.getItem(ONBOARDING_SEEN_KEY);
-    return seen === 'true' ? '/(auth)/login' : '/(auth)';
+    return seen === 'true' ? '/(auth)/login' : '/(auth)/welcome';
   } catch (error) {
     console.warn('Failed to read onboarding flag:', error);
     return '/(auth)/login';
@@ -74,8 +74,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!session && segments[0] !== '(auth)') {
-          // Здесь человек уже пользовался приложением — приветствие ни к чему.
-          setShouldRedirect({ to: '/(auth)/login', replace: true });
+          // Тот же выбор, что и в checkAuth: на старте supabase присылает
+          // INITIAL_SESSION без сессии, и жёсткий редирект на вход перебивал
+          // приветствие — человек его никогда не видел.
+          setShouldRedirect({ to: await unauthenticatedRoute(), replace: true });
         }
       }
     );

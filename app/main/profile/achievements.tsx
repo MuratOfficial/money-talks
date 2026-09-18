@@ -7,6 +7,7 @@ import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Motion, Opacity } from '@/constants/design';
 import { AchievementId, computeAchievements } from '@/utils/achievements';
+import { goBack } from '@/utils/navigation';
 
 const IMAGES: Record<AchievementId, ImageSourcePropType> = {
   'first-steps': require('../../../assets/images/ach1.png'),
@@ -40,7 +41,7 @@ const AchievementsScreen = () => {
       <FadeInView style={{ flex: 1 }}>
         <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
           <View className="flex-row items-center py-3 pb-2 w-full">
-            <TouchableOpacity activeOpacity={Opacity.press} onPress={() => router.replace('/main/profile')}>
+            <TouchableOpacity activeOpacity={Opacity.press} onPress={() => goBack('/main/profile')}>
               <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
             <Text className={`${textColor} flex-1 text-center text-lg font-['SFProDisplaySemiBold'] mr-6`}>

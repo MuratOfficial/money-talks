@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 
 const walletTypes = [
   { id: 'card', label: 'Карта', icon: 'card', color: '#4FC3F7' },
@@ -93,7 +94,7 @@ const AddWalletScreen = () => {
     }
 
     getWalletBalance();
-    router.replace('/main');
+    goBack('/main');
   };
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -107,7 +108,7 @@ const AddWalletScreen = () => {
     setShowDeleteModal(false);
     setTimeout(() => {
       getWalletBalance();
-      router.replace('/main');
+      goBack('/main');
     }, 100);
   };
 
@@ -134,7 +135,7 @@ const AddWalletScreen = () => {
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity
-          onPress={() => router.replace('/main')}
+          onPress={() => goBack('/main')}
           activeOpacity={Opacity.press}
           className="p-2"
         >

@@ -19,6 +19,7 @@ import FinGuidePointer from './FinGuidePointer';
 import { useHintPointer } from '@/hooks/useHintPointer';
 import LoadingAnimation from './LoadingAnimation';
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import { goBack } from '@/utils/navigation';
 import { RecordKind, categoryLabel } from '@/constants/categories';
 import MonthlyTrends from './MonthlyTrends';
 
@@ -202,7 +203,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
     setCurrentAsset(asset);
 
     
-    router.replace(addLink || "/main/finance")
+    router.push(addLink || "/main/finance")
   };
 
 
@@ -210,12 +211,11 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
   const handleAddExpense = () => {
     setCurrentAsset(null)
-    router.replace(addLink || "/main/finance")
+    router.push(addLink || "/main/finance")
   };
 
   const handleBack = () => {
-    
-    router.replace("/main/finance")
+    goBack("/main/finance")
   };
 
   // Показываем загрузку при первой загрузке
@@ -245,7 +245,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         </Text>
         
         <View className="flex-row">
-          {diagramLink && <TouchableOpacity className="p-2 mr-1" onPress={()=>router.replace(diagramLink)}>
+          {diagramLink && <TouchableOpacity className="p-2 mr-1" onPress={()=>router.push(diagramLink)}>
             <Ionicons name="pie-chart-outline" size={20} color={iconColor} />
           </TouchableOpacity>}
           

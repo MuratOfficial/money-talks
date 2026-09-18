@@ -91,9 +91,11 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
   useEffect(() => {
     if (visible) {
       setRendered(true);
-      Animated.timing(translateY, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+      // JS-драйвер: тем же значением двигает лист жест (setValue), а на
+      // нативном драйвере такие сдвиги на Android не применялись.
+      Animated.timing(translateY, { toValue: 0, duration: 320, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
     } else {
-      Animated.timing(translateY, { toValue: screenHeight, duration: 240, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(
+      Animated.timing(translateY, { toValue: screenHeight, duration: 240, easing: Easing.in(Easing.cubic), useNativeDriver: false }).start(
         ({ finished }) => finished && setRendered(false)
       );
     }
@@ -197,6 +199,7 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
           {/* Шапка — она же зона для свайпа вниз */}
           <View
             {...dragHandlers}
+            collapsable={false}
             style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}
           >
             <View style={{ alignItems: 'center', paddingTop: 8 }}>

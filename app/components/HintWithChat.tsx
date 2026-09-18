@@ -78,14 +78,16 @@ const InfoModal: React.FC<InfoModalProps> = ({
         toValue: 0,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
+        // JS-драйвер: тем же значением двигает лист жест (setValue), а на
+        // нативном драйвере такие сдвиги на Android не применялись.
+        useNativeDriver: false,
       }).start();
     } else {
       Animated.timing(translateY, {
         toValue: screenHeight,
         duration: 250,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start(({ finished }) => {
         if (finished) setRendered(false);
       });
@@ -162,7 +164,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}>
           {/* Ручка и шапка — зона для свайпа вниз */}
-          <View {...dragHandlers}>
+          <View {...dragHandlers} collapsable={false}>
           <View style={{ alignItems: 'center', paddingVertical: 8 }}>
             <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#9CA3AF' }} />
           </View>

@@ -8,6 +8,7 @@ import FadeInView from '@/app/components/FadeInView';
 import ScoreRing from '@/app/components/ScoreRing';
 import { Motion, Opacity } from '@/constants/design';
 import { HEALTH_LEVELS, computeFinancialHealth, weakestHint } from '@/utils/financialHealth';
+import { goBack } from '@/utils/navigation';
 
 /** «Финансовое здоровье»: балл, уровень, составляющие и чек-лист «Как улучшить». */
 const HealthScreen = () => {
@@ -32,7 +33,7 @@ const HealthScreen = () => {
   return (
     <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity activeOpacity={Opacity.press} onPress={() => router.replace('/main/profile')}>
+        <TouchableOpacity activeOpacity={Opacity.press} onPress={() => goBack('/main/profile')}>
           <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         <Text className={`${textColor} flex-1 text-center text-lg font-['SFProDisplaySemiBold'] mr-6`}>
@@ -119,7 +120,7 @@ const HealthScreen = () => {
             checklist.map((c) => (
               <TouchableOpacity
                 key={c.id}
-                onPress={() => router.replace(c.route as Href)}
+                onPress={() => router.push(c.route as Href)}
                 activeOpacity={Opacity.press}
                 className={`${cardBgColor} rounded-2xl p-4 mb-3 flex-row items-center`}
               >

@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import useFinancialStore, { GoalAnalysis } from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 import {
   ANALYSIS_TOOLS,
   AnalysisTool,
@@ -51,7 +52,7 @@ const GoalToolsScreen = () => {
   const borderColor = isDark ? 'border-gray-700' : 'border-gray-300';
   const iconColor = isDark ? 'white' : '#11181C';
 
-  const goBack = () => router.replace('/main/goals/main');
+  const goBackToGoals = () => goBack('/main/goals/main');
 
   if (!goal) {
     return (
@@ -59,7 +60,7 @@ const GoalToolsScreen = () => {
         <Text className={`${textColor} text-base text-center mb-4 font-['SFProDisplayRegular']`}>
           Цель не найдена
         </Text>
-        <TouchableOpacity onPress={goBack} activeOpacity={Opacity.press}>
+        <TouchableOpacity onPress={goBackToGoals} activeOpacity={Opacity.press}>
           <Text className="text-[#4CAF50] text-base font-['SFProDisplayRegular']">К списку целей</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -82,7 +83,7 @@ const GoalToolsScreen = () => {
     if (!sameAnalysis(goal.analysis, analysis)) {
       updateGoal(goal.id, { analysis: cleanAnalysis(analysis) });
     }
-    goBack();
+    goBackToGoals();
   };
 
   const handleSave = () => {

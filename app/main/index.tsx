@@ -34,7 +34,7 @@ const MainScreen = () => {
   const handleGoal = useCallback((title: string, type?: string, itemId?: string) => {
     if (title === "Кошелек" && itemId) {
       pickEditWallet(itemId);
-      router.replace('/main/wallet/add-wallet');
+      router.push('/main/wallet/add-wallet');
       return;
     }
     if (title === "Цели") {
@@ -47,13 +47,13 @@ const MainScreen = () => {
       if (type === "Долгосрочные") {
         setGoalFilter("Долгосрочные");
       }
-      router.replace('/main/goals/main');
+      router.push('/main/goals/main');
     }
     if (title === "Доходы") {
-      router.replace('/main/finance/incomes/main');
+      router.push('/main/finance/incomes/main');
     }
     if (title === "Расходы") {
-      router.replace('/main/finance/expences/main');
+      router.push('/main/finance/expences/main');
     }
   }, [setGoalFilter, router, pickEditWallet]);
 
@@ -146,7 +146,7 @@ const MainScreen = () => {
 
         {category.title === 'Кошелек' ? (
           <TouchableOpacity
-            onPress={() => { pickEditWallet(''); router.replace('/main/wallet/add-wallet'); }}
+            onPress={() => { pickEditWallet(''); router.push('/main/wallet/add-wallet'); }}
             activeOpacity={Opacity.press}
             className={`flex-row items-center ${chipClass} px-2 py-1 rounded-xl border`}
           >

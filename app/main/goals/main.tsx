@@ -15,6 +15,7 @@ import FadeInView from '@/app/components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import { monthNameToIndex } from '@/hooks/pdf/pdfCalculations';
 import { ANALYSIS_TOOLS, completedToolsCount } from '@/constants/goalAnalysis';
+import { goBack } from '@/utils/navigation';
 
 const PRIORITY_ORDER: Record<GoalPriority, number> = { high: 0, medium: 1, low: 2 };
 
@@ -163,7 +164,7 @@ const GoalsScreen = () => {
 const handleAdd = () => {
   pickEditGoal("");
   setGoalFilter(selectedTerm);
-  router.replace("/main/goals/add-goal")
+  router.push("/main/goals/add-goal")
 }
 
 // Использование в компоненте с useEffect
@@ -448,7 +449,7 @@ useEffect(() => {
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity
-          onPress={() => router.replace('/main')}
+          onPress={() => goBack('/main')}
           activeOpacity={Opacity.press}
           className="p-2"
         >

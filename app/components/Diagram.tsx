@@ -14,6 +14,7 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 
 import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
 import { RecordKind, groupByCategory } from '@/constants/categories';
+import { goBack } from '@/utils/navigation';
 
 interface ExpenseCategory {
   id: string;
@@ -114,7 +115,7 @@ const ChartScreen = ({backLink, assets, categoryKind}:ChartScreenProps) => {
   };
 
   const handleBack = () => {
-     router.replace(backLink || "/main/finance")
+     goBack(backLink || "/main/finance")
   };
 
   return (

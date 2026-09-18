@@ -8,6 +8,7 @@ import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 
 const EditProfilePage: React.FC = () => {
 
@@ -108,7 +109,7 @@ const EditProfilePage: React.FC = () => {
       email: email,
       avatar: avatarUri // добавляем аватар в обновление профиля
     });
-    router.push("/main/profile");
+    goBack("/main/profile");
   };
 
   // Открывает подтверждение удаления (сам диалог).
@@ -139,7 +140,7 @@ const EditProfilePage: React.FC = () => {
     <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 pb-6">
-        <TouchableOpacity className="mr-4" activeOpacity={Opacity.press} onPress={()=>router.replace('/main/profile')}>
+        <TouchableOpacity className="mr-4" activeOpacity={Opacity.press} onPress={()=>goBack('/main/profile')}>
            <Ionicons name="chevron-back" size={24} color={iconColor} />
         </TouchableOpacity>
         <Text className={`${textColor} text-lg font-['SFProDisplayRegular']`}>

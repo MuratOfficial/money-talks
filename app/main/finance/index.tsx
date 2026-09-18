@@ -111,34 +111,34 @@ const FinanceApp: React.FC = () => {
     // Формы добавления открываются в режиме редактирования, если в сторе
     // остался выбранный ранее элемент.
     setCurrentAsset(null);
-    router.replace(route as Href);
+    router.push(route as Href);
   };
 
   const financeItems:FinanceCardProps[] = [
     {
       title: 'Расходы',
       iconName: images["img1"],
-      onPress: () => router.replace('/main/finance/expences/main')
+      onPress: () => router.push('/main/finance/expences/main')
     },
     {
       title: 'Доходы',
       iconName: images["img2"],
-      onPress: () => router.replace('/main/finance/incomes/main')
+      onPress: () => router.push('/main/finance/incomes/main')
     },
     {
       title: 'Активы',
       iconName: images["img3"],
-      onPress: () => router.replace('/main/finance/actives/main')
+      onPress: () => router.push('/main/finance/actives/main')
     },
     {
       title: 'Пассивы',
       iconName: images["img4"],
-      onPress: () => router.replace('/main/finance/passives/main')
+      onPress: () => router.push('/main/finance/passives/main')
     },
     {
       title: 'Анализ',
       iconName: images["img5"],
-      onPress: () => router.replace('/main/finance/analyze/main')
+      onPress: () => router.push('/main/finance/analyze/main')
     },
   ];
 

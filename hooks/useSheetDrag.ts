@@ -54,7 +54,8 @@ export function useSheetDrag({
       Animated.spring(translateY, {
         toValue: 0,
         bounciness: 0,
-        useNativeDriver: true,
+        // Тот же драйвер, что у открытия листа (см. комментарий там).
+        useNativeDriver: false,
       }).start();
 
     return PanResponder.create({

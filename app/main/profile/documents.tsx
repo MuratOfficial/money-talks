@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Colors, Opacity, Motion } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 
 type DocType = 'text' | 'development';
 
@@ -181,7 +182,7 @@ const DocumentsScreen = () => {
   return (
     <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-        <Header title="Документы" onBack={() => router.replace('/main/profile')} />
+        <Header title="Документы" onBack={() => goBack('/main/profile')} />
 
         <View className="mb-8">
           {DOCUMENTS.map((item, index) => (

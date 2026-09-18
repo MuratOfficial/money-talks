@@ -16,6 +16,7 @@ import useFinancialStore, { Asset } from '@/hooks/useStore';
 import { assetFormSchema, firstError, parseAmountInput } from '@/validation/forms';
 import FadeInView from './FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 import {
   RecordKind,
   findCategory,
@@ -67,14 +68,9 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
   const handleGoBack = () => {
     try {
-      if (backLink) {
-        router.replace(backLink);
-      } else {
-        router.back();
-      }
+      goBack(backLink || '/main/finance');
     } catch (error) {
       console.error('Navigation error:', error);
-
       router.replace('/main/finance');
     }
   };
@@ -117,7 +113,7 @@ const AddForm = ({backLink, name, type, formItem}:AddFormProps) => {
 
       setTimeout(() => {
         try {
-          router.replace(backLink || '/main/finance');
+          goBack(backLink || '/main/finance');
         } catch (navError) {
           console.error('Navigation error:', navError);
         }

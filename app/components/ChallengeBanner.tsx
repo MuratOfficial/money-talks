@@ -31,7 +31,7 @@ const ChallengeBanner = () => {
 
   return (
     <TouchableOpacity
-      onPress={() => router.replace('/main/profile/progress')}
+      onPress={() => router.push('/main/profile/progress')}
       activeOpacity={Opacity.press}
       className={`${isDark ? 'bg-white/10' : 'bg-white/70'} rounded-2xl p-3 mb-6 flex-row items-center`}
     >

@@ -63,14 +63,16 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
         toValue: 0,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
+        // JS-драйвер: тем же значением двигает лист жест (setValue), а на
+        // нативном драйвере такие сдвиги на Android не применялись.
+        useNativeDriver: false,
       }).start();
     } else {
       Animated.timing(translateY, {
         toValue: screenHeight,
         duration: 250,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start(({ finished }) => {
         if (finished) setRendered(false);
       });
@@ -116,7 +118,7 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
           }}
         >
           {/* Ручка и шапка — зона для свайпа вниз */}
-          <View {...dragHandlers}>
+          <View {...dragHandlers} collapsable={false}>
             <View className={`w-10 h-1 ${isDark ? 'bg-gray-600' : 'bg-gray-400'} rounded-full self-center mb-6`} />
 
             <View className="flex-row items-center justify-between mb-6">

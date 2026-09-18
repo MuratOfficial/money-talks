@@ -13,6 +13,7 @@ import { Href, useRouter } from 'expo-router';
 import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '@/app/components/FadeInView';
 import { Opacity } from '@/constants/design';
+import { goBack } from '@/utils/navigation';
 
 const AddActivesForm = () => {
 
@@ -53,7 +54,7 @@ const AddActivesForm = () => {
 
 
   const handleBack = () => {
-    router.replace( "/main/finance/actives/main")
+    goBack("/main/finance/actives/main")
   };
 
   const handleAddExpense = () => {
@@ -77,7 +78,7 @@ const AddActivesForm = () => {
     }
     
 
-    router.replace("/main/finance/actives/main")
+    goBack("/main/finance/actives/main")
 
   };
 
