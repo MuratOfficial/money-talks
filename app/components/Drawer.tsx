@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, Dimensions, ScrollView, Animated, Easing, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 import { Opacity } from '@/constants/design';
 
 interface DrawerProps {
@@ -47,6 +48,9 @@ const Drawer: React.FC<DrawerProps> = ({
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
+
+  // Свайп вниз по шапке закрывает шторку.
+  const dragHandlers = useSheetDrag({ translateY, onClose });
 
   useEffect(() => {
     if (visible) {
@@ -134,21 +138,22 @@ const Drawer: React.FC<DrawerProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}
         >
-          {/* Handle Bar */}
-          <View className={`w-10 h-1 ${handleBarColor} rounded-full self-center mb-6`} />
+          {/* Ручка и шапка — зона для свайпа вниз */}
+          <View {...dragHandlers}>
+            <View className={`w-10 h-1 ${handleBarColor} rounded-full self-center mb-6`} />
 
-          {/* Header */}
-          <View className="flex-row items-center justify-between mb-6">
-            <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
-              {title}
-            </Text>
-            <TouchableOpacity
-              onPress={onClose}
-              className="p-1"
-              activeOpacity={Opacity.press}
-            >
-              <Ionicons name="close" size={24} color={iconColor} />
-            </TouchableOpacity>
+            <View className="flex-row items-center justify-between mb-6">
+              <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>
+                {title}
+              </Text>
+              <TouchableOpacity
+                onPress={onClose}
+                className="p-1"
+                activeOpacity={Opacity.press}
+              >
+                <Ionicons name="close" size={24} color={iconColor} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Options — с ограничением высоты и прокруткой */}

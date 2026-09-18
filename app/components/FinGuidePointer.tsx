@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Modal, Pressable, TouchableOpacity, useWindowDimensions } from 'react-native';
+import {
+  Animated,
+  BackHandler,
+  Easing,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Colors } from '@/constants/design';
 import FinGuide from './FinGuide';
 import FinGuideCard from './FinGuideCard';
@@ -13,7 +21,7 @@ export interface TargetRect {
 
 interface FinGuidePointerProps {
   visible: boolean;
-  /** Координаты кнопки из measureInWindow — Modal рисуется в той же системе. */
+  /** Координаты кнопки из measureInWindow — пересчитываем их в систему оверлея. */
   target: TargetRect;
   message: string;
   actionLabel?: string;
@@ -32,6 +40,12 @@ const SIDE_PADDING = 16;
 /**
  * Подсказка на пустом экране: затемнение, пульсирующее кольцо вокруг кнопки
  * «Подсказки» и ФинГид, который указывает на неё рукой.
+ *
+ * Оверлей рисуется внутри самого экрана, а не в Modal. На Android Modal — это
+ * отдельное окно со своим началом координат, и кольцо оказывалось выше кнопки
+ * на высоту строки состояния. Здесь и кнопку, и оверлей мы измеряем через
+ * measureInWindow в одном окне и берём разницу — попадание точное на любом
+ * устройстве.
  */
 const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
   visible,
@@ -42,10 +56,12 @@ const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
   onClose,
   autoCloseDuration = 8000,
 }) => {
-  const { width: screenWidth } = useWindowDimensions();
   const appear = useRef(new Animated.Value(0)).current;
   const pulse = useRef(new Animated.Value(0)).current;
   const [rendered, setRendered] = useState(visible);
+  const rootRef = useRef<View>(null);
+  /** Положение и размер самого оверлея в окне — база для пересчёта координат. */
+  const [frame, setFrame] = useState<TargetRect | null>(null);
 
   useEffect(() => {
     if (!visible) {
@@ -69,6 +85,17 @@ const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
+  // Кнопка «Назад» на Android закрывает подсказку, а не уводит с экрана.
+  useEffect(() => {
+    if (!visible) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      hide(onClose);
+      return true;
+    });
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
   const hide = (after: () => void) => {
     Animated.timing(appear, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => {
       setRendered(false);
@@ -76,19 +103,27 @@ const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
     });
   };
 
+  const measureSelf = () => {
+    rootRef.current?.measureInWindow((x, y, width, height) => {
+      if (width > 0 && height > 0) setFrame({ x, y, width, height });
+    });
+  };
+
   if (!visible && !rendered) return null;
 
-  const centerX = target.x + target.width / 2;
-  const centerY = target.y + target.height / 2;
+  // Координаты кнопки в системе оверлея.
+  const overlayWidth = frame?.width ?? 0;
+  const centerX = target.x - (frame?.x ?? 0) + target.width / 2;
+  const centerY = target.y - (frame?.y ?? 0) + target.height / 2;
   const ringSize = Math.max(target.width, target.height) + 14;
 
   // Персонаж стоит под кнопкой так, чтобы кисть оказалась под её центром.
   const guideLeft = Math.min(
     Math.max(centerX - GUIDE_SIZE * HAND_X, SIDE_PADDING),
-    screenWidth - GUIDE_SIZE - SIDE_PADDING / 2
+    Math.max(overlayWidth - GUIDE_SIZE - SIDE_PADDING / 2, SIDE_PADDING)
   );
-  const guideTop = target.y + target.height + 6;
-  const guideOnRight = guideLeft + GUIDE_SIZE / 2 > screenWidth / 2;
+  const guideTop = centerY + target.height / 2 + 6;
+  const guideOnRight = guideLeft + GUIDE_SIZE / 2 > overlayWidth / 2;
 
   const guideStyle = {
     opacity: appear,
@@ -103,79 +138,78 @@ const FinGuidePointer: React.FC<FinGuidePointerProps> = ({
   };
 
   return (
-    <Modal
-      visible={rendered}
-      transparent
-      animationType="none"
-      // Android: без этого Modal рисуется под строкой состояния, и координаты
-      // кнопки из measureInWindow не совпадают с координатами внутри модалки.
-      statusBarTranslucent
-      navigationBarTranslucent
-      onRequestClose={() => hide(onClose)}
+    <Animated.View
+      ref={rootRef}
+      onLayout={measureSelf}
+      // elevation — чтобы на Android оверлей лёг поверх карточек с тенями.
+      style={[StyleSheet.absoluteFill, { opacity: appear, zIndex: 50, elevation: 24 }]}
     >
-      <Animated.View style={{ flex: 1, opacity: appear }}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={() => hide(onClose)} />
+      <Pressable style={StyleSheet.absoluteFill} onPress={() => hide(onClose)} />
 
-        {/* Пульсирующее кольцо вокруг кнопки */}
-        <Animated.View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            left: centerX - ringSize / 2,
-            top: centerY - ringSize / 2,
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: 2,
-            borderColor: Colors.primary,
-            opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.9, 0] }),
-            transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }],
-          }}
-        />
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => hide(onPressTarget)}
-          accessibilityLabel="Открыть подсказки"
-          style={{
-            position: 'absolute',
-            left: centerX - ringSize / 2,
-            top: centerY - ringSize / 2,
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: 2,
-            borderColor: Colors.primary,
-            backgroundColor: 'rgba(255,255,255,0.18)',
-          }}
-        />
-
-        <Animated.View
-          pointerEvents="none"
-          style={[{ position: 'absolute', left: guideLeft, top: guideTop }, guideStyle]}
-        >
-          <FinGuide size={GUIDE_SIZE} mood="happy" point={guideOnRight} wave={!guideOnRight} />
-        </Animated.View>
-
-        <Animated.View
-          style={[
-            {
+      {/* Пока оверлей не измерен, координаты кнопки пересчитать не во что. */}
+      {frame && (
+        <>
+          {/* Пульсирующее кольцо вокруг кнопки */}
+          <Animated.View
+            pointerEvents="none"
+            style={{
               position: 'absolute',
-              top: guideTop + GUIDE_HEIGHT * 0.35,
-              left: guideOnRight ? SIDE_PADDING : guideLeft + GUIDE_SIZE,
-              right: guideOnRight ? screenWidth - guideLeft : SIDE_PADDING,
-            },
-            cardStyle,
-          ]}
-        >
-          <FinGuideCard
-            message={message}
-            showGuide={false}
-            action={{ label: actionLabel, onPress: () => hide(onPressTarget) }}
-            onClose={() => hide(onClose)}
+              left: centerX - ringSize / 2,
+              top: centerY - ringSize / 2,
+              width: ringSize,
+              height: ringSize,
+              borderRadius: ringSize / 2,
+              borderWidth: 2,
+              borderColor: Colors.primary,
+              opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.9, 0] }),
+              transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }],
+            }}
           />
-        </Animated.View>
-      </Animated.View>
-    </Modal>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => hide(onPressTarget)}
+            accessibilityLabel="Открыть подсказки"
+            style={{
+              position: 'absolute',
+              left: centerX - ringSize / 2,
+              top: centerY - ringSize / 2,
+              width: ringSize,
+              height: ringSize,
+              borderRadius: ringSize / 2,
+              borderWidth: 2,
+              borderColor: Colors.primary,
+              backgroundColor: 'rgba(255,255,255,0.18)',
+            }}
+          />
+
+          <Animated.View
+            pointerEvents="none"
+            style={[{ position: 'absolute', left: guideLeft, top: guideTop }, guideStyle]}
+          >
+            <FinGuide size={GUIDE_SIZE} mood="happy" point={guideOnRight} wave={!guideOnRight} />
+          </Animated.View>
+
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: guideTop + GUIDE_HEIGHT * 0.35,
+                left: guideOnRight ? SIDE_PADDING : guideLeft + GUIDE_SIZE,
+                right: guideOnRight ? overlayWidth - guideLeft : SIDE_PADDING,
+              },
+              cardStyle,
+            ]}
+          >
+            <FinGuideCard
+              message={message}
+              showGuide={false}
+              action={{ label: actionLabel, onPress: () => hide(onPressTarget) }}
+              onClose={() => hide(onClose)}
+            />
+          </Animated.View>
+        </>
+      )}
+    </Animated.View>
   );
 };
 

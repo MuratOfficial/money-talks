@@ -4,8 +4,8 @@ import type { TargetRect } from '@/app/components/FinGuidePointer';
 
 /**
  * Для пустого экрана: измеряет кнопку «Подсказки» и включает ФинГида,
- * который на неё указывает. Координаты берутся из measureInWindow — в той же
- * системе рисуется полноэкранный Modal указателя.
+ * который на неё указывает. Координаты берутся из measureInWindow, а оверлей
+ * пересчитывает их относительно себя (см. FinGuidePointer).
  */
 export function useHintPointer(shouldShow: boolean, delay = 600) {
   const targetRef = useRef<View>(null);

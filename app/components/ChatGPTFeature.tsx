@@ -22,6 +22,7 @@ import { ChatGPTMessage, sendChatGPTMessage } from '@/services/api';
 import useFinancialStore from '@/hooks/useStore';
 import { Colors, Opacity } from '@/constants/design';
 import { markdownStyles } from '@/constants/markdown';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 import FinGuide from './FinGuide';
 import FadeInView from './FadeInView';
 
@@ -152,6 +153,9 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
     onClose();
   };
 
+  // Свайп вниз по шапке закрывает чат — так же, как кнопка «крестик».
+  const dragHandlers = useSheetDrag({ translateY, onClose: handleClose });
+
   const confirmClear = () => {
     if (messages.length === 0) return;
     Alert.alert('Очистить чат?', 'Вся история разговора будет удалена.', [
@@ -190,8 +194,11 @@ const ChatGPTFeature: React.FC<ChatGPTFeatureProps> = ({ visible, onClose, title
             transform: [{ translateY }],
           }}
         >
-          {/* Header */}
-          <View style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}>
+          {/* Шапка — она же зона для свайпа вниз */}
+          <View
+            {...dragHandlers}
+            style={{ backgroundColor: c.header, borderBottomWidth: 1, borderBottomColor: c.border }}
+          >
             <View style={{ alignItems: 'center', paddingTop: 8 }}>
               <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#D1D5DB' }} />
             </View>

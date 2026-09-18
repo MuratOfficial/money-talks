@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, TouchableOpacity, Modal, Dimensions, Animated, Easing, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useFinancialStore from '@/hooks/useStore';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 import { Opacity } from '@/constants/design';
 
 interface ConfirmationDrawerProps {
@@ -51,6 +52,9 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
+
+  // Свайп вниз по шапке закрывает шторку.
+  const dragHandlers = useSheetDrag({ translateY, onClose });
 
   useEffect(() => {
     if (visible) {
@@ -111,21 +115,22 @@ const ConfirmationDrawer: React.FC<ConfirmationDrawerProps> = ({
             paddingBottom: 16 + insets.bottom,
           }}
         >
-          {/* Handle Bar */}
-          <View className={`w-10 h-1 ${isDark ? 'bg-gray-600' : 'bg-gray-400'} rounded-full self-center mb-6`} />
+          {/* Ручка и шапка — зона для свайпа вниз */}
+          <View {...dragHandlers}>
+            <View className={`w-10 h-1 ${isDark ? 'bg-gray-600' : 'bg-gray-400'} rounded-full self-center mb-6`} />
 
-          {/* Header with Close Button */}
-          <View className="flex-row items-center justify-between mb-6">
-            <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] flex-1`}>
-              {title}
-            </Text>
-            <TouchableOpacity
-              onPress={onClose}
-              className="ml-4 p-1"
-              activeOpacity={Opacity.press}
-            >
-              <MaterialIcons name="close" size={24} color={iconColor} />
-            </TouchableOpacity>
+            <View className="flex-row items-center justify-between mb-6">
+              <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold'] flex-1`}>
+                {title}
+              </Text>
+              <TouchableOpacity
+                onPress={onClose}
+                className="ml-4 p-1"
+                activeOpacity={Opacity.press}
+              >
+                <MaterialIcons name="close" size={24} color={iconColor} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Action Buttons */}

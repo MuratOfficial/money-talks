@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import React, { ReactElement } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useFinancialStore from '@/hooks/useStore';
@@ -50,7 +50,10 @@ export default function RootLayout(): ReactElement {
     <View className="flex-1">
       {/* Основной контент с padding снизу для навигации */}
       <View className="flex-1" style={{ paddingBottom: NAV_BAR_HEIGHT + insets.bottom }}>
-        <Slot />
+        {/* Stack, а не Slot: Slot не хранит историю, и кнопка «Назад» на Android
+            с любого экрана возвращала на Главную, а не на предыдущий.
+            Анимацию отключаем — переходы между разделами остаются как были. */}
+        <Stack screenOptions={{ headerShown: false, animation: 'none' }} />
       </View>
 
       <LevelUpWatcher />

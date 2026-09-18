@@ -17,6 +17,7 @@ import Markdown from 'react-native-markdown-display';
 import ChatGPTFeature from './ChatGPTFeature';
 import VideoHintPlayer from './VideoHintPlayer';
 import useFinancialStore from '@/hooks/useStore';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 import { Colors, Opacity } from '@/constants/design';
 import { markdownStyles } from '@/constants/markdown';
 import FinGuide from './FinGuide';
@@ -91,6 +92,9 @@ const InfoModal: React.FC<InfoModalProps> = ({
     }
   }, [visible]);
 
+  // Свайп вниз по шапке закрывает шторку.
+  const dragHandlers = useSheetDrag({ translateY, onClose });
+
   const isDark = theme === 'dark';
   const dividerColor = isDark ? '#374151' : '#D1D5DB';
   const iconColor = isDark ? 'white' : '#11181C';
@@ -157,7 +161,8 @@ const InfoModal: React.FC<InfoModalProps> = ({
             paddingTop: 24,
             paddingBottom: 16 + insets.bottom,
           }}>
-          {/* Drag Indicator */}
+          {/* Ручка и шапка — зона для свайпа вниз */}
+          <View {...dragHandlers}>
           <View style={{ alignItems: 'center', paddingVertical: 8 }}>
             <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: isDark ? '#4B5563' : '#9CA3AF' }} />
           </View>
@@ -208,6 +213,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
               </Animated.View>
             )}
             {!enableChatGPT && <View style={{ width: 24 }} />}
+          </View>
           </View>
 
           <ScrollView 
