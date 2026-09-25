@@ -40,7 +40,7 @@ const ChallengeBanner = () => {
         <Text className={`${isDark ? 'text-white' : 'text-gray-900'} text-sm font-['SFProDisplaySemiBold']`} numberOfLines={1}>
           {title}
         </Text>
-        <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-xs mb-1.5 font-['SFProDisplayRegular']`}>{subtitle}</Text>
+        <Text className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mb-1.5 font-['SFProDisplayRegular']`}>{subtitle}</Text>
         <View className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
           <View className="h-full rounded-full bg-[#4CAF50]" style={{ width: `${Math.round(Math.min(1, progress) * 100)}%` }} />
         </View>

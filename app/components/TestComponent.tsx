@@ -298,8 +298,8 @@ export const AllocationBar = ({ protectiveShare }: { protectiveShare: number }) 
       <View style={{ flex: 100 - protectiveShare, backgroundColor: '#4CAF50' }} />
     </View>
     <View className="flex-row justify-between mt-1">
-      <Text className="text-xs text-[#3B82F6] font-['SFProDisplayRegular']">Защита {protectiveShare}%</Text>
-      <Text className="text-xs text-[#4CAF50] font-['SFProDisplayRegular']">Рост {100 - protectiveShare}%</Text>
+      <Text className="text-sm text-[#3B82F6] font-['SFProDisplayRegular']">Защита {protectiveShare}%</Text>
+      <Text className="text-sm text-[#4CAF50] font-['SFProDisplayRegular']">Рост {100 - protectiveShare}%</Text>
     </View>
   </View>
 );

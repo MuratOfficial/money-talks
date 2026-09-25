@@ -412,11 +412,11 @@ useEffect(() => {
         >
           <View className="flex-row items-center">
             <Ionicons name="bulb-outline" size={16} color="#4CAF50" />
-            <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] ml-2`}>
+            <Text className={`${textColor} text-base font-['SFProDisplayRegular'] ml-2`}>
               Проверить истинность цели
             </Text>
           </View>
-          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             {completedToolsCount(goal.analysis)}/{ANALYSIS_TOOLS.length}
           </Text>
         </TouchableOpacity>

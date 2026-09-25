@@ -60,8 +60,8 @@ const BrokersScreen = () => {
   const row = (label: string, value?: string | null) =>
     value ? (
       <View className="flex-row justify-between mt-1">
-        <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>{label}</Text>
-        <Text className={`${textColor} text-xs font-['SFProDisplayRegular'] flex-1 text-right ml-3`}>{value}</Text>
+        <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>{label}</Text>
+        <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] flex-1 text-right ml-3`}>{value}</Text>
       </View>
     ) : null;
 
@@ -79,11 +79,11 @@ const BrokersScreen = () => {
       <FadeInView style={{ flex: 1 }}>
         <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
           <View className={`${cardBgColor} rounded-xl p-4 mb-4`}>
-            <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold'] mb-2`}>На что смотреть</Text>
+            <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mb-2`}>На что смотреть</Text>
             {CHECKLIST.map((item, index) => (
               <View key={item} className={`flex-row ${index > 0 ? 'mt-2' : ''}`}>
-                <Text className="text-[#4CAF50] text-xs mr-2 font-['SFProDisplaySemiBold']">{index + 1}</Text>
-                <Text className={`${textSecondaryColor} text-xs leading-5 flex-1 font-['SFProDisplayRegular']`}>
+                <Text className="text-[#4CAF50] text-sm mr-2 font-['SFProDisplaySemiBold']">{index + 1}</Text>
+                <Text className={`${textSecondaryColor} text-sm leading-5 flex-1 font-['SFProDisplayRegular']`}>
                   {item}
                 </Text>
               </View>
@@ -94,7 +94,7 @@ const BrokersScreen = () => {
             <View key={broker.id} className={`${cardBgColor} rounded-xl p-4 mb-3`}>
               <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{broker.name}</Text>
               {!!broker.description && (
-                <Text className={`${textSecondaryColor} text-xs leading-5 mt-1 font-['SFProDisplayRegular']`}>
+                <Text className={`${textSecondaryColor} text-sm leading-5 mt-1 font-['SFProDisplayRegular']`}>
                   {broker.description}
                 </Text>
               )}
@@ -110,7 +110,7 @@ const BrokersScreen = () => {
                   className="flex-row items-center justify-center mt-3 py-2.5 rounded-lg border border-[#4CAF50]"
                 >
                   <MaterialIcons name="open-in-new" size={16} color="#4CAF50" style={{ marginRight: 6 }} />
-                  <Text className="text-[#4CAF50] text-xs font-['SFProDisplayRegular']">Открыть сайт</Text>
+                  <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">Открыть сайт</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -131,7 +131,7 @@ const BrokersScreen = () => {
             className="bg-[#4CAF50] rounded-xl py-3.5 px-4 mt-2 mb-10 flex-row items-center justify-center"
           >
             <MaterialIcons name="verified-user" size={18} color="white" style={{ marginRight: 8 }} />
-            <Text className="text-white text-sm font-['SFProDisplayRegular']">Проверить брокера в реестре АРРФР</Text>
+            <Text className="text-white text-base font-['SFProDisplayRegular']">Проверить брокера в реестре АРРФР</Text>
           </TouchableOpacity>
         </ScrollView>
       </FadeInView>

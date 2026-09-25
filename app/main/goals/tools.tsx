@@ -128,7 +128,7 @@ const GoalToolsScreen = () => {
           </TouchableOpacity>
           <View className="flex-1 items-center">
             <Text className={`${textColor} text-lg font-['SFProDisplaySemiBold']`}>Проработка цели</Text>
-            <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`} numberOfLines={1}>
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`} numberOfLines={1}>
               {goal.name}
             </Text>
           </View>

@@ -68,7 +68,7 @@ const CrisisScenarios: React.FC = () => {
       <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
         Что если…
       </Text>
-      <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mb-3`}>
+      <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
         Проверьте план на кризис: приложение пересчитает дельту и срок жизни накоплений.
       </Text>
 
@@ -88,7 +88,7 @@ const CrisisScenarios: React.FC = () => {
               className={`px-3 py-1.5 mr-2 rounded-2xl border ${active ? 'border-[#4CAF50] bg-[#4CAF50]/10' : chipBorder}`}
             >
               <Text
-                className={`text-xs font-['SFProDisplayRegular'] ${active ? 'text-[#4CAF50]' : textSecondaryColor}`}
+                className={`text-sm font-['SFProDisplayRegular'] ${active ? 'text-[#4CAF50]' : textSecondaryColor}`}
               >
                 {item.title}
               </Text>
@@ -98,22 +98,22 @@ const CrisisScenarios: React.FC = () => {
       </ScrollView>
 
       <View className={`p-3 rounded-xl ${cardBgColor}`}>
-        <Text className={`${textSecondaryColor} text-xs leading-5 mb-3 font-['SFProDisplayRegular']`}>
+        <Text className={`${textSecondaryColor} text-sm mb-3 font-['SFProDisplayRegular']`}>
           {scenario.description}
         </Text>
 
         <View className="flex-row justify-between items-center mb-2">
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Доход</Text>
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{formatAmount(result.income)}</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Доход</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{formatAmount(result.income)}</Text>
         </View>
         <View className="flex-row justify-between items-center mb-2">
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Расходы</Text>
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{formatAmount(result.expense)}</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Расходы</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{formatAmount(result.expense)}</Text>
         </View>
         <View className="flex-row justify-between items-center">
-          <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Дельта</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Дельта</Text>
           <Text
-            className="text-sm font-['SFProDisplaySemiBold']"
+            className="text-base font-['SFProDisplaySemiBold']"
             style={{ color: result.delta >= 0 ? '#4CAF50' : '#EF4444' }}
           >
             {formatAmount(result.delta)}
@@ -123,11 +123,11 @@ const CrisisScenarios: React.FC = () => {
         <View className={`h-1.5 rounded-full overflow-hidden mt-4 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
           <View className="h-full rounded-full" style={{ width: `${barWidth}%`, backgroundColor: levelColor }} />
         </View>
-        <Text className="text-xs mt-2 font-['SFProDisplaySemiBold']" style={{ color: levelColor }}>
+        <Text className="text-sm mt-2 font-['SFProDisplaySemiBold']" style={{ color: levelColor }}>
           {result.summary}
         </Text>
         {result.monthsCovered !== null && (
-          <Text className={`${textSecondaryColor} text-xs mt-1 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm mt-1 font-['SFProDisplayRegular']`}>
             Полная полоса — полгода жизни без дохода. Дефицит {formatAmount(result.gap)} в месяц.
           </Text>
         )}
@@ -135,13 +135,13 @@ const CrisisScenarios: React.FC = () => {
 
       {strategies.length > 0 && (
         <View className={`p-3 rounded-xl mt-3 ${cardBgColor}`}>
-          <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold'] mb-2`}>Что можно сделать</Text>
+          <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mb-2`}>Что можно сделать</Text>
           {strategies.map((strategy, index) => (
             <View key={strategy.id} className={`flex-row ${index > 0 ? 'mt-3' : ''}`}>
               <Ionicons name="arrow-forward-circle-outline" size={18} color="#4CAF50" style={{ marginRight: 8, marginTop: 1 }} />
               <View className="flex-1">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{strategy.title}</Text>
-                <Text className={`${textSecondaryColor} text-xs leading-5 mt-0.5 font-['SFProDisplayRegular']`}>
+                <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>{strategy.title}</Text>
+                <Text className={`${textSecondaryColor} text-sm mt-0.5 font-['SFProDisplayRegular']`}>
                   {strategy.detail}
                 </Text>
               </View>
@@ -156,7 +156,7 @@ const CrisisScenarios: React.FC = () => {
         className="flex-row items-center justify-center mt-3 py-3 rounded-xl border border-[#4CAF50]"
       >
         <Ionicons name="sparkles-outline" size={16} color="#4CAF50" style={{ marginRight: 8 }} />
-        <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">Спросить ФинГида о сценарии</Text>
+        <Text className="text-[#4CAF50] text-base font-['SFProDisplayRegular']">Спросить ФинГида о сценарии</Text>
       </TouchableOpacity>
 
       <ChatGPTFeature

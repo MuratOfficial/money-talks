@@ -229,7 +229,7 @@ const AddWalletScreen = () => {
             <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>
               Учитывать в балансе
             </Text>
-            <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mt-1`}>
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mt-1`}>
               Выключите, чтобы счёт остался в кошельке, но не входил в общую сумму
             </Text>
           </View>

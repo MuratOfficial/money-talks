@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    fontSize: 13,
+    fontSize: 14,
     marginLeft: 6,
     flex: 1,
     fontFamily: 'SFProDisplayRegular',
@@ -128,13 +128,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#D1D5DB',
-    fontSize: 13,
+    fontSize: 14,
     marginTop: 8,
     fontFamily: 'SFProDisplayRegular',
   },
   errorSub: {
     color: '#6B7280',
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 4,
     textAlign: 'center',
   },

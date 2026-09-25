@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   content: { flex: 1 },
-  title: { color: Colors.primary, fontSize: 12, marginBottom: 3, fontFamily: 'SFProDisplaySemiBold' },
-  message: { fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+  title: { color: Colors.primary, fontSize: 13, marginBottom: 3, fontFamily: 'SFProDisplaySemiBold' },
+  message: { fontSize: 15, lineHeight: 21, fontFamily: 'SFProDisplayRegular' },
   action: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: Colors.primary,
   },
-  actionLabel: { color: '#FFFFFF', fontSize: 13, marginRight: 6, fontFamily: 'SFProDisplaySemiBold' },
+  actionLabel: { color: '#FFFFFF', fontSize: 15, marginRight: 6, fontFamily: 'SFProDisplaySemiBold' },
   close: {
     position: 'absolute',
     top: 10,

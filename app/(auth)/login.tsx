@@ -158,6 +158,6 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     textAlign: 'center',
     marginTop: 20,
-    fontSize: 14,
+    fontSize: 16,
   },
 });

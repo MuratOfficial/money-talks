@@ -263,7 +263,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
             }`}
             onPress={() => setRegOption('regular')}
           >
-            <Text className={`text-center text-xs font-['SFProDisplayRegular'] ${textColor}`}>
+            <Text className={`text-center text-sm font-['SFProDisplayRegular'] ${textColor}`}>
               {tab1}
             </Text>
           </TouchableOpacity>
@@ -274,7 +274,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
             }`}
             onPress={() => setRegOption('irregular')}
           >
-            <Text className={`text-center text-xs font-['SFProDisplayRegular'] ${textColor}`}>
+            <Text className={`text-center text-sm font-['SFProDisplayRegular'] ${textColor}`}>
               {tab2}
             </Text>
           </TouchableOpacity>
@@ -296,7 +296,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 }`}
                 onPress={()=> handleCategory(category.id)}
               >
-                <Text className={`text-xs font-['SFProDisplayRegular'] ${
+                <Text className={`text-sm font-['SFProDisplayRegular'] ${
                   currentCategoryOption === category.id ? 'text-white' : textColor
                 }`}>
                   {category.label}
@@ -310,7 +310,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#4CAF50]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
+                <Text className={`text-sm mr-1 ${textColor} font-['SFProDisplayRegular']`}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 
@@ -338,7 +338,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 className={`px-2 py-1 rounded-full border flex-row items-center border-[#4CAF50]`}
                 onPress={() => setShowDrawerFilter(true)}
               >
-                <Text className={`text-xs mr-1 ${textColor} font-['SFProDisplayRegular']`}>
+                <Text className={`text-sm mr-1 ${textColor} font-['SFProDisplayRegular']`}>
                   {selectedSortFilter}
                 </Text>
                 <Ionicons 
@@ -362,7 +362,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
             {assetName}
           </Text>
-          {currentCategoryOption !== "effect" && <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
+          {currentCategoryOption !== "effect" && <Text className="text-[#4CAF50] text-base font-['SFProDisplaySemiBold']">
             {formatAmount(totalAmount)}
           </Text>}
           
@@ -373,24 +373,24 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
             <FadeInView key={asset.id} delay={index * Motion.stagger} offset={6}>
               <View className="flex-row items-center justify-between py-3">
                 <View className="flex-1">
-                  <Text className={`${textColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
+                  <Text className={`${textColor} text-base mb-1 font-['SFProDisplayRegular']`}>
                     {asset.name}
                   </Text>
 
                   {asset.category && tipsPage && CATEGORY_KIND[tipsPage] && (
-                    <Text className={`${textSecondaryColor} text-xs mb-1 font-['SFProDisplayRegular']`}>
+                    <Text className={`${textSecondaryColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
                       {categoryLabel(CATEGORY_KIND[tipsPage], asset)}
                     </Text>
                   )}
 
-                  {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+                  {asset.yield && !isPassive && <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                     Доходность {asset.yield}%
                   </Text>}
 
                 </View>
 
                 <View className="flex-row items-center">
-                  <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
+                  <Text className={`${textColor} text-base mr-3 font-['SFProDisplaySemiBold']`}>
                     {formatAmount(asset.amount, asset.yield)}
                   </Text>
 
@@ -423,7 +423,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   {asset.name}
                 </Text>
-                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-base font-['SFProDisplaySemiBold']">
                   {getTotal(asset.item)}
                 </Text>
               </View>
@@ -432,7 +432,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                   <View key={el.id} >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mb-1 font-['SFProDisplayRegular']`}>
                           {el.name}
                         </Text>
 
@@ -441,7 +441,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mr-3 font-['SFProDisplaySemiBold']`}>
                           {formatAmount(el.amount)}
                         </Text>
                         
@@ -463,7 +463,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Дельта
                 </Text>
-                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-base font-['SFProDisplaySemiBold']">
                   {delta}
                 </Text>
               </View>
@@ -472,7 +472,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mb-1 font-['SFProDisplayRegular']`}>
                           Доход-расходы
                         </Text>
 
@@ -481,7 +481,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mr-3 font-['SFProDisplaySemiBold']`}>
                         {delta}
                         </Text>
                         
@@ -501,7 +501,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                 <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                   Расчет чистого капитала
                 </Text>
-                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">
+                <Text className="text-[#4CAF50] text-base font-['SFProDisplaySemiBold']">
                   {defActPass}
                 </Text>
               </View>
@@ -510,7 +510,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                   <View  >
                     <View className="flex-row items-center justify-between py-3">
                       <View className="flex-1">
-                        <Text className={`${textColor} text-sm font-medium mb-1 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mb-1 font-['SFProDisplayRegular']`}>
                           Активы-пассивы
                         </Text>
 
@@ -519,7 +519,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className={`${textColor} text-sm font-medium mr-3 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textColor} text-base mr-3 font-['SFProDisplaySemiBold']`}>
                         {defActPass}
                         </Text>
                         
@@ -542,7 +542,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
          {emptyTitle }
         </Text>
         
-        <Text className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-xs text-center font-['SFProDisplayRegular'] mb-8 leading-5`}>
+        <Text className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm text-center font-['SFProDisplayRegular'] mb-8`}>
           {emptyDesc}
         </Text>
         {isAnalyze === true ? "" : <TouchableOpacity
@@ -550,7 +550,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           onPress={handleAddExpense}
           activeOpacity={Opacity.press}
         >
-          <Text className={`${textColor} text-sm font-medium mr-2 font-['SFProDisplayRegular']`}>
+          <Text className={`${textColor} text-base mr-2 font-['SFProDisplayRegular']`}>
             Добавить
           </Text>
           <Ionicons name="add-circle-outline" size={18} color={iconColor} />

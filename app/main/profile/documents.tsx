@@ -165,7 +165,7 @@ const DocumentsScreen = () => {
                     }}
                   >
                     <Ionicons name="open-outline" size={16} color="#FFFFFF" />
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, marginLeft: 8, fontFamily: 'SFProDisplaySemiBold' }}>
+                    <Text style={{ color: '#FFFFFF', fontSize: 16, marginLeft: 8, fontFamily: 'SFProDisplaySemiBold' }}>
                       {activeDoc.link.label}
                     </Text>
                   </TouchableOpacity>

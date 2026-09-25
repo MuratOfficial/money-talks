@@ -319,7 +319,7 @@ const ProfileScreen = () => {
               <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{game.level.level.title}</Text>
               <Text className="text-sm text-[#F59E0B] font-['SFProDisplaySemiBold']">🪙 {game.coins.balance}</Text>
             </View>
-            <Text className={`${textSecondaryColor} text-xs mb-2 font-['SFProDisplayRegular']`}>
+            <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
               {game.level.next ? `${game.xp.total} / ${game.level.next.xp} XP` : `${game.xp.total} XP`}
               {game.boxes > 0 ? ` · сундуков: ${game.boxes}` : ''}
             </Text>
@@ -341,7 +341,7 @@ const ProfileScreen = () => {
             <Text className="text-sm font-['SFProDisplayRegular']" style={{ color: health.level.color }}>
               {health.level.title}
             </Text>
-            <Text className="text-[#4CAF50] text-xs mt-1 font-['SFProDisplayRegular']">Как улучшить? →</Text>
+            <Text className="text-[#4CAF50] text-sm mt-1 font-['SFProDisplayRegular']">Как улучшить? →</Text>
           </View>
         </TouchableOpacity>
 

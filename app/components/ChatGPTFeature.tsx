@@ -477,15 +477,15 @@ const SendButton = ({ enabled, onPress, disabledColor }: { enabled: boolean; onP
 const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 12 },
   headerTexts: { flex: 1, marginLeft: 12, marginRight: 8 },
-  headerTitle: { fontSize: 16, fontFamily: 'SFProDisplaySemiBold' },
-  headerStatus: { flex: 1, fontSize: 12, fontFamily: 'SFProDisplayRegular' },
+  headerTitle: { fontSize: 17, fontFamily: 'SFProDisplaySemiBold' },
+  headerStatus: { flex: 1, fontSize: 13, fontFamily: 'SFProDisplayRegular' },
   onlineDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6, backgroundColor: Colors.primary },
 
-  greeting: { fontSize: 20, textAlign: 'center', marginTop: 16, marginBottom: 6, fontFamily: 'SFProDisplaySemiBold' },
-  greetingHint: { fontSize: 14, lineHeight: 20, textAlign: 'center', paddingHorizontal: 24, fontFamily: 'SFProDisplayRegular' },
+  greeting: { fontSize: 22, textAlign: 'center', marginTop: 16, marginBottom: 6, fontFamily: 'SFProDisplaySemiBold' },
+  greetingHint: { fontSize: 15, lineHeight: 21, textAlign: 'center', paddingHorizontal: 24, fontFamily: 'SFProDisplayRegular' },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20, paddingHorizontal: 12 },
   chip: { borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10, margin: 5, borderWidth: 1, borderColor: 'rgba(76,175,80,0.35)' },
-  chipText: { color: Colors.primary, fontSize: 14, fontFamily: 'SFProDisplayRegular' },
+  chipText: { color: Colors.primary, fontSize: 15, fontFamily: 'SFProDisplayRegular' },
 
   botRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 12 },
   userBubble: {
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 6,
     backgroundColor: Colors.primary,
   },
-  userText: { color: '#FFFFFF', fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+  userText: { color: '#FFFFFF', fontSize: 16, lineHeight: 23, fontFamily: 'SFProDisplayRegular' },
   userTime: { color: 'rgba(255,255,255,0.75)', alignSelf: 'flex-end' },
   botBubble: {
     maxWidth: '80%',
@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderBottomLeftRadius: 6,
   },
-  bodyText: { fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
-  time: { fontSize: 10, marginTop: 4, fontFamily: 'SFProDisplayRegular' },
+  bodyText: { fontSize: 16, lineHeight: 23, fontFamily: 'SFProDisplayRegular' },
+  time: { fontSize: 11, marginTop: 4, fontFamily: 'SFProDisplayRegular' },
   retry: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: Colors.primary,
   },
-  retryLabel: { color: '#FFFFFF', fontSize: 12, marginLeft: 6, fontFamily: 'SFProDisplaySemiBold' },
+  retryLabel: { color: '#FFFFFF', fontSize: 14, marginLeft: 6, fontFamily: 'SFProDisplaySemiBold' },
   typingBubble: { marginLeft: 8, paddingHorizontal: 18, paddingVertical: 16, borderRadius: 18, borderBottomLeftRadius: 6 },
 
   inputBar: { paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1 },
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     fontFamily: 'SFProDisplayRegular',
   },
-  note: { fontSize: 11, textAlign: 'center', marginTop: 8, fontFamily: 'SFProDisplayRegular' },
+  note: { fontSize: 12, textAlign: 'center', marginTop: 8, fontFamily: 'SFProDisplayRegular' },
 });
 
 export default ChatGPTFeature;

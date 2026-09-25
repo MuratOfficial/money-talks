@@ -100,7 +100,7 @@ const GlossaryScreen = () => {
                 className={`${cardBgColor} rounded-xl p-4 mb-2`}
               >
                 <View className="flex-row items-center justify-between">
-                  <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold'] flex-1 mr-3`}>{item.term}</Text>
+                  <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] flex-1 mr-3`}>{item.term}</Text>
                   <Ionicons
                     name={isOpen ? 'chevron-up' : 'chevron-down'}
                     size={18}

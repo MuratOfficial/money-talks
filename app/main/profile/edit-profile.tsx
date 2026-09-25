@@ -173,7 +173,7 @@ const EditProfilePage: React.FC = () => {
               <MaterialIcons name="camera-alt" size={32} color={iconSecondaryColor} />
             )}
           </TouchableOpacity>
-          <Text className={`${textSecondaryColor} text-xs text-center font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm text-center font-['SFProDisplayRegular']`}>
             Нажмите для изменения фото
           </Text>
         </View>

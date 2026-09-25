@@ -182,7 +182,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 flex: 1,
                 marginHorizontal: 12,
                 textAlign: 'center',
-                fontSize: 16,
+                fontSize: 17,
                 color: isDark ? '#FFFFFF' : '#11181C',
                 fontFamily: 'SFProDisplaySemiBold',
               }}
@@ -238,7 +238,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 </View>
               ) : linkUrl ? (
                 <View style={[styles.block, { borderTopColor: dividerColor }]}>
-                  <Text style={{ color: askCard.muted, fontSize: 14, marginBottom: 12, fontFamily: 'SFProDisplayRegular' }}>
+                  <Text style={{ color: askCard.muted, fontSize: 15, marginBottom: 12, fontFamily: 'SFProDisplayRegular' }}>
                     Ссылка на видеоурок:
                   </Text>
 
@@ -254,7 +254,7 @@ const InfoModal: React.FC<InfoModalProps> = ({
                     activeOpacity={Opacity.press}
                   >
                     <Ionicons name="link" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
-                    <Text style={{ flex: 1, marginHorizontal: 8, fontSize: 14, color: Colors.primary, fontFamily: 'SFProDisplayRegular' }} numberOfLines={1}>
+                    <Text style={{ flex: 1, marginHorizontal: 8, fontSize: 15, color: Colors.primary, fontFamily: 'SFProDisplayRegular' }} numberOfLines={1}>
                       {linkText || linkUrl}
                     </Text>
                     <Ionicons name="chevron-forward" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
@@ -279,10 +279,10 @@ const InfoModal: React.FC<InfoModalProps> = ({
                 >
                   <FinGuide size={48} mood="thinking" />
                   <View style={{ flex: 1, marginLeft: 12, marginRight: 10 }}>
-                    <Text style={{ color: isDark ? '#FFFFFF' : '#11181C', fontSize: 14, fontFamily: 'SFProDisplaySemiBold' }}>
+                    <Text style={{ color: isDark ? '#FFFFFF' : '#11181C', fontSize: 15, fontFamily: 'SFProDisplaySemiBold' }}>
                       Остались вопросы?
                     </Text>
-                    <Text style={{ color: askCard.muted, fontSize: 12, lineHeight: 17, marginTop: 2, fontFamily: 'SFProDisplayRegular' }}>
+                    <Text style={{ color: askCard.muted, fontSize: 13, lineHeight: 18, marginTop: 2, fontFamily: 'SFProDisplayRegular' }}>
                       Спроси ФинГида — объясню простыми словами
                     </Text>
                   </View>

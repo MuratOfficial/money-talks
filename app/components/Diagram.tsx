@@ -168,7 +168,7 @@ const ChartScreen = ({backLink, assets, categoryKind}:ChartScreenProps) => {
                   }`}
                   onPress={() => setSelectedPeriod(period.value as DateFilterType)}
                 >
-                  <Text className={`text-xs font-['SFProDisplayRegular'] ${
+                  <Text className={`text-sm font-['SFProDisplayRegular'] ${
                     selectedPeriod === period.value ? 'text-white font-medium' : textColor
                   }`}>
                     {period.label}
@@ -228,13 +228,13 @@ const ChartScreen = ({backLink, assets, categoryKind}:ChartScreenProps) => {
 
                 {expanded && item.subcategories!.map((sub) => (
                   <View key={sub.name} className="flex-row items-center justify-between pb-2 pl-7 pr-6">
-                    <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] flex-1`}>
+                    <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] flex-1`}>
                       {sub.name}
                     </Text>
-                    <Text className={`${textSecondaryColor} text-xs mr-3 font-['SFProDisplayRegular']`}>
+                    <Text className={`${textSecondaryColor} text-sm mr-3 font-['SFProDisplayRegular']`}>
                       {item.amount > 0 ? ((sub.amount / item.amount) * 100).toFixed(0) : 0}%
                     </Text>
-                    <Text className={`${textColor} text-xs font-['SFProDisplayRegular']`}>
+                    <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>
                       {formatAmount(sub.amount)}
                     </Text>
                   </View>

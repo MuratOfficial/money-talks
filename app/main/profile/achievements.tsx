@@ -72,7 +72,7 @@ const AchievementsScreen = () => {
                       <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{a.title}</Text>
                       {a.unlocked && <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />}
                     </View>
-                    <Text className={`${textSecondaryColor} text-xs mb-2 leading-4 font-['SFProDisplayRegular']`}>
+                    <Text className={`${textSecondaryColor} text-sm mb-2 leading-5 font-['SFProDisplayRegular']`}>
                       {a.description}
                     </Text>
                     {!a.unlocked && (
@@ -81,7 +81,7 @@ const AchievementsScreen = () => {
                       </View>
                     )}
                     <Text
-                      className={`text-xs font-['SFProDisplayRegular'] ${a.unlocked ? 'text-[#4CAF50]' : textSecondaryColor}`}
+                      className={`text-sm font-['SFProDisplayRegular'] ${a.unlocked ? 'text-[#4CAF50]' : textSecondaryColor}`}
                     >
                       {a.progressLabel}
                     </Text>

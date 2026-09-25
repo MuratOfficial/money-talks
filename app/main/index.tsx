@@ -118,12 +118,19 @@ const MainScreen = () => {
       </Text>
 
       {item.amount && (
-        <Text className={`${textColor} text-xs font-['SFProDisplayBold'] text-center`}>
+        // Главное число экрана: крупнее подписи, а длинные суммы в плитке
+        // шириной в четверть экрана ужимаются, а не переносятся на две строки.
+        <Text
+          className={`${textColor} text-sm font-['SFProDisplayBold'] text-center`}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
           {item.amount}
         </Text>
       )}
       {item.excluded && (
-        <Text className={`${textColor} text-[10px] font-['SFProDisplayRegular'] text-center`}>
+        <Text className={`${textColor} text-[11px] font-['SFProDisplayRegular'] text-center`}>
           не в балансе
         </Text>
       )}

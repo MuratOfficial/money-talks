@@ -21,22 +21,22 @@ export function markdownStyles({ isDark, compact = false }: MarkdownStyleOptions
   const gap = compact ? 6 : 8;
 
   return {
-    body: { color: text, fontSize: 14, lineHeight: 20, fontFamily: 'SFProDisplayRegular' },
+    body: { color: text, fontSize: 16, lineHeight: 23, fontFamily: 'SFProDisplayRegular' },
     // Без этого длинные слова и ссылки не переносятся (см. комментарий выше).
     // minWidth: 0 нужен из-за веба: там у текстового блока min-width: auto,
     // и он отказывается сжиматься до ширины пузыря.
     textgroup: { flexShrink: 1, minWidth: 0 },
     text: { flexShrink: 1 },
-    paragraph: { color: text, fontSize: 14, lineHeight: 20, marginTop: 0, marginBottom: gap, width: '100%' as const },
-    heading1: { color: heading, fontSize: compact ? 17 : 20, fontFamily: 'SFProDisplaySemiBold', marginBottom: gap, flexShrink: 1, minWidth: 0 },
-    heading2: { color: heading, fontSize: compact ? 16 : 18, fontFamily: 'SFProDisplaySemiBold', marginBottom: gap, flexShrink: 1, minWidth: 0 },
-    heading3: { color: heading, fontSize: compact ? 15 : 16, fontFamily: 'SFProDisplaySemiBold', marginBottom: 6, flexShrink: 1, minWidth: 0 },
+    paragraph: { color: text, fontSize: 16, lineHeight: 23, marginTop: 0, marginBottom: gap, width: '100%' as const },
+    heading1: { color: heading, fontSize: compact ? 18 : 22, fontFamily: 'SFProDisplaySemiBold', marginBottom: gap, flexShrink: 1, minWidth: 0 },
+    heading2: { color: heading, fontSize: compact ? 17 : 20, fontFamily: 'SFProDisplaySemiBold', marginBottom: gap, flexShrink: 1, minWidth: 0 },
+    heading3: { color: heading, fontSize: compact ? 16 : 18, fontFamily: 'SFProDisplaySemiBold', marginBottom: 6, flexShrink: 1, minWidth: 0 },
     strong: { color: heading, fontFamily: 'SFProDisplaySemiBold', fontWeight: '600' as const },
     em: { color: Colors.primary, fontStyle: 'italic' as const },
     link: { color: Colors.primary, textDecorationLine: 'underline' as const },
     bullet_list: { marginBottom: gap },
     ordered_list: { marginBottom: gap },
-    list_item: { color: text, fontSize: 14, marginBottom: 4, flexShrink: 1, minWidth: 0 },
+    list_item: { color: text, fontSize: 16, lineHeight: 23, marginBottom: 4, flexShrink: 1, minWidth: 0 },
     bullet_list_icon: { marginLeft: 0, marginRight: 8, color: Colors.primary },
     ordered_list_icon: { marginLeft: 0, marginRight: 8, color: Colors.primary },
     code_inline: { backgroundColor: surface, color: heading, paddingHorizontal: 4, paddingVertical: 2, borderRadius: 4 },

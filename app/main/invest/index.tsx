@@ -244,8 +244,8 @@ const InvestmentsPage: React.FC = () => {
               style={{ width: '48.5%' }}
             >
               <MaterialIcons name={section.icon} size={22} color="#4CAF50" />
-              <Text className={`${textColor} text-sm mt-2 font-['SFProDisplaySemiBold']`}>{section.title}</Text>
-              <Text className={`${textSecondaryColor} text-xs mt-1 leading-4 font-['SFProDisplayRegular']`}>
+              <Text className={`${textColor} text-base mt-2 font-['SFProDisplaySemiBold']`}>{section.title}</Text>
+              <Text className={`${textSecondaryColor} text-sm mt-1 leading-5 font-['SFProDisplayRegular']`}>
                 {section.subtitle}
               </Text>
             </TouchableOpacity>
@@ -286,7 +286,7 @@ const InvestmentsPage: React.FC = () => {
                     activeOpacity={Opacity.press}
                   >
                     <MaterialIcons name="open-in-new" size={20} color="white" style={{ marginRight: 8 }} />
-                    <Text className="text-white text-sm font-semibold font-['SFProDisplayRegular']">
+                    <Text className="text-white text-base font-semibold font-['SFProDisplayRegular']">
                       Проверить брокера на сайте АРРФР
                     </Text>
                   </TouchableOpacity>
@@ -303,13 +303,13 @@ const InvestmentsPage: React.FC = () => {
         {riskProfile && (
           <View className={`${cardBgColor} rounded-xl px-4 py-3 mb-3 flex-row items-center justify-between`}>
             <View className="flex-1 mr-3">
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                 Ваш тип инвестора
               </Text>
               <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
                 {currentProfile?.title}
               </Text>
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                 Защита {currentProfile?.protectiveShare}% · Рост {100 - (currentProfile?.protectiveShare ?? 0)}%
               </Text>
             </View>

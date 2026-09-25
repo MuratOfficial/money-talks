@@ -66,7 +66,7 @@ const HealthScreen = () => {
                     style={{ backgroundColor: level.color, opacity: active ? 1 : 0.35 }}
                   />
                   <Text
-                    className={`text-[10px] mt-1 text-center font-['SFProDisplayRegular'] ${active ? textColor : textSecondaryColor}`}
+                    className={`text-[11px] mt-1 text-center font-['SFProDisplayRegular'] ${active ? textColor : textSecondaryColor}`}
                     numberOfLines={2}
                   >
                     {level.title}
@@ -103,7 +103,7 @@ const HealthScreen = () => {
                     style={{ width: `${(c.points / c.max) * 100}%`, backgroundColor: health.level.color }}
                   />
                 </View>
-                <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>{c.summary}</Text>
+                <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>{c.summary}</Text>
               </View>
             </FadeInView>
           ))}

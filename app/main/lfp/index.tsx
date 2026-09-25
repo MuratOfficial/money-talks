@@ -310,7 +310,7 @@ const PersonalFinancialPlanScreen = () => {
               isLast
             />
           </View>
-          <Text className={`${textSecondaryColor} text-xs leading-5 mt-2 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm mt-2 font-['SFProDisplayRegular']`}>
             Точная дата нужна для расчёта страхового полиса и пенсионного планирования.
           </Text>
         </View>
@@ -342,7 +342,7 @@ const PersonalFinancialPlanScreen = () => {
             keyboardType="number-pad"
             placeholderTextColor={isDark ? "#666" : "#999"}
           />
-          <Text className={`${textSecondaryColor} text-xs leading-5 mt-2 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm mt-2 font-['SFProDisplayRegular']`}>
             Сколько людей финансово зависят от вас — это учитывается в расходах и страховании.
           </Text>
         </View>
@@ -357,7 +357,7 @@ const PersonalFinancialPlanScreen = () => {
               onPress={() => setShowDrawer(true)}
               className={`px-3 py-1.5 border ${borderColor} w-fit rounded-2xl flex flex-row items-center justify-center gap-2`}
             >
-              <Text className={`${textColor} text-xs font-['SFProDisplayRegular']`}>
+              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>
                 {selectedSort}
               </Text>
               <View className="w-4 h-4 rounded items-center justify-center">
@@ -381,7 +381,7 @@ const PersonalFinancialPlanScreen = () => {
                 }`}
               activeOpacity={0.8}
             >
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular'] mr-2`}>
                 {loadingState.isVisible ?
                   (loadingState.status === 'generating' ? 'Создание PDF...' :
                     loadingState.status === 'sharing' ? 'Подготовка...' :
@@ -407,24 +407,24 @@ const PersonalFinancialPlanScreen = () => {
 
           <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Расходы</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Расходы</Text>
               <View className="flex-row items-center">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{formatAmount(expence)}</Text>
+                <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mr-2`}>{formatAmount(expence)}</Text>
                 <Ionicons name="create-outline" size={16} color={iconColor} onPress={() => router.push("/main/finance/expences/main")} />
               </View>
             </View>
 
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Доходы</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Доходы</Text>
               <View className="flex-row items-center">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{formatAmount(income)}</Text>
+                <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mr-2`}>{formatAmount(income)}</Text>
                 <Ionicons name="create-outline" size={16} color={iconColor} onPress={() => router.push("/main/finance/incomes/main")} />
               </View>
             </View>
 
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Дельта</Text>
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{formatAmount(delta)}</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Дельта</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{formatAmount(delta)}</Text>
             </View>
           </View>
         </View>
@@ -437,25 +437,25 @@ const PersonalFinancialPlanScreen = () => {
 
           <View className={`space-y-3 p-3 rounded-xl ${cardBgColor}`}>
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Активы</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Активы</Text>
               <View className="flex-row items-center">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{formatAmount(totalActives)}</Text>
+                <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mr-2`}>{formatAmount(totalActives)}</Text>
                 <Ionicons onPress={() => router.push("/main/finance/actives/main")} name="create-outline" size={16} color={iconColor} />
               </View>
             </View>
 
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Пассивы</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Пассивы</Text>
               <View className="flex-row items-center">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{formatAmount(totalPassives)}</Text>
+                <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mr-2`}>{formatAmount(totalPassives)}</Text>
                 <Ionicons onPress={() => router.push("/main/finance/passives/main")} name="create-outline" size={16} color={iconColor} />
               </View>
             </View>
 
             <View className="flex-row justify-between items-center">
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Чистый капитал</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Чистый капитал</Text>
               <View className="flex-row items-center">
-                <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] mr-2`}>{formatAmount(netWorth)}</Text>
+                <Text className={`${textColor} text-base font-['SFProDisplaySemiBold'] mr-2`}>{formatAmount(netWorth)}</Text>
               </View>
             </View>
           </View>
@@ -478,7 +478,7 @@ const PersonalFinancialPlanScreen = () => {
           <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
             Защита жизни, здоровья и капитала
           </Text>
-          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mb-3`}>
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-3`}>
             {insurancePlan.yearsLeft === null
               ? 'Укажите дату рождения — рассчитаем срок страхования (до 82 лет)'
               : insurancePlan.yearsLeft > 0
@@ -492,12 +492,12 @@ const PersonalFinancialPlanScreen = () => {
               return (
                 <View key={kind} className={index > 0 ? 'mt-4' : ''}>
                   <View className="flex-row justify-between items-center">
-                    <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{label}</Text>
+                    <Text className={`${textColor} text-base font-['SFProDisplayRegular'] flex-1 mr-3`}>{label}</Text>
                     <TextInput
                       value={personalFinancialPlan?.insurance[kind] ?? '0'}
                       onChangeText={(val) => updateInsurance(kind, val)}
                       keyboardType="number-pad"
-                      className={`${inputTextColor} text-sm font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right min-w-[120px]`}
+                      className={`${inputTextColor} text-base font-['SFProDisplayRegular'] border ${isDark ? 'border-white/20' : 'border-gray-300'} rounded-lg px-3 py-1.5 text-right w-[130px]`}
                       placeholder="0"
                       placeholderTextColor={isDark ? "#666" : "#999"}
                     />
@@ -510,12 +510,12 @@ const PersonalFinancialPlanScreen = () => {
                           style={{ width: `${rec.coverage}%`, backgroundColor: rec.coverage >= 100 ? '#4CAF50' : rec.coverage >= 50 ? '#F59E0B' : '#EF4444' }}
                         />
                       </View>
-                      <Text className={`${textSecondaryColor} text-xs mt-1 font-['SFProDisplayRegular']`}>
+                      <Text className={`${textSecondaryColor} text-sm mt-1 font-['SFProDisplayRegular']`}>
                         Рекомендуется {formatAmount(rec.recommended)} · покрыто {rec.coverage}%
                       </Text>
                     </>
                   )}
-                  <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>{rec.explanation}</Text>
+                  <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>{rec.explanation}</Text>
                 </View>
               );
             })}
@@ -526,7 +526,7 @@ const PersonalFinancialPlanScreen = () => {
               <Ionicons name="sparkles-outline" size={18} color="#4CAF50" style={{ marginRight: 8, marginTop: 2 }} />
               <View className="flex-1">
                 {insurancePlan.hints.map((hint) => (
-                  <Text key={hint} className={`${textSecondaryColor} text-xs leading-5 mb-1 font-['SFProDisplayRegular']`}>
+                  <Text key={hint} className={`${textSecondaryColor} text-sm mb-1 font-['SFProDisplayRegular']`}>
                     {hint}
                   </Text>
                 ))}

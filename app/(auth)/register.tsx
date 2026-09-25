@@ -236,7 +236,7 @@ const RegistrationScreen: React.FC = () => {
               editable={!isLoading}
             />
             {errors.fullName && (
-              <Text className="text-red-500 text-xs mt-1 font-['SFProDisplayRegular']">
+              <Text className="text-red-500 text-sm mt-1 font-['SFProDisplayRegular']">
                 {errors.fullName}
               </Text>
             )}
@@ -263,7 +263,7 @@ const RegistrationScreen: React.FC = () => {
               editable={!isLoading}
             />
             {errors.email && (
-              <Text className="text-red-500 text-xs mt-1 font-['SFProDisplayRegular']">
+              <Text className="text-red-500 text-sm mt-1 font-['SFProDisplayRegular']">
                 {errors.email}
               </Text>
             )}
@@ -307,7 +307,7 @@ const RegistrationScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
             {errors.password && (
-              <Text className="text-red-500 text-xs mt-1 font-['SFProDisplayRegular']">
+              <Text className="text-red-500 text-sm mt-1 font-['SFProDisplayRegular']">
                 {errors.password}
               </Text>
             )}
@@ -348,7 +348,7 @@ const RegistrationScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
             {errors.confirmPassword && (
-              <Text className="text-red-500 text-xs mt-1 font-['SFProDisplayRegular']">
+              <Text className="text-red-500 text-sm mt-1 font-['SFProDisplayRegular']">
                 {errors.confirmPassword}
               </Text>
             )}

@@ -78,7 +78,7 @@ export default function RootLayout(): ReactElement {
               size={24}
               color={button.route.includes(activeRoute) ? '#4CAF50' : navInactiveColor}
             />
-            <Text className={`text-[10px] mt-[5px] ${
+            <Text className={`text-[11px] mt-[5px] ${
               button.route.includes(activeRoute) ? 'text-[#4CAF50]' : (isDark ? 'text-[#666]' : 'text-gray-600')
             }`}>
               {button.label}

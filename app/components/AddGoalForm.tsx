@@ -502,7 +502,7 @@ const handleSortSelectYear = (value: string) => {
                 </TouchableOpacity>
               ))}
             </View>
-            <Text className={`${textSecondaryColor} text-xs mt-2 leading-5 font-['SFProDisplayRegular']`}>
+            <Text className={`${textSecondaryColor} text-sm mt-2 leading-5 font-['SFProDisplayRegular']`}>
               {formData.type === 'short'
                 ? 'Цель до 1 года — копите в валюте, в которой будете делать покупку.'
                 : 'Для средне- и долгосрочной цели удобнее копить в долларах как в более твёрдой валюте.'}

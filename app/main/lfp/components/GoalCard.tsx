@@ -24,11 +24,11 @@ const GoalCard = ({ goal }:{goal:Goal}) => {
                       </Text>:<Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
                         Выберите срок
                         </Text>}
-          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular'] mb-1`}>
+          <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular'] mb-1`}>
             {goal.amount}
           </Text>
           {goal.monthlyInvestment && (
-            <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+            <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
               {goal.monthlyInvestment}
             </Text>
           )}

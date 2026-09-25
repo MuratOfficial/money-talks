@@ -262,7 +262,7 @@ const CategoryPicker = ({
               >
                 <Ionicons name={c.icon as any} size={24} color="#FFFFFF" />
               </View>
-              <Text className={`${textColor} text-[11px] mt-1 text-center font-['SFProDisplayRegular']`} numberOfLines={2}>
+              <Text className={`${textColor} text-xs mt-1 text-center font-['SFProDisplayRegular']`} numberOfLines={2}>
                 {c.name}
               </Text>
             </TouchableOpacity>

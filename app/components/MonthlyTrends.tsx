@@ -134,7 +134,7 @@ const MonthlyTrends = () => {
     return (
       <View className="flex-1">
         <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>{title}</Text>
-        <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold']`}>{compact(current)}</Text>
+        <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{compact(current)}</Text>
         <Text
           className="text-xs font-['SFProDisplayRegular']"
           style={{ color: good === null ? mutedColor : good ? GREEN : RED }}
@@ -168,7 +168,7 @@ const MonthlyTrends = () => {
               activeOpacity={Opacity.press}
               className={`px-3 py-1 rounded-full ml-2 ${kind === k ? 'bg-[#4CAF50]' : ''}`}
             >
-              <Text className={`text-xs font-['SFProDisplayRegular'] ${kind === k ? 'text-white' : textSecondaryColor}`}>
+              <Text className={`text-sm font-['SFProDisplayRegular'] ${kind === k ? 'text-white' : textSecondaryColor}`}>
                 {k === 'month' ? 'Месяцы' : 'Кварталы'}
               </Text>
             </TouchableOpacity>
@@ -187,7 +187,7 @@ const MonthlyTrends = () => {
 
       {/* Доходы, расходы, дельта */}
       <View className={`${cardBgColor} rounded-2xl p-3 mb-3`} onLayout={onLayout}>
-        <Text className={`${textColor} text-sm mb-2 font-['SFProDisplaySemiBold']`}>Доходы, расходы и дельта</Text>
+        <Text className={`${textColor} text-base mb-2 font-['SFProDisplaySemiBold']`}>Доходы, расходы и дельта</Text>
         {width > 0 && (
           <TrendChart
             width={width - 24}
@@ -202,7 +202,7 @@ const MonthlyTrends = () => {
           />
         )}
         <Legend items={[[GREEN, 'Доходы'], [RED, 'Расходы'], [BLUE, 'Дельта']]} />
-        <Text className={`${textSecondaryColor} text-xs mt-3 mb-1 font-['SFProDisplayRegular']`}>
+        <Text className={`${textSecondaryColor} text-sm mt-3 mb-1 font-['SFProDisplayRegular']`}>
           Сравнение с {periodName}
         </Text>
         <View className="flex-row">
@@ -214,7 +214,7 @@ const MonthlyTrends = () => {
 
       {/* Чистый капитал */}
       <View className={`${cardBgColor} rounded-2xl p-3 mb-3`}>
-        <Text className={`${textColor} text-sm mb-2 font-['SFProDisplaySemiBold']`}>Рост чистого капитала</Text>
+        <Text className={`${textColor} text-base mb-2 font-['SFProDisplaySemiBold']`}>Рост чистого капитала</Text>
         {width > 0 && (
           <TrendChart
             width={width - 24}
@@ -234,8 +234,8 @@ const MonthlyTrends = () => {
       {/* Прогноз по целям */}
       {forecasts.length > 0 && (
         <View className={`${cardBgColor} rounded-2xl p-3 mb-3`}>
-          <Text className={`${textColor} text-sm mb-1 font-['SFProDisplaySemiBold']`}>Когда цели будут достигнуты</Text>
-          <Text className={`${textSecondaryColor} text-xs mb-2 font-['SFProDisplayRegular']`}>
+          <Text className={`${textColor} text-base mb-1 font-['SFProDisplaySemiBold']`}>Когда цели будут достигнуты</Text>
+          <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
             {averageDelta > 0
               ? `Если откладывать среднюю дельту за 3 месяца — ${compact(averageDelta)} в месяц`
               : 'Средняя дельта за 3 месяца не положительная — копить не из чего'}

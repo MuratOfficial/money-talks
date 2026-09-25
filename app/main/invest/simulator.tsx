@@ -72,7 +72,7 @@ const InvestmentSimulatorScreen = () => {
   const chipClass = (active: boolean) =>
     `px-3 py-1.5 mr-2 rounded-2xl border ${active ? 'border-[#4CAF50] bg-[#4CAF50]/10' : chipBorder}`;
   const chipTextClass = (active: boolean) =>
-    `text-xs font-['SFProDisplayRegular'] ${active ? 'text-[#4CAF50]' : textSecondaryColor}`;
+    `text-sm font-['SFProDisplayRegular'] ${active ? 'text-[#4CAF50]' : textSecondaryColor}`;
 
   return (
     <SafeAreaView edges={['top']} className={`flex-1 ${bgColor}`}>
@@ -109,7 +109,7 @@ const InvestmentSimulatorScreen = () => {
               onPress={() => setMonthly(String(freeMonthly))}
               className="mt-2"
             >
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                 По вашим данным свободно {formatAmount(freeMonthly)} в месяц — нажмите, чтобы подставить.
               </Text>
             </TouchableOpacity>
@@ -150,12 +150,12 @@ const InvestmentSimulatorScreen = () => {
           {/* Результат */}
           <View className={`p-4 rounded-xl mt-6 ${cardBgColor}`}>
             <View className="flex-row justify-between items-center mb-2">
-              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>Вложите сами</Text>
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{formatAmount(result.invested)}</Text>
+              <Text className={`${textSecondaryColor} text-base font-['SFProDisplayRegular']`}>Вложите сами</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{formatAmount(result.invested)}</Text>
             </View>
             <View className="flex-row justify-between items-center mb-2">
-              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>Заработает доходность</Text>
-              <Text className="text-sm font-['SFProDisplayRegular']" style={{ color: GREEN }}>
+              <Text className={`${textSecondaryColor} text-base font-['SFProDisplayRegular']`}>Заработает доходность</Text>
+              <Text className="text-base font-['SFProDisplaySemiBold']" style={{ color: GREEN }}>
                 {formatAmount(result.profit)}
               </Text>
             </View>
@@ -166,7 +166,7 @@ const InvestmentSimulatorScreen = () => {
               </Text>
             </View>
             {multiplier !== null && multiplier > 1 && (
-              <Text className={`${textSecondaryColor} text-xs mt-2 font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm mt-2 font-['SFProDisplayRegular']`}>
                 Это в {String(multiplier).replace('.', ',')} раза больше, чем вы внесли.
               </Text>
             )}
@@ -201,20 +201,20 @@ const InvestmentSimulatorScreen = () => {
               )}
             </View>
             <View className="flex-row justify-between mt-2">
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>сегодня</Text>
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>сегодня</Text>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                 через {years} лет · {compact(result.value)}
               </Text>
             </View>
             <View className="flex-row items-center mt-3">
               <View className="w-3 h-0.5 mr-2" style={{ backgroundColor: GREEN }} />
-              <Text className={`${textSecondaryColor} text-xs mr-4 font-['SFProDisplayRegular']`}>с инвестициями</Text>
+              <Text className={`${textSecondaryColor} text-sm mr-4 font-['SFProDisplayRegular']`}>с инвестициями</Text>
               <View className="w-3 h-0.5 mr-2" style={{ backgroundColor: GRAY_LINE }} />
-              <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>просто копить</Text>
+              <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>просто копить</Text>
             </View>
           </View>
 
-          <Text className={`${textSecondaryColor} text-xs leading-5 mt-4 mb-10 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm leading-5 mt-4 mb-10 font-['SFProDisplayRegular']`}>
             Расчёт предполагает, что доходность одинакова каждый месяц. В жизни она скачет, поэтому итог —
             ориентир, а не обещание. {DISCLAIMER}
           </Text>

@@ -93,7 +93,7 @@ const PortfolioTemplatesScreen = () => {
                       <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>{template.title}</Text>
                       {template.riskProfile && (
                         <Text
-                          className="text-xs mt-0.5 font-['SFProDisplayRegular']"
+                          className="text-sm mt-0.5 font-['SFProDisplayRegular']"
                           style={{ color: isMine ? '#4CAF50' : isDark ? '#9CA3AF' : '#6B7280' }}
                         >
                           {isMine ? `Ваш профиль · ${template.riskProfile}` : template.riskProfile}
@@ -116,7 +116,7 @@ const PortfolioTemplatesScreen = () => {
                           className="w-2 h-2 rounded-full mr-1.5"
                           style={{ backgroundColor: SLICE_COLORS[index % SLICE_COLORS.length] }}
                         />
-                        <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+                        <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                           {slice.percent}% — {slice.label}
                         </Text>
                       </View>
@@ -132,14 +132,14 @@ const PortfolioTemplatesScreen = () => {
 
                     {!!template.horizon && (
                       <View className="flex-row justify-between mt-3">
-                        <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>Горизонт</Text>
-                        <Text className={`${textColor} text-xs font-['SFProDisplayRegular']`}>{template.horizon}</Text>
+                        <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>Горизонт</Text>
+                        <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>{template.horizon}</Text>
                       </View>
                     )}
                     {!!template.expectedReturn && (
                       <View className="flex-row justify-between mt-1">
-                        <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>Доходность</Text>
-                        <Text className={`${textColor} text-xs font-['SFProDisplayRegular'] flex-1 text-right ml-3`}>
+                        <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>Доходность</Text>
+                        <Text className={`${textColor} text-sm font-['SFProDisplayRegular'] flex-1 text-right ml-3`}>
                           {template.expectedReturn}
                         </Text>
                       </View>
@@ -148,7 +148,7 @@ const PortfolioTemplatesScreen = () => {
                     {!!template.risks && (
                       <View className="flex-row mt-3">
                         <Ionicons name="warning-outline" size={16} color="#F59E0B" style={{ marginRight: 8, marginTop: 1 }} />
-                        <Text className={`${textSecondaryColor} text-xs leading-5 flex-1 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textSecondaryColor} text-sm leading-5 flex-1 font-['SFProDisplayRegular']`}>
                           {template.risks}
                         </Text>
                       </View>
@@ -156,7 +156,7 @@ const PortfolioTemplatesScreen = () => {
                     {!!template.firstStep && (
                       <View className="flex-row mt-2">
                         <Ionicons name="footsteps-outline" size={16} color="#4CAF50" style={{ marginRight: 8, marginTop: 1 }} />
-                        <Text className={`${textSecondaryColor} text-xs leading-5 flex-1 font-['SFProDisplayRegular']`}>
+                        <Text className={`${textSecondaryColor} text-sm leading-5 flex-1 font-['SFProDisplayRegular']`}>
                           {template.firstStep}
                         </Text>
                       </View>
@@ -167,7 +167,7 @@ const PortfolioTemplatesScreen = () => {
             );
           })}
 
-          <Text className={`${textSecondaryColor} text-xs leading-5 mt-2 mb-10 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm leading-5 mt-2 mb-10 font-['SFProDisplayRegular']`}>
             {DISCLAIMER}
           </Text>
         </ScrollView>

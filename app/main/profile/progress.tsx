@@ -80,12 +80,12 @@ const ProgressScreen = () => {
               🪙 {def.coins} · +{def.xp} XP
             </Text>
           </View>
-          <Text className={`${textSecondaryColor} text-xs leading-4 mb-3 font-['SFProDisplayRegular']`}>{def.description}</Text>
+          <Text className={`${textSecondaryColor} text-sm leading-5 mb-3 font-['SFProDisplayRegular']`}>{def.description}</Text>
 
           {(status === 'active' || status === 'completed' || status === 'failed') && (
             <View className="mb-3">
               <ProgressBar value={c.current / c.target} color={status === 'failed' ? '#EF4444' : '#4CAF50'} />
-              <Text className={`${textSecondaryColor} text-xs mt-1 font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm mt-1 font-['SFProDisplayRegular']`}>
                 {c.current} из {c.target} {def.unit} · {statusText}
               </Text>
             </View>
@@ -107,10 +107,10 @@ const ProgressScreen = () => {
           )}
           {status === 'failed' && (
             <TouchableOpacity onPress={() => startChallenge(def.id)} activeOpacity={Opacity.press} className={`rounded-xl py-2.5 items-center border ${isDark ? 'border-gray-600' : 'border-gray-300'}`}>
-              <Text className={`${textColor} text-sm font-['SFProDisplayRegular']`}>Попробовать снова</Text>
+              <Text className={`${textColor} text-base font-['SFProDisplayRegular']`}>Попробовать снова</Text>
             </TouchableOpacity>
           )}
-          {status === 'claimed' && <Text className="text-[#4CAF50] text-xs font-['SFProDisplayRegular']">✓ {statusText}</Text>}
+          {status === 'claimed' && <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">✓ {statusText}</Text>}
         </View>
       </FadeInView>
     );
@@ -130,14 +130,14 @@ const ProgressScreen = () => {
         <FinGuide size={72} mood="happy" />
         <View className="flex-1 ml-3">
           <Text className={`${textColor} text-xl font-['SFProDisplaySemiBold']`}>{level.level.title}</Text>
-          <Text className={`${textSecondaryColor} text-xs mb-2 font-['SFProDisplayRegular']`}>
+          <Text className={`${textSecondaryColor} text-sm mb-2 font-['SFProDisplayRegular']`}>
             {level.next ? `${xp.total} / ${level.next.xp} XP до «${level.next.title}»` : `${xp.total} XP — максимальный уровень`}
           </Text>
           <ProgressBar value={level.progress} />
         </View>
         <View className="items-center ml-3">
           <Text className="text-lg font-['SFProDisplayBold'] text-[#F59E0B]">🪙 {coins.balance}</Text>
-          <Text className={`${textSecondaryColor} text-[10px] font-['SFProDisplayRegular']`}>монеты</Text>
+          <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>монеты</Text>
         </View>
       </View>
 
@@ -149,7 +149,7 @@ const ProgressScreen = () => {
             activeOpacity={Opacity.press}
             className={`flex-1 py-2 rounded-full items-center border ${tab === t.key ? 'bg-[#4CAF50] border-[#4CAF50]' : isDark ? 'border-gray-700' : 'border-gray-300'}`}
           >
-            <Text className={`text-xs font-['SFProDisplayRegular'] ${tab === t.key ? 'text-white' : textSecondaryColor}`}>
+            <Text className={`text-sm font-['SFProDisplayRegular'] ${tab === t.key ? 'text-white' : textSecondaryColor}`}>
               {t.label}
               {t.key === 'challenges' && challenges.some((c) => c.status === 'completed') ? ' •' : ''}
               {t.key === 'rewards' && boxes > 0 ? ` (${boxes})` : ''}
@@ -177,7 +177,7 @@ const ProgressScreen = () => {
                       <Text className={`${textColor} text-sm font-['SFProDisplaySemiBold']`}>
                         {l.title} · {l.xp} XP
                       </Text>
-                      <Text className={`${textSecondaryColor} text-xs font-['SFProDisplayRegular']`}>
+                      <Text className={`${textSecondaryColor} text-sm font-['SFProDisplayRegular']`}>
                         {l.perks} · 🪙 {l.bonusCoins}
                       </Text>
                     </View>
@@ -207,7 +207,7 @@ const ProgressScreen = () => {
 
           {tab === 'challenges' && (
             <>
-              <Text className={`${textSecondaryColor} text-xs mb-3 font-['SFProDisplayRegular']`}>
+              <Text className={`${textSecondaryColor} text-sm mb-3 font-['SFProDisplayRegular']`}>
                 Челлендж засчитывается по данным, которые вы вносите после старта.
               </Text>
               {[...challenges]
@@ -224,7 +224,7 @@ const ProgressScreen = () => {
                 <Text className={`${textColor} text-base font-['SFProDisplaySemiBold']`}>
                   {boxes > 0 ? `Сундуков к открытию: ${boxes}` : 'Сундуков пока нет'}
                 </Text>
-                <Text className={`${textSecondaryColor} text-xs text-center mt-1 mb-3 font-['SFProDisplayRegular']`}>
+                <Text className={`${textSecondaryColor} text-sm text-center mt-1 mb-3 font-['SFProDisplayRegular']`}>
                   Сундук выдаётся за каждый новый уровень и выполненный челлендж. Внутри — монеты, скин ФинГида или совет.
                 </Text>
                 <TouchableOpacity
@@ -256,7 +256,7 @@ const ProgressScreen = () => {
                         activeOpacity={Opacity.press}
                         className={`mt-2 rounded-lg px-3 py-1.5 ${active ? '' : owned ? 'bg-[#4CAF50]' : 'bg-[#F59E0B]'}`}
                       >
-                        <Text className={`text-xs font-['SFProDisplaySemiBold'] ${active ? 'text-[#4CAF50]' : 'text-white'}`}>
+                        <Text className={`text-sm font-['SFProDisplaySemiBold'] ${active ? 'text-[#4CAF50]' : 'text-white'}`}>
                           {active ? 'Выбран' : owned ? 'Выбрать' : `🪙 ${skin.price}`}
                         </Text>
                       </TouchableOpacity>
