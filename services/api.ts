@@ -1,6 +1,7 @@
 import { AppState } from '@/hooks/useStore';
 import axios from 'axios';
 import { API_BASE_URL } from './apiConfig';
+import type { StatementResult } from '@/utils/statementImport';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStaticTips } from '@/constants/staticTips';
 import { AppSettings, DEFAULT_APP_SETTINGS, mergeAppSettings } from '@/constants/appSettings';
@@ -45,6 +46,8 @@ api.interceptors.request.use(async (config) => {
 
 // Таймаут по умолчанию для нативных fetch-запросов (мс)
 const FETCH_TIMEOUT_MS = 15000;
+/** Загрузка и разбор выписки на много страниц на медленном интернете — дольше обычного запроса. */
+const STATEMENT_TIMEOUT_MS = 60000;
 
 /**
  * Обёртка над fetch с таймаутом через AbortController.
@@ -487,6 +490,48 @@ export const deleteUserDataFromServer = async (
     console.error('Error deleting user data from server:', error);
     throw error;
   }
+};
+
+/** Выбранный PDF: на телефоне — uri, в вебе ещё и сам File. */
+export interface StatementFile {
+  uri: string;
+  name: string;
+  mimeType?: string | null;
+  file?: File;
+}
+
+/**
+ * Отправляет PDF-выписку на разбор. Файл нужен серверу только на время
+ * разбора и не сохраняется. Ошибки сервера уже на русском — отдаём их как есть.
+ */
+export const parseStatementPdf = async (file: StatementFile): Promise<StatementResult> => {
+  const token = await getAccessToken();
+  if (!token) throw new Error('Войдите в приложение, чтобы загрузить выписку.');
+
+  const form = new FormData();
+  if (file.file) {
+    form.append('file', file.file, file.name);
+  } else {
+    // React Native отправляет файл по uri в таком виде.
+    form.append('file', { uri: file.uri, name: file.name, type: file.mimeType || 'application/pdf' } as unknown as Blob);
+  }
+
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/public/statements/parse`,
+      { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form },
+      STATEMENT_TIMEOUT_MS
+    );
+  } catch (error: any) {
+    throw new Error(error?.message?.includes('время ожидания') ? error.message : 'Нет связи с сервером. Проверьте интернет и попробуйте снова.');
+  }
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.error || 'Не получилось разобрать выписку. Попробуйте ещё раз.');
+  }
+  return data as StatementResult;
 };
 
 export default api;

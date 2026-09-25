@@ -34,6 +34,7 @@ type FinanceSlice = Pick<
   | 'getWalletBalance'
   | 'addExpences'
   | 'addIncomes'
+  | 'importRecords'
   | 'addActives'
   | 'addPassives'
   | 'updateExpences'
@@ -62,8 +63,8 @@ export const createFinanceSlice: SliceCreator<FinanceSlice> = (set, get) => ({
   currentAsset: null,
   totalBalance: '1 990 000 ₸',
   walletBalance: '0 ₸',
-  walletBalanceEUR: '0 $',
-  walletBalanceUSD: '0 €',
+  walletBalanceEUR: '0 €',
+  walletBalanceUSD: '0 $',
   wallets: [],
   currentEditWalletId: '',
 
@@ -143,6 +144,30 @@ export const createFinanceSlice: SliceCreator<FinanceSlice> = (set, get) => ({
       );
 
       return { incomes: newIncomes, categories: updatedCategories };
+    }),
+
+  importRecords: ({ incomes, expences }) =>
+    set((state) => {
+      const stamp = (record: Omit<Asset, 'id'>): Asset => ({
+        ...record,
+        id: state.generateId(),
+        createdAt: record.createdAt ?? new Date(),
+      });
+      const newIncomes = [...state.incomes, ...incomes.map(stamp)];
+      const newExpences = [...state.expences, ...expences.map(stamp)];
+      const total = (assets: Asset[]) => assets.reduce((sum, asset) => sum + asset.amount, 0);
+
+      const updatedCategories = state.categories.map((category) => {
+        if (category.id === 'income' && incomes.length) {
+          return { ...category, title: 'Доходы', balance: `${total(newIncomes)} ₸`, items: assetsToItems(newIncomes, '#E91E63') };
+        }
+        if (category.id === 'expence' && expences.length) {
+          return { ...category, title: 'Расходы', balance: `${total(newExpences)} ₸`, items: assetsToItems(newExpences, '#E91E63') };
+        }
+        return category;
+      });
+
+      return { incomes: newIncomes, expences: newExpences, categories: updatedCategories };
     }),
 
   // Обновление
@@ -279,10 +304,13 @@ export const createFinanceSlice: SliceCreator<FinanceSlice> = (set, get) => ({
     const allSummUSD = sumBy((x) => x.currency.includes('$'));
     const allSummEUR = sumBy((x) => x.currency.includes('€'));
 
+    // С разделителями разрядов, как суммы доходов и расходов (formatAmount).
+    const format = (value: number) => new Intl.NumberFormat('ru-RU').format(value);
+
     set({
-      walletBalance: `${allSumm} ₸`,
-      walletBalanceUSD: `${allSummUSD} $`,
-      walletBalanceEUR: `${allSummEUR} €`,
+      walletBalance: `${format(allSumm)} ₸`,
+      walletBalanceUSD: `${format(allSummUSD)} $`,
+      walletBalanceEUR: `${format(allSummEUR)} €`,
     });
   },
 });

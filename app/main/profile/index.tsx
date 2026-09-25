@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import ConfirmationDrawer from '@/app/components/MiniDrawer';
 import Drawer from '@/app/components/Drawer';
@@ -345,6 +346,39 @@ const ProfileScreen = () => {
           </View>
         </TouchableOpacity>
 
+
+        {/* Импорт выписки — отдельная карточка над меню: функция новая и заметная. */}
+        <FadeInView>
+          <TouchableOpacity
+            onPress={() => router.push('/main/profile/import-statement')}
+            activeOpacity={Opacity.press}
+            className="mb-4"
+          >
+            <LinearGradient
+              colors={['#4CAF50', '#2E7D32']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              // Стиль, а не className: NativeWind не применяет классы к LinearGradient.
+              style={{ borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center' }}
+            >
+              <View className="w-12 h-12 rounded-full bg-white/20 items-center justify-center">
+                <Ionicons name="document-attach" size={24} color="white" />
+              </View>
+              <View className="flex-1 ml-3 mr-2">
+                <View className="flex-row items-center">
+                  <Text className="text-white text-base font-['SFProDisplaySemiBold']">Импорт выписки</Text>
+                  <View className="ml-2 px-2 py-0.5 rounded-full bg-white/25">
+                    <Text className="text-white text-xs font-['SFProDisplaySemiBold']">Новое</Text>
+                  </View>
+                </View>
+                <Text className="text-white/85 text-sm mt-0.5 font-['SFProDisplayRegular']">
+                  PDF из банка — операции добавятся сами
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="white" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </FadeInView>
 
         {/* Menu Items */}
         <View className="mb-8">

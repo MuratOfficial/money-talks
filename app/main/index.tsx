@@ -9,6 +9,17 @@ import useFinancialStore from '@/hooks/useStore';
 import FadeInView from '../components/FadeInView';
 import { Opacity, Motion } from '@/constants/design';
 import ChallengeBanner from '@/app/components/ChallengeBanner';
+import { parseStoredAmount } from '@/hooks/store/initialData';
+
+/**
+ * Суммы доходов и расходов стор хранит строками вида «1086042.32 ₸» — без
+ * разрядов и с точкой. Приводим к «1 086 042,32 ₸» при выводе: так
+ * исправляются и записи, уже сохранённые у пользователей.
+ */
+const prettyTenge = (value?: string) =>
+  value && /₸\s*$/.test(value)
+    ? `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(parseStoredAmount(value))} ₸`
+    : value;
 
 const MainScreen = () => {
   const { setGoalFilter, categories, wallets, walletBalance, walletBalanceEUR, walletBalanceUSD, getWalletBalance, theme, pickEditWallet } = useFinancialStore();
@@ -73,7 +84,7 @@ const MainScreen = () => {
       items: wallets.map(x => ({
         id: x.id,
         name: x.name,
-        amount: `${x.summ.toString()} ${x.currency}`,
+        amount: `${new Intl.NumberFormat('ru-RU').format(x.summ)} ${x.currency}`,
         color: x.color,
         icon: x.icon || 'card',
         iconType: "ionicons",
@@ -126,7 +137,7 @@ const MainScreen = () => {
           adjustsFontSizeToFit
           minimumFontScale={0.75}
         >
-          {item.amount}
+          {prettyTenge(item.amount)}
         </Text>
       )}
       {item.excluded && (
@@ -146,7 +157,7 @@ const MainScreen = () => {
           </Text>
           {category.balance && (
             <Text className={`${textSecondaryColor} text-sm w-52 font-['SFProDisplayRegular']`}>
-              {category.balance} {category?.balanceUSD && `- ${category?.balanceUSD}`} {category?.balanceEUR && `- ${category?.balanceEUR}`}
+              {prettyTenge(category.balance)} {category?.balanceUSD && `- ${category?.balanceUSD}`} {category?.balanceEUR && `- ${category?.balanceEUR}`}
             </Text>
           )}
         </View>

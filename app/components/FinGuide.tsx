@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop, Text as SvgText } from 'react-native-svg';
 import useFinancialStore from '@/hooks/useStore';
@@ -34,9 +34,12 @@ const FinGuide: React.FC<FinGuideProps> = ({ size = 96, mood = 'happy', animated
   const activeSkin = useFinancialStore((s) => s.activeSkin);
   const skinId = skin ?? activeSkin;
   const palette = FINGUIDE_SKINS.find((s) => s.id === skinId)?.palette ?? FINGUIDE_SKINS[0].palette;
-  // id градиента должен различаться у скинов: на вебе id глобальные, и все
-  // персонажи на экране брали цвет тела у первого.
-  const gradientId = `finguide-body-${skinId}`;
+  // id градиента уникален для каждого персонажа: на вебе id глобальные на весь
+  // документ, а навигатор держит прошлые экраны смонтированными и скрытыми.
+  // С общим id тело брало градиент из скрытого экрана — браузер его не рисует,
+  // и тело становилось прозрачным. useId даёт «:r1:» — двоеточия в url(#…) не годятся.
+  const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const gradientId = `finguide-body-${skinId}-${instanceId}`;
 
   const bob = useRef(new Animated.Value(0)).current;
   const headTilt = useRef(new Animated.Value(0)).current;

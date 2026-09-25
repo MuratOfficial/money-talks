@@ -74,6 +74,7 @@ describe('getWalletBalance', () => {
       ],
     });
     useFinancialStore.getState().getWalletBalance();
-    expect(useFinancialStore.getState().walletBalance).toBe('1500 ₸');
+    // Intl разделяет разряды неразрывным пробелом — сравниваем с обычным.
+    expect(useFinancialStore.getState().walletBalance.replace(/\s/g, ' ')).toBe('1 500 ₸');
   });
 });

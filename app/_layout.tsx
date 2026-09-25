@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { useFonts } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
@@ -17,6 +17,15 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { isAuthenticated, user } = useFinancialStore();
   const { syncToServer, isSyncing, syncError, clearSyncError, isOnline } = useSync();
+
+  // Баннер «нет интернета» висит поверх шапки экрана и закрывал кнопку «Назад»,
+  // а закрыть его было нельзя. Теперь он скрывается сам или по нажатию и
+  // появляется снова, только когда связь пропадёт ещё раз.
+  const [offlineDismissed, setOfflineDismissed] = useState(false);
+  const dismissOffline = useCallback(() => setOfflineDismissed(true), []);
+  useEffect(() => {
+    if (isOnline) setOfflineDismissed(false);
+  }, [isOnline]);
 
   // Держим актуальную ссылку на syncToServer, чтобы подписка на AppState
   // не захватывала устаревшее замыкание со старыми данными стора
@@ -73,11 +82,11 @@ export default function RootLayout() {
         {/* Синхронизация — фоновый процесс: показываем её тонкой полосой,
             а не баннером с текстом поверх контента. */}
         <SyncActivityIndicator active={isSyncing && isAuthenticated} />
-        {!isOnline && (
+        {!isOnline && !offlineDismissed && (
           <SyncStatusBanner
             message="Нет подключения к интернету — изменения сохранены локально"
-            onDismiss={() => {}}
-            autoHideMs={0}
+            onDismiss={dismissOffline}
+            autoHideMs={6000}
           />
         )}
         {isOnline && (

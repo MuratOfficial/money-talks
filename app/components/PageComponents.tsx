@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Href, useRouter } from 'expo-router';
+import { Href, useLocalSearchParams, useRouter } from 'expo-router';
 import Drawer from './Drawer';
 import useFinancialStore, { Asset } from '@/hooks/useStore';
 import PaymentModal from './PaymentModal';
@@ -18,7 +18,7 @@ import InfoModal from './HintWithChat';
 import FinGuidePointer from './FinGuidePointer';
 import { useHintPointer } from '@/hooks/useHintPointer';
 import LoadingAnimation from './LoadingAnimation';
-import { filterAssetsByDate, DateFilterType } from '@/utils/dateFilters';
+import { filterAssetsByDate, DateFilterType, DATE_FILTERS } from '@/utils/dateFilters';
 import { goBack } from '@/utils/navigation';
 import { RecordKind, categoryLabel } from '@/constants/categories';
 import MonthlyTrends from './MonthlyTrends';
@@ -112,7 +112,12 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
 
  const router = useRouter();
   const [showDrawerFilter, setShowDrawerFilter] = useState(false);
-  const [selectedSortFilter, setSelectedSortFilter] = useState('Сегодня');
+  // Период можно передать в адресе (?period=Все время) — так открывает раздел
+  // экран импорта выписки: у импортированных операций прошлые даты.
+  const { period } = useLocalSearchParams<{ period?: string }>();
+  const [selectedSortFilter, setSelectedSortFilter] = useState<string>(
+    DATE_FILTERS.includes(period as DateFilterType) ? (period as string) : 'Сегодня'
+  );
 
   const [paymentModalShow, setPaymentModalShow] = useState(false);
 
@@ -157,6 +162,41 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
   const currentAssets = filterAssetsByDate(filteredByCategory, selectedSortFilter as DateFilterType);
 
   const totalAmount = currentAssets?.reduce((sum, asset) => sum + asset.amount, 0);
+
+  // Раздел пуст только из-за фильтров? Подсказываем, где записи: иначе кажется,
+  // что их нет. Особенно после импорта выписки — у операций прошлые даты и
+  // чаще всего «Нерегулярные», а по умолчанию открыты «Сегодня» и «Регулярные».
+  const byCategoryTab = (list: Asset[], tab: string) =>
+    categories && categories[0].id !== 'effect' && !isPassive ? list.filter((x) => x.categoryTab === tab) : list;
+  const byPeriod = (list: Asset[]) => filterAssetsByDate(list, selectedSortFilter as DateFilterType);
+  const otherReg = currentRegOption === 'regular' ? 'irregular' : 'regular';
+  const otherCategory = categories?.find((c) => c.id !== currentCategoryOption);
+  const filterHints: { label: string; onPress: () => void }[] = [];
+  if (!isAnalyze && assets?.length && !currentAssets.length) {
+    if (selectedSortFilter !== 'Все время' && filteredByCategory.length) {
+      filterHints.push({ label: `За всё время · ${filteredByCategory.length}`, onPress: () => setSelectedSortFilter('Все время') });
+    }
+    const inOtherReg = byPeriod(byCategoryTab(assets.filter((x) => x.regularity === otherReg), currentCategoryOption)).length;
+    if (tab1 && tab2 && inOtherReg) {
+      filterHints.push({ label: `${otherReg === 'regular' ? tab1 : tab2} · ${inOtherReg}`, onPress: () => setRegOption(otherReg) });
+    }
+    const inOtherCategory = otherCategory ? byPeriod(byCategoryTab(filteredByRegularity, otherCategory.id)).length : 0;
+    if (otherCategory && inOtherCategory) {
+      filterHints.push({ label: `${otherCategory.label} · ${inOtherCategory}`, onPress: () => setCategoryOption(otherCategory.id) });
+    }
+    // Записи скрыты сразу несколькими фильтрами — открываем там, где первая из них.
+    if (!filterHints.length) {
+      const first = assets[0];
+      filterHints.push({
+        label: `Показать записи · ${assets.length}`,
+        onPress: () => {
+          setSelectedSortFilter('Все время');
+          if (first.regularity) setRegOption(first.regularity);
+          if (first.categoryTab && categories?.some((c) => c.id === first.categoryTab)) setCategoryOption(first.categoryTab);
+        },
+      });
+    }
+  }
 
   const getTotal = (assets:Asset[]): string => {
     const sum = assets.reduce((sum, asset) => sum + asset.amount, 0) || 0;
@@ -539,12 +579,26 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
         
       </ScrollView> : <View className="flex-1 justify-center items-center px-8">
         <Text className={`${textColor} text-base font-['SFProDisplayRegular'] mb-3 text-center`}>
-         {emptyTitle }
+         {filterHints.length ? 'С этими фильтрами записей нет' : emptyTitle}
         </Text>
-        
-        <Text className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm text-center font-['SFProDisplayRegular'] mb-8`}>
-          {emptyDesc}
+
+        <Text className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm text-center font-['SFProDisplayRegular'] ${filterHints.length ? 'mb-4' : 'mb-8'}`}>
+          {filterHints.length ? 'Но в разделе есть записи — они здесь:' : emptyDesc}
         </Text>
+        {filterHints.length > 0 && (
+          <View className="flex-row flex-wrap justify-center mb-8">
+            {filterHints.map((hint) => (
+              <TouchableOpacity
+                key={hint.label}
+                onPress={hint.onPress}
+                activeOpacity={Opacity.press}
+                className="px-4 py-2 m-1 rounded-full border border-[#4CAF50]"
+              >
+                <Text className="text-[#4CAF50] text-sm font-['SFProDisplayRegular']">{hint.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
         {isAnalyze === true ? "" : <TouchableOpacity
           className={`border-2 ${isDark ? 'border-white' : 'border-gray-900'} rounded-2xl px-8 py-1 flex-row items-center`}
           onPress={handleAddExpense}
@@ -577,7 +631,7 @@ const PageComponent = ({title, analyzeList, isAnalyze = false, isPassive, assetN
           onClose={() => setShowDrawerFilter(false)}
           onSelect={handleSortSelectFilter}
           selectedValue={selectedSortFilter}
-          options={ ['Сегодня', 'За месяц', 'За год', 'Все время']}
+          options={DATE_FILTERS}
           />
 
           <InfoModal

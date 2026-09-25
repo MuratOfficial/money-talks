@@ -270,6 +270,11 @@ export interface AppState extends GamificationState {
   // Расходы Доходы
   addExpences: (expence: Omit<Asset, 'id'>) => void;
   addIncomes: (income: Omit<Asset, 'id'>) => void;
+  /**
+   * Пакетное добавление из выписки банка: дата записи — дата операции
+   * (а не сегодняшняя, как у addIncomes/addExpences), итоги пересчитываются один раз.
+   */
+  importRecords: (records: { incomes: Omit<Asset, 'id'>[]; expences: Omit<Asset, 'id'>[] }) => void;
 
   // Активы
   addActives: (active: Omit<Asset, 'id'>) => void;
